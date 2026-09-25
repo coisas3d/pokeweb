@@ -5,63 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PokeWeb - Coisas 3D</title>
     <style>
-        body {
-            margin: 0; padding: 0; background-color: #2c3e50;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; font-family: 'Courier New', Courier, monospace; color: #333;
-        }
+        body { margin: 0; padding: 0; background-color: #2c3e50; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Courier New', Courier, monospace; color: #333; }
+        #app-container { width: 90%; max-width: 400px; height: 500px; background-color: #f8f1e5; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column; position: relative; }
 
-        #app-container {
-            width: 90%; max-width: 400px; height: 500px;
-            background-color: #f1f2f6; border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;
-            display: flex; flex-direction: column; position: relative;
-        }
-
-        /* Classes para alternar ecrãs */
         .screen { display: none; flex-direction: column; height: 100%; }
         .screen.active { display: flex; }
 
-        /* Estilos dos ecrãs de seleção */
-        .selecao-header { background-color: #34495e; color: white; padding: 20px; text-align: center; font-weight: bold; }
+        .selecao-header { background-color: #333; color: white; padding: 20px; text-align: center; font-weight: bold; }
         .opcoes-grid { display: flex; flex-direction: column; gap: 15px; padding: 20px; flex-grow: 1; justify-content: center; }
         
+        /* Layout dos botões baseado na referência enviada */
         .btn-opcao {
-            background-color: #ecf0f1; border: 3px solid #bdc3c7; padding: 15px;
-            border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 0 #bdc3c7; transition: transform 0.1s; text-align: center;
+            display: flex; align-items: center; padding: 10px 20px;
+            border-radius: 10px; border: 2px solid #333; cursor: pointer;
+            font-size: 18px; font-weight: bold; font-family: 'Courier New', Courier, monospace;
+            box-shadow: 0 4px 0 #333; transition: transform 0.1s;
         }
-        .btn-opcao:active { transform: translateY(4px); box-shadow: 0 0 0 #bdc3c7; }
+        .btn-opcao:active { transform: translateY(4px); box-shadow: 0 0 0 #333; }
+        .btn-opcao img { width: 45px; image-rendering: pixelated; margin-right: 15px; }
+        
+        /* Cores específicas dos botões de região e tipos */
+        .btn-regiao { background-color: #fff; justify-content: center; padding: 15px; }
+        .btn-tipo-grama { background-color: #c8e6c9; }
+        .btn-tipo-fogo { background-color: #ffcdd2; }
+        .btn-tipo-agua { background-color: #b3e5fc; }
 
         /* Estilos do Jogo Principal */
         .status-bar { display: flex; justify-content: space-around; background-color: #a8d5a2; padding: 15px 0; font-weight: bold; font-size: 18px; border-bottom: 3px solid #7cb575; z-index: 5; }
         #tela-jogo { flex-grow: 1; background-color: #ccebc5; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: 4px solid #333; position: relative; }
-        
         #controles { display: flex; justify-content: center; padding: 20px; background-color: #ecf0f1; }
         .btn-principal { background-color: #e74c3c; color: white; border: none; padding: 15px 0; width: 80%; border-radius: 10px; font-size: 20px; font-weight: bold; box-shadow: 0 5px 0 #c0392b; cursor: pointer; }
         .btn-principal:active { transform: translateY(5px); box-shadow: 0 0 0 #c0392b; }
 
-        /* Sprites e Ovos */
         .sprite-container { display: flex; justify-content: center; align-items: center; flex-direction: column; }
         .sprite-container img { width: 90px; image-rendering: pixelated; animation: pular 1s infinite alternate; }
         
-        /* Design do Ovo CSS */
-        .ovo {
-            width: 80px; height: 100px; background-color: #fdf5e6;
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.1);
-            animation: pular 1s infinite alternate, tremer 2s infinite;
-        }
-        .ovo-grass { border: 5px solid #2ecc71; }
-        .ovo-fire { border: 5px solid #e74c3c; }
-        .ovo-water { border: 5px solid #3498db; }
+        /* Ovos com as cores atualizadas para a tipagem correta */
+        .ovo { width: 80px; height: 100px; background-color: #fdf5e6; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.1); animation: pular 1s infinite alternate, tremer 2s infinite; }
+        .ovo-grama { border: 5px solid #2ecc71; }
+        .ovo-fogo { border: 5px solid #e74c3c; }
+        .ovo-agua { border: 5px solid #3498db; }
         
         #tempo-eclosao { margin-top: 20px; font-weight: bold; font-size: 14px; color: #333; }
 
         @keyframes pular { from { transform: translateY(0); } to { transform: translateY(-10px); } }
         @keyframes tremer { 0% { margin-left: 0; } 10% { margin-left: -5px; } 20% { margin-left: 5px; } 30% { margin-left: 0; } }
 
-        /* Menu Overlay */
         #menu-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(44, 62, 80, 0.95); flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 85%; }
         .menu-btn { background-color: #3498db; color: white; border: none; padding: 20px 10px; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 5px 0 #2980b9; cursor: pointer; }
@@ -72,22 +61,21 @@
 <body>
 
     <div id="app-container">
-        
         <!-- ECRÃ 1: ESCOLHER REGIÃO -->
         <div id="screen-region" class="screen">
-            <div class="selecao-header">ESCOLHA A REGIÃO</div>
+            <div class="selecao-header">ESCOLHA UMA REGIÃO</div>
             <div class="opcoes-grid">
-                <button class="btn-opcao" onclick="mostrarStarters('kanto')">Kanto</button>
-                <button class="btn-opcao" onclick="mostrarStarters('johto')">Johto</button>
-                <button class="btn-opcao" onclick="mostrarStarters('hoenn')">Hoenn</button>
+                <button class="btn-opcao btn-regiao" onclick="mostrarStarters('kanto')">KANTO</button>
+                <button class="btn-opcao btn-regiao" onclick="mostrarStarters('johto')">JOHTO</button>
+                <button class="btn-opcao btn-regiao" onclick="mostrarStarters('hoenn')">HOENN</button>
             </div>
         </div>
 
         <!-- ECRÃ 2: ESCOLHER STARTER -->
         <div id="screen-starter" class="screen">
-            <div class="selecao-header">ESCOLHA O SEU PARCEIRO</div>
+            <div class="selecao-header">ESCOLHA SEU PARCEIRO</div>
             <div class="opcoes-grid" id="lista-starters">
-                <!-- Injetado via JS -->
+                <!-- Botões coloridos com sprites injetados via JS -->
             </div>
         </div>
 
@@ -98,9 +86,7 @@
                 <span id="fome">Fome: --%</span>
             </div>
             <div id="tela-jogo">
-                <div class="sprite-container" id="monstrinho">
-                    <!-- Ovo ou Sprite PMDCollab injetado aqui -->
-                </div>
+                <div class="sprite-container" id="monstrinho"></div>
                 <div id="tempo-eclosao"></div>
             </div>
             <div id="controles">
@@ -117,7 +103,6 @@
                 <button class="menu-btn btn-voltar" onclick="fecharMenu()">VOLTAR</button>
             </div>
         </div>
-
     </div>
 
     <script src="database.js"></script>
@@ -127,13 +112,15 @@
         let mascoteAtivo = null;
         let loopEclosao = null;
 
-        // --- SISTEMA DE ECRÃS ---
+        function formatarIDPMDCollab(id) {
+            return String(id).padStart(4, '0');
+        }
+
         function mostrarEcra(idEcra) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(idEcra).classList.add('active');
         }
 
-        // --- FLUXO DE INICIALIZAÇÃO ---
         async function iniciarJogo() {
             try {
                 let saveState = await loadGame();
@@ -151,21 +138,30 @@
             }
         }
 
+        function gerarBotaoStarter(id, nome, tipo) {
+            const pmdID = formatarIDPMDCollab(id);
+            const imgUrl = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${pmdID}/Normal.png`;
+            return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
+                        <img src="${imgUrl}" alt="${nome}">
+                        <span>${nome.toUpperCase()}</span>
+                    </button>`;
+        }
+
         function mostrarStarters(regiao) {
             const lista = document.getElementById('lista-starters');
             let html = '';
             if (regiao === 'kanto') {
-                html = `<button class="btn-opcao" onclick="escolherStarter(1)">Bulbasaur (Erva)</button>
-                        <button class="btn-opcao" onclick="escolherStarter(4)">Charmander (Fogo)</button>
-                        <button class="btn-opcao" onclick="escolherStarter(7)">Squirtle (Água)</button>`;
+                html = gerarBotaoStarter(1, "Bulbasaur", "grama") +
+                       gerarBotaoStarter(4, "Charmander", "fogo") +
+                       gerarBotaoStarter(7, "Squirtle", "agua");
             } else if (regiao === 'johto') {
-                html = `<button class="btn-opcao" onclick="escolherStarter(152)">Chikorita (Erva)</button>
-                        <button class="btn-opcao" onclick="escolherStarter(155)">Cyndaquil (Fogo)</button>
-                        <button class="btn-opcao" onclick="escolherStarter(158)">Totodile (Água)</button>`;
+                html = gerarBotaoStarter(152, "Chikorita", "grama") +
+                       gerarBotaoStarter(155, "Cyndaquil", "fogo") +
+                       gerarBotaoStarter(158, "Totodile", "agua");
             } else if (regiao === 'hoenn') {
-                html = `<button class="btn-opcao" onclick="escolherStarter(252)">Treecko (Erva)</button>
-                        <button class="btn-opcao" onclick="escolherStarter(255)">Torchic (Fogo)</button>
-                        <button class="btn-opcao" onclick="escolherStarter(258)">Mudkip (Água)</button>`;
+                html = gerarBotaoStarter(252, "Treecko", "grama") +
+                       gerarBotaoStarter(255, "Torchic", "fogo") +
+                       gerarBotaoStarter(258, "Mudkip", "agua");
             }
             lista.innerHTML = html;
             mostrarEcra('screen-starter');
@@ -176,11 +172,6 @@
             await saveGame(mascoteAtivo);
             mostrarEcra('screen-game');
             atualizarInterface();
-        }
-
-        // --- INTERFACE E LÓGICA DE ECLOSÃO ---
-        function formatarIDPMDCollab(id) {
-            return String(id).padStart(4, '0');
         }
 
         function atualizarInterface() {
@@ -195,41 +186,33 @@
             if (mascoteAtivo.isEgg) {
                 const tempoRestante = mascoteAtivo.hatchTime - Date.now();
                 if (tempoRestante <= 0) {
-                    // Eclodiu!
                     mascoteAtivo.isEgg = false;
                     saveGame(mascoteAtivo);
                     atualizarInterface();
                     if(loopEclosao) clearInterval(loopEclosao);
                 } else {
-                    // Ainda é um ovo, desenha com a cor do tipo
                     const tipo = mascoteAtivo.species.type;
                     container.innerHTML = `<div class="ovo ovo-${tipo}"></div>`;
                     textoEclosao.innerText = `A chocar... ${Math.ceil(tempoRestante/1000)}s`;
-                    
-                    // Atualiza o relógio a cada segundo
                     if(!loopEclosao) loopEclosao = setInterval(atualizarInterface, 1000);
                 }
             } else {
-                // Eclodido: Usa o sprite do PMDCollab
                 textoEclosao.innerText = "";
                 const pmdID = formatarIDPMDCollab(mascoteAtivo.species.id);
-                // Utiliza a diretoria 'portrait' e a imagem 'Normal.png' do repositório oficial PMDCollab
                 container.innerHTML = `<img src="https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${pmdID}/Normal.png" alt="${mascoteAtivo.species.name}">`;
             }
         }
 
-        // --- CONTROLOS DO MENU ---
         function abrirMenu() { document.getElementById('menu-overlay').style.display = 'flex'; }
         function fecharMenu() { document.getElementById('menu-overlay').style.display = 'none'; }
 
         async function executarAcao(acao) {
             if (!mascoteAtivo) return;
             if (mascoteAtivo.isEgg) {
-                alert("Ainda é um ovo! Espere que ecluda.");
+                alert("Ainda é um ovo! Espere que ecloda.");
                 fecharMenu();
                 return;
             }
-
             if (acao === 'alimentar') {
                 mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25);
                 await saveGame(mascoteAtivo);
