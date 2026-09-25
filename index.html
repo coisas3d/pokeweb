@@ -22,7 +22,7 @@
         }
         .btn-opcao:active { transform: translateY(4px); box-shadow: 0 0 0 #333; }
         
-        /* Retornando o fit correto para a imagem de retrato no menu */
+        /* O GIF no menu agora usa object-fit para manter a proporção sem distorcer */
         .btn-opcao img { width: 48px; height: 48px; object-fit: contain; margin-right: 15px; }
         
         .btn-regiao { background-color: #fff; justify-content: center; padding: 15px; }
@@ -61,7 +61,6 @@
 <body>
 
     <div id="app-container">
-        <!-- ECRÃ 1: ESCOLHER REGIÃO -->
         <div id="screen-region" class="screen">
             <div class="selecao-header">ESCOLHA UMA REGIÃO</div>
             <div class="opcoes-grid">
@@ -71,13 +70,11 @@
             </div>
         </div>
 
-        <!-- ECRÃ 2: ESCOLHER STARTER -->
         <div id="screen-starter" class="screen">
             <div class="selecao-header">ESCOLHA SEU PARCEIRO</div>
             <div class="opcoes-grid" id="lista-starters"></div>
         </div>
 
-        <!-- ECRÃ 3: JOGO PRINCIPAL -->
         <div id="screen-game" class="screen">
             <div class="status-bar">
                 <span id="nivel">Nvl: --</span>
@@ -89,7 +86,6 @@
                     <div id="ovo-visual"></div>
                     <div id="tempo-eclosao"></div>
                 </div>
-                <!-- Camada do Motor de Inteligência -->
                 <div id="sprite-layer"></div>
             </div>
 
@@ -135,7 +131,8 @@
                     this.element.style.position = 'absolute';
                     this.element.style.imageRendering = 'pixelated';
                     this.element.style.transformOrigin = 'center center';
-                    this.element.style.height = '60px'; // Tamanho uniforme na tela principal
+                    // Altura reduzida para uma proporção muito mais elegante
+                    this.element.style.height = '48px'; 
                     layer.appendChild(this.element);
                 }
                 this.isRunning = true;
@@ -144,7 +141,6 @@
 
             setPokemon(name) {
                 this.pokemonName = name.toLowerCase();
-                // Utiliza os GIFs da Gen 5 perfeitamente animados
                 this.element.src = `https://play.pokemonshowdown.com/sprites/gen5ani/${this.pokemonName}.gif`;
                 this.changeAction('Idle');
             },
@@ -161,15 +157,15 @@
 
             changeAction(newState) {
                 this.state = newState;
-                // A manipulação de scaleX espelha a imagem para simular o movimento nas duas direções
+                // Removido o scale(1.5) excessivo, mantendo apenas a inversão de eixo (scaleX) para espelhar o monstrinho
                 if (this.state === 'WalkLeft') {
                     this.direction = 'Left';
-                    this.element.style.transform = 'scaleX(1) scale(1.5)';
+                    this.element.style.transform = 'scaleX(1)';
                 } else if (this.state === 'WalkRight') {
                     this.direction = 'Right';
-                    this.element.style.transform = 'scaleX(-1) scale(1.5)';
+                    this.element.style.transform = 'scaleX(-1)';
                 } else {
-                    this.element.style.transform = (this.direction === 'Right') ? 'scaleX(-1) scale(1.5)' : 'scaleX(1) scale(1.5)';
+                    this.element.style.transform = (this.direction === 'Right') ? 'scaleX(-1)' : 'scaleX(1)';
                 }
             },
 
@@ -188,14 +184,14 @@
                     if (this.direction === 'Right') this.x += this.speed;
                     if (this.direction === 'Left') this.x -= this.speed;
 
-                    if (this.x < 40) { this.x = 40; this.changeAction('WalkRight'); }
-                    if (this.x > this.containerW - 40) { this.x = this.containerW - 40; this.changeAction('WalkLeft'); }
+                    if (this.x < 30) { this.x = 30; this.changeAction('WalkRight'); }
+                    if (this.x > this.containerW - 30) { this.x = this.containerW - 30; this.changeAction('WalkLeft'); }
                 }
             },
 
             draw() {
-                this.element.style.left = (this.x - 30) + 'px';
-                this.element.style.top = (this.y - 30) + 'px';
+                this.element.style.left = (this.x - 24) + 'px';
+                this.element.style.top = (this.y - 24) + 'px';
             },
 
             loop() {
@@ -229,9 +225,8 @@
         }
 
         function gerarBotaoStarter(id, nome, tipo) {
-            const pmdID = String(id).padStart(4, '0');
-            // Retorno à arquitetura estável da pasta portrait para menus estáticos
-            const imgUrl = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${pmdID}/Normal.png`;
+            // URL atualizada para usar o GIF animado no ecrã de seleção
+            const imgUrl = `https://play.pokemonshowdown.com/sprites/gen5ani/${nome.toLowerCase()}.gif`;
             return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
                         <img src="${imgUrl}" alt="${nome}">
                         <span>${nome.toUpperCase()}</span>
@@ -308,7 +303,7 @@
 
             if (acao === 'alimentar') {
                 if (PetEngine.dormindo) {
-                    alert("O monstrinho está dormindo!");
+                    alert("O monstrinho está a dormir!");
                 } else {
                     mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25);
                     await saveGame(mascoteAtivo);
