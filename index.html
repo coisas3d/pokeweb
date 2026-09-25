@@ -14,15 +14,8 @@
         .selecao-header { background-color: #333; color: white; padding: 20px; text-align: center; font-weight: bold; }
         .opcoes-grid { display: flex; flex-direction: column; gap: 15px; padding: 20px; flex-grow: 1; justify-content: center; }
         
-        .btn-opcao {
-            display: flex; align-items: center; padding: 10px 20px;
-            border-radius: 10px; border: 2px solid #333; cursor: pointer;
-            font-size: 18px; font-weight: bold; font-family: 'Courier New', Courier, monospace;
-            box-shadow: 0 4px 0 #333; transition: transform 0.1s;
-        }
+        .btn-opcao { display: flex; align-items: center; padding: 10px 20px; border-radius: 10px; border: 2px solid #333; cursor: pointer; font-size: 18px; font-weight: bold; font-family: 'Courier New', Courier, monospace; box-shadow: 0 4px 0 #333; transition: transform 0.1s; }
         .btn-opcao:active { transform: translateY(4px); box-shadow: 0 0 0 #333; }
-        
-        /* O GIF no menu agora usa object-fit para manter a proporção sem distorcer */
         .btn-opcao img { width: 48px; height: 48px; object-fit: contain; margin-right: 15px; }
         
         .btn-regiao { background-color: #fff; justify-content: center; padding: 15px; }
@@ -40,16 +33,42 @@
         .btn-principal:active { transform: translateY(5px); box-shadow: 0 0 0 #c0392b; }
 
         #ovo-container { display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
-        .ovo { width: 80px; height: 100px; background-color: #fdf5e6; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.1); animation: pular 1s infinite alternate, tremer 2s infinite; }
-        .ovo-grama { border: 5px solid #2ecc71; }
-        .ovo-fogo { border: 5px solid #e74c3c; }
-        .ovo-agua { border: 5px solid #3498db; }
-        #tempo-eclosao { margin-top: 25px; font-weight: bold; font-size: 16px; color: #333; }
+        
+        .ovo { 
+            width: 80px; height: 100px; 
+            background-color: #fdf5e6; 
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; 
+            box-shadow: inset -10px -15px 20px rgba(0,0,0,0.15), 0 10px 15px rgba(0,0,0,0.2); 
+            animation: ovo-tremendo 3s infinite; 
+        }
+        
+        .ovo-grama { background-image: radial-gradient(circle at 30% 30%, #2ecc71 12px, transparent 13px), radial-gradient(circle at 75% 60%, #2ecc71 18px, transparent 19px), radial-gradient(circle at 45% 85%, #2ecc71 10px, transparent 11px); }
+        .ovo-fogo { background-image: radial-gradient(circle at 30% 30%, #e74c3c 12px, transparent 13px), radial-gradient(circle at 75% 60%, #e74c3c 18px, transparent 19px), radial-gradient(circle at 45% 85%, #e74c3c 10px, transparent 11px); }
+        .ovo-agua { background-image: radial-gradient(circle at 30% 30%, #3498db 12px, transparent 13px), radial-gradient(circle at 75% 60%, #3498db 18px, transparent 19px), radial-gradient(circle at 45% 85%, #3498db 10px, transparent 11px); }
+        
+        #tempo-eclosao { margin-top: 30px; font-weight: bold; font-size: 16px; color: #333; background: rgba(255,255,255,0.5); padding: 5px 15px; border-radius: 15px; }
 
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
 
-        @keyframes pular { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-        @keyframes tremer { 0% { margin-left: 0; } 10% { margin-left: -5px; } 20% { margin-left: 5px; } 30% { margin-left: 0; } }
+        @keyframes ovo-tremendo { 
+            0%, 80% { transform: rotate(0deg) scale(1); }
+            85% { transform: rotate(-10deg) scale(1.05); }
+            90% { transform: rotate(10deg) scale(1.05); }
+            95% { transform: rotate(-10deg) scale(1.05); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+        
+        @keyframes rachando {
+            0% { filter: brightness(1); transform: scale(1); }
+            50% { filter: brightness(1.5) contrast(1.5); transform: scale(1.1) rotate(15deg); }
+            80% { filter: brightness(2) contrast(2); transform: scale(1.2) rotate(-15deg); }
+            100% { filter: brightness(5) contrast(3); transform: scale(1.5); opacity: 0; }
+        }
+
+        #screen-hatch { background-color: #2c3e50; justify-content: center; align-items: center; color: white; text-align: center; }
+        .hatch-container { background-color: rgba(0,0,0,0.4); padding: 40px; border-radius: 15px; width: 80%; display: flex; flex-direction: column; align-items: center; }
+        .hatch-texto { font-size: 22px; font-weight: bold; margin-bottom: 20px; min-height: 30px; }
+        #hatch-sprite { width: 80px; image-rendering: pixelated; margin-bottom: 30px; display: none; animation: ovo-tremendo 2s infinite; }
 
         #menu-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(44, 62, 80, 0.95); flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 85%; }
@@ -80,7 +99,6 @@
                 <span id="nivel">Nvl: --</span>
                 <span id="fome">Fome: --%</span>
             </div>
-            
             <div id="tela-jogo">
                 <div id="ovo-container">
                     <div id="ovo-visual"></div>
@@ -88,11 +106,9 @@
                 </div>
                 <div id="sprite-layer"></div>
             </div>
-
             <div id="controles">
                 <button class="btn-principal" onclick="abrirMenu()">MENU</button>
             </div>
-            
             <div id="menu-overlay">
                 <div class="menu-grid">
                     <button class="menu-btn" onclick="executarAcao('status')">Status</button>
@@ -103,6 +119,14 @@
                 <button class="menu-btn btn-voltar" onclick="fecharMenu()">VOLTAR</button>
             </div>
         </div>
+
+        <div id="screen-hatch" class="screen">
+            <div class="hatch-container">
+                <div id="hatch-texto" class="hatch-texto">Oh?...</div>
+                <img id="hatch-sprite" src="">
+                <button id="btn-hatch-continuar" class="btn-principal" style="display:none; width:100%; margin-top:10px;" onclick="concluirEclosao()">Continuar</button>
+            </div>
+        </div>
     </div>
 
     <script src="database.js"></script>
@@ -111,67 +135,46 @@
     <script>
         let mascoteAtivo = null;
         let loopEclosao = null;
+        let processoEclosaoEmAndamento = false;
 
-        // --- MOTOR DE INTELIGÊNCIA AUTÔNOMO OTIMIZADO ---
         const PetEngine = {
-            element: null, state: 'Idle', direction: 'Left',
-            x: 0, y: 0, containerW: 0, containerH: 0,
-            speed: 1.2, isRunning: false, pokemonName: '', dormindo: false,
-            actionTimer: 0,
+            element: null, state: 'Idle', direction: 'Left', x: 0, y: 0, containerW: 0, containerH: 0,
+            speed: 0.5, // <-- Velocidade desacelerada para um caminhar mais suave e natural
+            isRunning: false, pokemonName: '', dormindo: false, actionTimer: 0,
 
             init(layerId) {
                 const layer = document.getElementById(layerId);
-                this.containerW = layer.clientWidth;
-                this.containerH = layer.clientHeight;
-                this.x = this.containerW / 2;
-                this.y = this.containerH / 2;
+                this.containerW = layer.clientWidth; this.containerH = layer.clientHeight;
+                this.x = this.containerW / 2; this.y = this.containerH / 2;
                 
                 if (!this.element) {
                     this.element = document.createElement('img');
                     this.element.style.position = 'absolute';
                     this.element.style.imageRendering = 'pixelated';
                     this.element.style.transformOrigin = 'center center';
-                    // Altura reduzida para uma proporção muito mais elegante
                     this.element.style.height = '48px'; 
                     layer.appendChild(this.element);
                 }
-                this.isRunning = true;
-                this.loop();
+                this.isRunning = true; this.loop();
             },
-
             setPokemon(name) {
                 this.pokemonName = name.toLowerCase();
                 this.element.src = `https://play.pokemonshowdown.com/sprites/gen5ani/${this.pokemonName}.gif`;
                 this.changeAction('Idle');
             },
-
             setDormindo(status) {
                 this.dormindo = status;
-                if (this.dormindo) {
-                    this.element.style.filter = 'brightness(0.3)';
-                    this.changeAction('Idle');
-                } else {
-                    this.element.style.filter = 'none';
-                }
+                if (this.dormindo) { this.element.style.filter = 'brightness(0.3)'; this.changeAction('Idle'); } 
+                else { this.element.style.filter = 'none'; }
             },
-
             changeAction(newState) {
                 this.state = newState;
-                // Removido o scale(1.5) excessivo, mantendo apenas a inversão de eixo (scaleX) para espelhar o monstrinho
-                if (this.state === 'WalkLeft') {
-                    this.direction = 'Left';
-                    this.element.style.transform = 'scaleX(1)';
-                } else if (this.state === 'WalkRight') {
-                    this.direction = 'Right';
-                    this.element.style.transform = 'scaleX(-1)';
-                } else {
-                    this.element.style.transform = (this.direction === 'Right') ? 'scaleX(-1)' : 'scaleX(1)';
-                }
+                if (this.state === 'WalkLeft') { this.direction = 'Left'; this.element.style.transform = 'scaleX(1)'; } 
+                else if (this.state === 'WalkRight') { this.direction = 'Right'; this.element.style.transform = 'scaleX(-1)'; } 
+                else { this.element.style.transform = (this.direction === 'Right') ? 'scaleX(-1)' : 'scaleX(1)'; }
             },
-
             updateLogic() {
                 if (this.dormindo) return;
-
                 if (Date.now() > this.actionTimer) {
                     this.actionTimer = Date.now() + 2000 + Math.random() * 4000;
                     const r = Math.random();
@@ -179,25 +182,20 @@
                     else if (r < 0.70) this.changeAction('WalkRight');
                     else this.changeAction('Idle');
                 }
-
                 if (this.state.startsWith('Walk')) {
                     if (this.direction === 'Right') this.x += this.speed;
                     if (this.direction === 'Left') this.x -= this.speed;
-
                     if (this.x < 30) { this.x = 30; this.changeAction('WalkRight'); }
                     if (this.x > this.containerW - 30) { this.x = this.containerW - 30; this.changeAction('WalkLeft'); }
                 }
             },
-
             draw() {
                 this.element.style.left = (this.x - 24) + 'px';
                 this.element.style.top = (this.y - 24) + 'px';
             },
-
             loop() {
                 if (!this.isRunning) return;
-                this.updateLogic();
-                this.draw();
+                this.updateLogic(); this.draw();
                 requestAnimationFrame(() => this.loop());
             }
         };
@@ -219,29 +217,21 @@
                 } else {
                     mostrarEcra('screen-region');
                 }
-            } catch (erro) {
-                console.error("Erro fatal ao iniciar:", erro);
-            }
+            } catch (erro) { console.error("Erro fatal ao iniciar:", erro); }
         }
 
         function gerarBotaoStarter(id, nome, tipo) {
-            // URL atualizada para usar o GIF animado no ecrã de seleção
             const imgUrl = `https://play.pokemonshowdown.com/sprites/gen5ani/${nome.toLowerCase()}.gif`;
             return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
-                        <img src="${imgUrl}" alt="${nome}">
-                        <span>${nome.toUpperCase()}</span>
+                        <img src="${imgUrl}" alt="${nome}"><span>${nome.toUpperCase()}</span>
                     </button>`;
         }
 
         function mostrarStarters(regiao) {
             const lista = document.getElementById('lista-starters');
-            if (regiao === 'kanto') {
-                lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur", "grama") + gerarBotaoStarter(4, "Charmander", "fogo") + gerarBotaoStarter(7, "Squirtle", "agua");
-            } else if (regiao === 'johto') {
-                lista.innerHTML = gerarBotaoStarter(152, "Chikorita", "grama") + gerarBotaoStarter(155, "Cyndaquil", "fogo") + gerarBotaoStarter(158, "Totodile", "agua");
-            } else if (regiao === 'hoenn') {
-                lista.innerHTML = gerarBotaoStarter(252, "Treecko", "grama") + gerarBotaoStarter(255, "Torchic", "fogo") + gerarBotaoStarter(258, "Mudkip", "agua");
-            }
+            if (regiao === 'kanto') { lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur", "grama") + gerarBotaoStarter(4, "Charmander", "fogo") + gerarBotaoStarter(7, "Squirtle", "agua"); } 
+            else if (regiao === 'johto') { lista.innerHTML = gerarBotaoStarter(152, "Chikorita", "grama") + gerarBotaoStarter(155, "Cyndaquil", "fogo") + gerarBotaoStarter(158, "Totodile", "agua"); } 
+            else if (regiao === 'hoenn') { lista.innerHTML = gerarBotaoStarter(252, "Treecko", "grama") + gerarBotaoStarter(255, "Torchic", "fogo") + gerarBotaoStarter(258, "Mudkip", "agua"); }
             mostrarEcra('screen-starter');
         }
 
@@ -249,6 +239,41 @@
             mascoteAtivo = new PokemonInstance(id);
             await saveGame(mascoteAtivo);
             mostrarEcra('screen-game');
+            atualizarInterface();
+        }
+
+        function acionarEfeitoEclosao() {
+            if (processoEclosaoEmAndamento) return;
+            processoEclosaoEmAndamento = true;
+            if(loopEclosao) clearInterval(loopEclosao);
+            
+            const ovoVisual = document.getElementById('ovo-visual');
+            const textoEclosao = document.getElementById('tempo-eclosao');
+            
+            textoEclosao.innerText = "Está chocando!";
+            ovoVisual.style.animation = "rachando 2s forwards";
+
+            setTimeout(() => {
+                mostrarEcra('screen-hatch');
+                document.getElementById('hatch-texto').innerText = "Oh?...";
+                document.getElementById('hatch-sprite').style.display = "none";
+                document.getElementById('btn-hatch-continuar').style.display = "none";
+
+                setTimeout(() => {
+                    document.getElementById('hatch-texto').innerText = `Nasceu um ${mascoteAtivo.species.name.toUpperCase()}!`;
+                    const sprite = document.getElementById('hatch-sprite');
+                    sprite.src = `https://play.pokemonshowdown.com/sprites/gen5ani/${mascoteAtivo.species.name.toLowerCase()}.gif`;
+                    sprite.style.display = "block";
+                    document.getElementById('btn-hatch-continuar').style.display = "block";
+                }, 2000);
+            }, 1800);
+        }
+
+        function concluirEclosao() {
+            mascoteAtivo.isEgg = false;
+            saveGame(mascoteAtivo);
+            mostrarEcra('screen-game');
+            processoEclosaoEmAndamento = false;
             atualizarInterface();
         }
 
@@ -269,13 +294,20 @@
 
                 const tempoRestante = mascoteAtivo.hatchTime - Date.now();
                 if (tempoRestante <= 0) {
-                    mascoteAtivo.isEgg = false;
-                    saveGame(mascoteAtivo);
-                    atualizarInterface();
-                    if(loopEclosao) clearInterval(loopEclosao);
+                    acionarEfeitoEclosao();
                 } else {
                     visualOvo.className = `ovo ovo-${mascoteAtivo.species.type}`;
                     textoEclosao.innerText = `Chocando... ${Math.ceil(tempoRestante/1000)}s`;
+                    
+                    // Lógica Dinâmica da Curva de Antecipação (Animação Acelerada)
+                    if (tempoRestante <= 15000) {
+                        visualOvo.style.animationDuration = "0.5s"; // Faltam 15s: Tremor frenético
+                    } else if (tempoRestante <= 30000) {
+                        visualOvo.style.animationDuration = "1.5s"; // Faltam 30s: Tremor acelerado
+                    } else {
+                        visualOvo.style.animationDuration = "3s"; // Padrão: Tremor lento
+                    }
+
                     if(!loopEclosao) loopEclosao = setInterval(atualizarInterface, 1000);
                 }
             } else {
@@ -294,28 +326,16 @@
 
         async function executarAcao(acao) {
             if (!mascoteAtivo) return;
-            
-            if (mascoteAtivo.isEgg) {
-                alert("Ainda é um ovo! Espere chocar.");
-                fecharMenu();
-                return;
-            }
+            if (mascoteAtivo.isEgg) { alert("Ainda é um ovo! Espere chocar."); fecharMenu(); return; }
 
             if (acao === 'alimentar') {
-                if (PetEngine.dormindo) {
-                    alert("O monstrinho está a dormir!");
-                } else {
-                    mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25);
-                    await saveGame(mascoteAtivo);
-                    atualizarInterface();
-                }
-            }
-            else if (acao === 'dormir') {
+                if (PetEngine.dormindo) { alert("O monstrinho está a dormir!"); } 
+                else { mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25); await saveGame(mascoteAtivo); atualizarInterface(); }
+            } else if (acao === 'dormir') {
                 const telaJogo = document.getElementById('tela-jogo');
                 const isDormindo = telaJogo.classList.toggle('dormindo');
                 PetEngine.setDormindo(isDormindo);
             }
-            
             fecharMenu();
         }
 
