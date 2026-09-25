@@ -58,7 +58,7 @@
         .menu-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #2980b9; }
         .btn-voltar { background-color: #95a5a6; box-shadow: 0 5px 0 #7f8c8d; margin-top: 25px; width: 85%; }
 
-        /* NOVA TELA DE STATUS DETALHADA */
+        /* TELA DE STATUS AVANÇADA */
         #status-overlay {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background-color: #34495e; z-index: 20; color: white; flex-direction: column; 
@@ -118,7 +118,7 @@
                 <button class="menu-btn btn-voltar" onclick="fecharMenu()">VOLTAR</button>
             </div>
 
-            <!-- TELA DE STATUS AVANÇADA (SOBREPOSIÇÃO) -->
+            <!-- TELA DE STATUS ANALÍTICA COM NATUREZA -->
             <div id="status-overlay">
                 <div class="status-box">
                     <div class="status-header">
@@ -129,20 +129,21 @@
                         </div>
                     </div>
                     <div class="stat-line"><span>Level:</span> <span id="status-lvl">--</span></div>
-                    <div class="stat-line">
+                    <div class="stat-line"><span>Nature:</span> <span id="status-nature" style="color: #f1c40f;">--</span></div>
+                    <div class="stat-line" style="margin-top: 10px;">
                         <span>EXP: <span id="status-exp" style="font-size: 14px; font-weight:normal;">0%</span></span>
                     </div>
                     <div class="stat-bar-bg"><div id="status-exp-bar" class="stat-bar-fill" style="background-color: #3498db; width: 0%;"></div></div>
                 </div>
                 
                 <div class="status-box" style="flex-grow: 1;">
-                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">ATRIBUTOS DE BATALHA</div>
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">ATRIBUTOS BASE</div>
                     <div class="stat-line"><span>HP:</span> <span id="stat-hp">--</span></div>
-                    <div class="stat-line"><span>Ataque:</span> <span id="stat-atk">--</span></div>
-                    <div class="stat-line"><span>Defesa:</span> <span id="stat-def">--</span></div>
-                    <div class="stat-line"><span>Atk. Esp:</span> <span id="stat-spa">--</span></div>
-                    <div class="stat-line"><span>Def. Esp:</span> <span id="stat-spd">--</span></div>
-                    <div class="stat-line"><span>Velocidade:</span> <span id="stat-spe">--</span></div>
+                    <div class="stat-line"><span>Attack:</span> <span id="stat-atk">--</span></div>
+                    <div class="stat-line"><span>Defense:</span> <span id="stat-def">--</span></div>
+                    <div class="stat-line"><span>Sp. Atk:</span> <span id="stat-spa">--</span></div>
+                    <div class="stat-line"><span>Sp. Def:</span> <span id="stat-spd">--</span></div>
+                    <div class="stat-line"><span>Speed:</span> <span id="stat-spe">--</span></div>
                 </div>
                 
                 <button class="btn-principal" style="width: 100%; background-color: #95a5a6; box-shadow: 0 5px 0 #7f8c8d;" onclick="fecharStatus()">FECHAR</button>
@@ -245,9 +246,11 @@
                 let saveState = await loadGame();
                 if (saveState) {
                     mascoteAtivo = saveState;
-                    // RECONECTA AS FUNÇÕES DA CLASSE (Crítico para saves recuperados do IndexedDB)
                     Object.setPrototypeOf(mascoteAtivo, PokemonInstance.prototype);
                     
+                    // Fallback para saves criados antes do sistema de Natures existir
+                    if (!mascoteAtivo.nature) mascoteAtivo.nature = "Hardy";
+
                     mascoteAtivo = TimeManager.calculateOfflineProgression(mascoteAtivo);
                     await saveGame(mascoteAtivo);
                     mostrarEcra('screen-game');
@@ -377,25 +380,34 @@
             SoundManager.play('menu_click');
             fecharMenu();
             
-            // Popula os dados na tela
             document.getElementById('status-img').src = `https://play.pokemonshowdown.com/sprites/gen5ani/${mascoteAtivo.species.name.toLowerCase()}.gif`;
             document.getElementById('status-nome').innerText = mascoteAtivo.species.name.toUpperCase();
-            document.getElementById('status-tipo').innerText = `TIPO: ${mascoteAtivo.species.type.toUpperCase()}`;
+            document.getElementById('status-tipo').innerText = `TYPE: ${mascoteAtivo.species.type.toUpperCase()}`;
             document.getElementById('status-lvl').innerText = mascoteAtivo.level;
             
             const expPercent = Math.floor(mascoteAtivo.exp * 100);
             document.getElementById('status-exp').innerText = `${expPercent}%`;
             document.getElementById('status-exp-bar').style.width = `${expPercent}%`;
             
-            // Requisita o cálculo matemático do Motor Genético
-            const statsReais = mascoteAtivo.calcularStatusReais();
+            document.getElementById('status-nature').innerText = mascoteAtivo.nature.toUpperCase();
             
-            document.getElementById('stat-hp').innerText = statsReais.hp;
-            document.getElementById('stat-atk').innerText = statsReais.atk;
-            document.getElementById('stat-def').innerText = statsReais.def;
-            document.getElementById('stat-spa').innerText = statsReais.spa;
-            document.getElementById('stat-spd').innerText = statsReais.spd;
-            document.getElementById('stat-spe').innerText = statsReais.spe;
+            const statsReais = mascoteAtivo.calcularStatusReais();
+            const natureData = Natures[mascoteAtivo.nature] || { buff: null, debuff: null };
+            
+            const renderStat = (statId, value, key) => {
+                const el = document.getElementById(statId);
+                el.innerText = value;
+                if (natureData.buff === key) el.style.color = "#2ecc71"; // Verde (+10%)
+                else if (natureData.debuff === key) el.style.color = "#e74c3c"; // Vermelho (-10%)
+                else el.style.color = "white"; // Neutro
+            };
+
+            document.getElementById('stat-hp').innerText = statsReais.hp; // HP não recebe influência da Nature
+            renderStat('stat-atk', statsReais.atk, 'atk');
+            renderStat('stat-def', statsReais.def, 'def');
+            renderStat('stat-spa', statsReais.spa, 'spa');
+            renderStat('stat-spd', statsReais.spd, 'spd');
+            renderStat('stat-spe', statsReais.spe, 'spe');
             
             document.getElementById('status-overlay').style.display = 'flex';
         }
@@ -406,7 +418,7 @@
 
             if (acao === 'status') {
                 abrirStatus();
-                return; // O abrirStatus já fecha o menu
+                return;
             }
             else if (acao === 'alimentar') {
                 if (PetEngine.dormindo) { 
