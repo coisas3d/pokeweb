@@ -167,6 +167,7 @@
     </div>
 
     <!-- O motor lógico carregado aqui -->
+    <script src="database.js"></script>
     <script src="pokemon_engine.js"></script>
     
     <!-- Lógica de interface da página (View) -->
@@ -180,6 +181,46 @@
         }
 
         function executarAcao(acao) {
+            // Variável global que segura o mascote atual na memória da tela
+        let mascoteAtivo = null;
+
+        // Função que roda automaticamente assim que o cliente abre a página
+        async function iniciarJogo() {
+            try {
+                // 1. Tenta carregar o save do celular do cliente
+                let saveState = await loadGame();
+
+                if (saveState) {
+                    // Se existe, restaura os dados na classe
+                    mascoteAtivo = saveState;
+                    
+                    // 2. O Motor de Tempo calcula o que aconteceu enquanto estava offline
+                    mascoteAtivo = TimeManager.calculateOfflineProgression(mascoteAtivo);
+                    
+                    // 3. Salva imediatamente as perdas de status atualizadas
+                    await saveGame(mascoteAtivo);
+                } else {
+                    // Se for o primeiro acesso na tag NFC, cria um Bulbasaur nível 5 (ID 1)
+                    mascoteAtivo = new PokemonInstance(1);
+                    await saveGame(mascoteAtivo);
+                }
+
+                // 4. Atualiza os textos na tela
+                atualizarInterface();
+                
+            } catch (erro) {
+                console.error("Erro fatal ao iniciar:", erro);
+            }
+        }
+
+        function atualizarInterface() {
+            if (!mascoteAtivo) return;
+            document.getElementById('nivel').innerText = `Nvl: ${mascoteAtivo.level}`;
+            document.getElementById('fome').innerText = `Fome: ${Math.floor(mascoteAtivo.hunger)}%`;
+        }
+
+        // Gatilho: executa iniciarJogo() quando a página terminar de carregar
+        window.onload = iniciarJogo;
             // Esta função conectará os botões ao IndexedDB e ao motor lógico nos próximos passos.
             console.log("Ação clicada:", acao);
             fecharMenu();
