@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <!-- Evita que o usuário dê zoom na tela acidentalmente -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PokeWeb - Coisas 3D</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212; /* Fundo preto para disfarçar o resto da tela do celular */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Courier New', Courier, monospace; /* Fonte estilo retrô/pixel */
+            color: #111;
+        }
+
+        /* O "Visor" redondo imitando a tela AMOLED do hardware físico */
+        #visor {
+            width: 300px;
+            height: 300px;
+            background-color: #ccebc5; /* Cor de fundo imitando tela de Tamagotchi */
+            border-radius: 50%;
+            border: 15px solid #333; /* Falsa borda da carcaça plástica */
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.3); /* Sombra interna para dar profundidade */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .status {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .sprite {
+            font-size: 80px; /* Tamanho temporário para o emoji */
+            margin: 15px 0;
+            animation: pular 1s infinite alternate; /* Animação simples de respiração/pulo */
+        }
+
+        /* Pequena animação para o monstrinho não ficar estático */
+        @keyframes pular {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="visor">
+        <div class="status">Nvl: 1 | Exp: 0</div>
+        <div class="sprite">🥚</div> <!-- Placeholder do ovo inicial -->
+        <div class="status">Fome: 10/10</div>
+    </div>
+
+</body>
+</html>
