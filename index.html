@@ -21,7 +21,9 @@
             box-shadow: 0 4px 0 #333; transition: transform 0.1s;
         }
         .btn-opcao:active { transform: translateY(4px); box-shadow: 0 0 0 #333; }
-        .btn-opcao img { width: 48px; height: 48px; object-fit: none; object-position: left top; image-rendering: pixelated; margin-right: 15px; }
+        
+        /* Retornando o fit correto para a imagem de retrato no menu */
+        .btn-opcao img { width: 48px; height: 48px; object-fit: contain; margin-right: 15px; }
         
         .btn-regiao { background-color: #fff; justify-content: center; padding: 15px; }
         .btn-tipo-grama { background-color: #c8e6c9; }
@@ -30,7 +32,6 @@
 
         .status-bar { display: flex; justify-content: space-around; background-color: #a8d5a2; padding: 15px 0; font-weight: bold; font-size: 18px; border-bottom: 3px solid #7cb575; z-index: 5; }
         
-        /* A tela principal agora lida com o modo noturno suavemente */
         #tela-jogo { flex-grow: 1; background-color: #ccebc5; display: flex; flex-direction: column; position: relative; border-bottom: 4px solid #333; transition: background-color 1s; }
         #tela-jogo.dormindo { background-color: #2c3e50; }
 
@@ -38,7 +39,6 @@
         .btn-principal { background-color: #e74c3c; color: white; border: none; padding: 15px 0; width: 80%; border-radius: 10px; font-size: 20px; font-weight: bold; box-shadow: 0 5px 0 #c0392b; cursor: pointer; }
         .btn-principal:active { transform: translateY(5px); box-shadow: 0 0 0 #c0392b; }
 
-        /* Container do Ovo */
         #ovo-container { display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
         .ovo { width: 80px; height: 100px; background-color: #fdf5e6; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.1); animation: pular 1s infinite alternate, tremer 2s infinite; }
         .ovo-grama { border: 5px solid #2ecc71; }
@@ -46,7 +46,6 @@
         .ovo-agua { border: 5px solid #3498db; }
         #tempo-eclosao { margin-top: 25px; font-weight: bold; font-size: 16px; color: #333; }
 
-        /* Camada dinâmica onde o motor 2D vai renderizar os Sprites */
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
 
         @keyframes pular { from { transform: translateY(0); } to { transform: translateY(-10px); } }
@@ -86,12 +85,11 @@
             </div>
             
             <div id="tela-jogo">
-                <!-- Estado Ovo -->
                 <div id="ovo-container">
                     <div id="ovo-visual"></div>
                     <div id="tempo-eclosao"></div>
                 </div>
-                <!-- Estado Pokemon (Gerido pelo Motor 2D) -->
+                <!-- Camada do Motor de Inteligência -->
                 <div id="sprite-layer"></div>
             </div>
 
@@ -118,13 +116,12 @@
         let mascoteAtivo = null;
         let loopEclosao = null;
 
-        // --- MOTOR DE ANIMAÇÃO AUTÔNOMO 2D ---
-        const SpriteEngine = {
-            element: null, state: 'Idle', direction: 'Down',
+        // --- MOTOR DE INTELIGÊNCIA AUTÔNOMO OTIMIZADO ---
+        const PetEngine = {
+            element: null, state: 'Idle', direction: 'Left',
             x: 0, y: 0, containerW: 0, containerH: 0,
-            image: new Image(), frames: 1, currentFrame: 0,
-            lastFrameTime: 0, frameDuration: 180, actionTimer: 0,
-            speed: 1.5, isRunning: false, pokemonId: '', dormindo: false,
+            speed: 1.2, isRunning: false, pokemonName: '', dormindo: false,
+            actionTimer: 0,
 
             init(layerId) {
                 const layer = document.getElementById(layerId);
@@ -134,91 +131,71 @@
                 this.y = this.containerH / 2;
                 
                 if (!this.element) {
-                    this.element = document.createElement('div');
+                    this.element = document.createElement('img');
                     this.element.style.position = 'absolute';
                     this.element.style.imageRendering = 'pixelated';
-                    this.element.style.transform = 'scale(2)'; 
                     this.element.style.transformOrigin = 'center center';
+                    this.element.style.height = '60px'; // Tamanho uniforme na tela principal
                     layer.appendChild(this.element);
                 }
                 this.isRunning = true;
                 this.loop();
             },
 
-            setPokemon(id) {
-                this.pokemonId = String(id).padStart(4, '0');
-                this.changeAction('Idle', 'Down');
+            setPokemon(name) {
+                this.pokemonName = name.toLowerCase();
+                // Utiliza os GIFs da Gen 5 perfeitamente animados
+                this.element.src = `https://play.pokemonshowdown.com/sprites/gen5ani/${this.pokemonName}.gif`;
+                this.changeAction('Idle');
             },
 
             setDormindo(status) {
                 this.dormindo = status;
-                if (this.dormindo) this.changeAction('Idle', 'Down');
+                if (this.dormindo) {
+                    this.element.style.filter = 'brightness(0.3)';
+                    this.changeAction('Idle');
+                } else {
+                    this.element.style.filter = 'none';
+                }
             },
 
-            changeAction(newState, newDir) {
-                if (this.state === newState && this.direction === newDir) return;
+            changeAction(newState) {
                 this.state = newState;
-                this.direction = newDir;
-                this.currentFrame = 0;
-                
-                const imgUrl = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${this.pokemonId}/${this.state}-${this.direction}.png`;
-                
-                const tempImg = new Image();
-                tempImg.onload = () => {
-                    this.image = tempImg;
-                    const frameSize = this.image.height;
-                    this.frames = Math.max(1, Math.floor(this.image.width / frameSize)); // Cálculo matemático de quadros
-                    this.element.style.width = frameSize + 'px';
-                    this.element.style.height = frameSize + 'px';
-                    this.element.style.backgroundImage = `url(${this.image.src})`;
-                };
-                tempImg.onerror = () => {
-                    // Fallback se uma direção não existir
-                    if (this.state !== 'Idle' || this.direction !== 'Down') this.changeAction('Idle', 'Down');
-                };
-                tempImg.src = imgUrl;
+                // A manipulação de scaleX espelha a imagem para simular o movimento nas duas direções
+                if (this.state === 'WalkLeft') {
+                    this.direction = 'Left';
+                    this.element.style.transform = 'scaleX(1) scale(1.5)';
+                } else if (this.state === 'WalkRight') {
+                    this.direction = 'Right';
+                    this.element.style.transform = 'scaleX(-1) scale(1.5)';
+                } else {
+                    this.element.style.transform = (this.direction === 'Right') ? 'scaleX(-1) scale(1.5)' : 'scaleX(1) scale(1.5)';
+                }
             },
 
             updateLogic() {
-                if (this.dormindo) return; // Congela se estiver dormindo
+                if (this.dormindo) return;
 
-                // Cérebro Autônomo
                 if (Date.now() > this.actionTimer) {
-                    this.actionTimer = Date.now() + 2000 + Math.random() * 3000;
-                    if (Math.random() < 0.4) {
-                        const dirs = ['Down', 'Up', 'Left', 'Right'];
-                        this.changeAction('Walk', dirs[Math.floor(Math.random() * dirs.length)]);
-                    } else {
-                        const dirs = ['Down', 'Up', 'Left', 'Right'];
-                        this.changeAction('Idle', dirs[Math.floor(Math.random() * dirs.length)]);
-                    }
+                    this.actionTimer = Date.now() + 2000 + Math.random() * 4000;
+                    const r = Math.random();
+                    if (r < 0.35) this.changeAction('WalkLeft');
+                    else if (r < 0.70) this.changeAction('WalkRight');
+                    else this.changeAction('Idle');
                 }
 
-                // Cálculo de Colisão e Deslocamento
-                if (this.state === 'Walk' && this.image.complete && this.image.height > 0) {
-                    const limit = this.image.height; // Buffer para bater nas bordas
+                if (this.state.startsWith('Walk')) {
                     if (this.direction === 'Right') this.x += this.speed;
                     if (this.direction === 'Left') this.x -= this.speed;
-                    if (this.direction === 'Down') this.y += this.speed;
-                    if (this.direction === 'Up') this.y -= this.speed;
 
-                    this.x = Math.max(limit, Math.min(this.containerW - limit, this.x));
-                    this.y = Math.max(limit, Math.min(this.containerH - limit, this.y));
+                    if (this.x < 40) { this.x = 40; this.changeAction('WalkRight'); }
+                    if (this.x > this.containerW - 40) { this.x = this.containerW - 40; this.changeAction('WalkLeft'); }
                 }
             },
 
             draw() {
-                if (!this.image.complete || this.image.height === 0) return;
-                
-                if (Date.now() - this.lastFrameTime > this.frameDuration) {
-                    this.currentFrame = (this.currentFrame + 1) % this.frames;
-                    this.lastFrameTime = Date.now();
-                }
-
-                const frameSize = this.image.height;
-                this.element.style.backgroundPosition = `-${this.currentFrame * frameSize}px 0px`;
-                this.element.style.left = (this.x - frameSize/2) + 'px';
-                this.element.style.top = (this.y - frameSize/2) + 'px';
+                this.element.style.left = (this.x - 30) + 'px';
+                this.element.style.top = (this.y - 30) + 'px';
             },
 
             loop() {
@@ -228,7 +205,6 @@
                 requestAnimationFrame(() => this.loop());
             }
         };
-        // -------------------------------------
 
         function mostrarEcra(idEcra) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -254,7 +230,8 @@
 
         function gerarBotaoStarter(id, nome, tipo) {
             const pmdID = String(id).padStart(4, '0');
-            const imgUrl = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${pmdID}/Idle-Down.png`;
+            // Retorno à arquitetura estável da pasta portrait para menus estáticos
+            const imgUrl = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${pmdID}/Normal.png`;
             return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
                         <img src="${imgUrl}" alt="${nome}">
                         <span>${nome.toUpperCase()}</span>
@@ -310,10 +287,9 @@
                 ovoContainer.style.display = 'none';
                 spriteLayer.style.display = 'block';
                 
-                // Inicializa o Motor 2D se ainda não estiver rodando
-                if (!SpriteEngine.isRunning) {
-                    SpriteEngine.init('sprite-layer');
-                    SpriteEngine.setPokemon(mascoteAtivo.species.id);
+                if (!PetEngine.isRunning) {
+                    PetEngine.init('sprite-layer');
+                    PetEngine.setPokemon(mascoteAtivo.species.name);
                 }
             }
         }
@@ -331,7 +307,7 @@
             }
 
             if (acao === 'alimentar') {
-                if (SpriteEngine.dormindo) {
+                if (PetEngine.dormindo) {
                     alert("O monstrinho está dormindo!");
                 } else {
                     mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25);
@@ -342,7 +318,7 @@
             else if (acao === 'dormir') {
                 const telaJogo = document.getElementById('tela-jogo');
                 const isDormindo = telaJogo.classList.toggle('dormindo');
-                SpriteEngine.setDormindo(isDormindo);
+                PetEngine.setDormindo(isDormindo);
             }
             
             fecharMenu();
