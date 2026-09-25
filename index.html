@@ -20,14 +20,14 @@
         #app-container {
             width: 90%;
             max-width: 400px;
-            height: 500px; /* Altura fixa para manter a proporção */
+            height: 500px;
             background-color: #f1f2f6;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            position: relative; /* Necessário para sobrepor o menu */
+            position: relative;
         }
 
         .status-bar {
@@ -87,9 +87,8 @@
             box-shadow: 0 0 0 #c0392b;
         }
 
-        /* --- TELA DE MENU OVERLAY --- */
         #menu-overlay {
-            display: none; /* Escondido por padrão */
+            display: none;
             position: absolute;
             top: 0;
             left: 0;
@@ -139,8 +138,8 @@
     <div id="app-container">
         <!-- TELA PRINCIPAL (IDLE STATE) -->
         <div class="status-bar">
-            <span id="nivel">Nvl: 5</span>
-            <span id="fome">Fome: 100%</span>
+            <span id="nivel">Nvl: --</span>
+            <span id="fome">Fome: --%</span>
         </div>
         
         <div id="tela-jogo">
@@ -159,19 +158,22 @@
                 <button class="menu-btn" onclick="executarAcao('dormir')">Dormir</button>
                 <button class="menu-btn" onclick="executarAcao('pc')">PC Box</button>
             </div>
-            <!-- Botão de batalha em destaque ocupando as duas colunas -->
+            <!-- Botão de batalha -->
             <button class="menu-btn" style="grid-column: span 2; background-color: #e67e22; box-shadow: 0 5px 0 #d35400; margin-top: 15px;" onclick="executarAcao('batalhar')">BATALHAR</button>
             
             <button class="menu-btn btn-voltar" onclick="fecharMenu()">VOLTAR</button>
         </div>
     </div>
 
-    <!-- O motor lógico carregado aqui -->
+    <!-- O motor lógico e o banco de dados carregados aqui -->
     <script src="database.js"></script>
     <script src="pokemon_engine.js"></script>
     
     <!-- Lógica de interface da página (View) -->
     <script>
+        // Variável global que segura o mascote atual na memória da tela
+        let mascoteAtivo = null;
+
         function abrirMenu() {
             document.getElementById('menu-overlay').style.display = 'flex';
         }
@@ -180,10 +182,6 @@
             document.getElementById('menu-overlay').style.display = 'none';
         }
 
-        function executarAcao(acao) {
-            // Variável global que segura o mascote atual na memória da tela
-        let mascoteAtivo = null;
-
         // Função que roda automaticamente assim que o cliente abre a página
         async function iniciarJogo() {
             try {
@@ -191,21 +189,19 @@
                 let saveState = await loadGame();
 
                 if (saveState) {
-                    // Se existe, restaura os dados na classe
+                    // Se existe, restaura os dados
                     mascoteAtivo = saveState;
-                    
-                    // 2. O Motor de Tempo calcula o que aconteceu enquanto estava offline
+                    // 2. Calcula o que aconteceu offline
                     mascoteAtivo = TimeManager.calculateOfflineProgression(mascoteAtivo);
-                    
-                    // 3. Salva imediatamente as perdas de status atualizadas
+                    // 3. Salva imediatamente
                     await saveGame(mascoteAtivo);
                 } else {
-                    // Se for o primeiro acesso na tag NFC, cria um Bulbasaur nível 5 (ID 1)
+                    // 4. Se for o primeiro acesso, cria um Bulbasaur nível 5
                     mascoteAtivo = new PokemonInstance(1);
                     await saveGame(mascoteAtivo);
                 }
 
-                // 4. Atualiza os textos na tela
+                // 5. Atualiza os textos na tela
                 atualizarInterface();
                 
             } catch (erro) {
@@ -219,12 +215,28 @@
             document.getElementById('fome').innerText = `Fome: ${Math.floor(mascoteAtivo.hunger)}%`;
         }
 
-        // Gatilho: executa iniciarJogo() quando a página terminar de carregar
-        window.onload = iniciarJogo;
-            // Esta função conectará os botões ao IndexedDB e ao motor lógico nos próximos passos.
-            console.log("Ação clicada:", acao);
+        // Conectando as ações do menu ao banco de dados
+        async function executarAcao(acao) {
+            if (!mascoteAtivo) return;
+
+            if (acao === 'alimentar') {
+                // Adiciona 25% de fome, não passando de 100
+                mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25);
+                
+                // Salva o novo status no IndexedDB
+                await saveGame(mascoteAtivo);
+                
+                // Atualiza a tela imediatamente
+                atualizarInterface();
+            } else {
+                console.log("Ação não programada ainda:", acao);
+            }
+
             fecharMenu();
         }
+
+        // Gatilho de inicialização
+        window.onload = iniciarJogo;
     </script>
 </body>
 </html>
