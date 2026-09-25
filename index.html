@@ -33,7 +33,9 @@
         .btn-principal:active { transform: translateY(5px); box-shadow: 0 0 0 #c0392b; }
 
         #ovo-container { display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; }
+        #ovo-wrapper { position: relative; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; }
         
+        /* OVO INTEIRO */
         .ovo { 
             width: 80px; height: 100px; 
             background-color: #fdf5e6; 
@@ -42,12 +44,39 @@
             animation: ovo-tremendo 3s infinite; 
         }
         
-        .ovo-grama { background-image: radial-gradient(circle at 30% 30%, #2ecc71 12px, transparent 13px), radial-gradient(circle at 75% 60%, #2ecc71 18px, transparent 19px), radial-gradient(circle at 45% 85%, #2ecc71 10px, transparent 11px); }
-        .ovo-fogo { background-image: radial-gradient(circle at 30% 30%, #e74c3c 12px, transparent 13px), radial-gradient(circle at 75% 60%, #e74c3c 18px, transparent 19px), radial-gradient(circle at 45% 85%, #e74c3c 10px, transparent 11px); }
-        .ovo-agua { background-image: radial-gradient(circle at 30% 30%, #3498db 12px, transparent 13px), radial-gradient(circle at 75% 60%, #3498db 18px, transparent 19px), radial-gradient(circle at 45% 85%, #3498db 10px, transparent 11px); }
+        /* PADRÕES DE MANCHAS */
+        .ovo-grama { border: 4px solid #2ecc71; background-image: radial-gradient(circle at 30% 30%, #2ecc71 12px, transparent 13px), radial-gradient(circle at 75% 60%, #2ecc71 18px, transparent 19px), radial-gradient(circle at 45% 85%, #2ecc71 10px, transparent 11px); }
+        .ovo-fogo { border: 4px solid #e74c3c; background-image: radial-gradient(circle at 30% 30%, #e74c3c 12px, transparent 13px), radial-gradient(circle at 75% 60%, #e74c3c 18px, transparent 19px), radial-gradient(circle at 45% 85%, #e74c3c 10px, transparent 11px); }
+        .ovo-agua { border: 4px solid #3498db; background-image: radial-gradient(circle at 30% 30%, #3498db 12px, transparent 13px), radial-gradient(circle at 75% 60%, #3498db 18px, transparent 19px), radial-gradient(circle at 45% 85%, #3498db 10px, transparent 11px); }
         
-        #tempo-eclosao { margin-top: 30px; font-weight: bold; font-size: 16px; color: #333; background: rgba(255,255,255,0.5); padding: 5px 15px; border-radius: 15px; }
+        /* METADES DO OVO PARA A ANIMAÇÃO DE RACHAR */
+        .ovo-metade {
+            position: absolute; top: 0; left: 0;
+            width: 80px; height: 100px; 
+            background-color: #fdf5e6; 
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; 
+        }
+        .ovo-topo {
+            clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 80% 40%, 60% 55%, 40% 45%, 20% 60%, 0% 50%);
+            animation: rachar-topo 1.5s forwards;
+        }
+        .ovo-base {
+            clip-path: polygon(0% 50%, 20% 60%, 40% 45%, 60% 55%, 80% 40%, 100% 50%, 100% 100%, 0% 100%);
+            animation: rachar-base 1.5s forwards;
+        }
 
+        /* LUZ OFUSCANTE DE ECLOSÃO */
+        .luz-eclosao {
+            position: absolute;
+            width: 20px; height: 20px;
+            background: white; border-radius: 50%;
+            box-shadow: 0 0 50px 50px white;
+            opacity: 0;
+            animation: brilho-eclosao 1.5s forwards;
+            z-index: 10;
+        }
+
+        #tempo-eclosao { margin-top: 30px; font-weight: bold; font-size: 16px; color: #333; background: rgba(255,255,255,0.5); padding: 5px 15px; border-radius: 15px; }
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
 
         @keyframes ovo-tremendo { 
@@ -58,11 +87,23 @@
             100% { transform: rotate(0deg) scale(1); }
         }
         
-        @keyframes rachando {
-            0% { filter: brightness(1); transform: scale(1); }
-            50% { filter: brightness(1.5) contrast(1.5); transform: scale(1.1) rotate(15deg); }
-            80% { filter: brightness(2) contrast(2); transform: scale(1.2) rotate(-15deg); }
-            100% { filter: brightness(5) contrast(3); transform: scale(1.5); opacity: 0; }
+        @keyframes rachar-topo {
+            0%, 20% { transform: translateY(0) rotate(0); }
+            30% { transform: translateY(-5px) rotate(-5deg); }
+            40% { transform: translateY(-5px) rotate(5deg); }
+            60%, 100% { transform: translateY(-60px) rotate(-25deg); opacity: 0; }
+        }
+
+        @keyframes rachar-base {
+            0%, 20% { transform: translateY(0); }
+            30%, 40% { transform: translateY(2px); }
+            60%, 100% { transform: translateY(40px); opacity: 0; }
+        }
+
+        @keyframes brilho-eclosao {
+            0%, 40% { opacity: 0; transform: scale(1); }
+            60% { opacity: 1; transform: scale(4); }
+            100% { opacity: 1; transform: scale(15); }
         }
 
         #screen-hatch { background-color: #2c3e50; justify-content: center; align-items: center; color: white; text-align: center; }
@@ -101,7 +142,9 @@
             </div>
             <div id="tela-jogo">
                 <div id="ovo-container">
-                    <div id="ovo-visual"></div>
+                    <div id="ovo-wrapper">
+                        <!-- Conteúdo dinâmico injetado via JS (Ovo inteiro ou Ovos rachados) -->
+                    </div>
                     <div id="tempo-eclosao"></div>
                 </div>
                 <div id="sprite-layer"></div>
@@ -137,10 +180,18 @@
         let loopEclosao = null;
         let processoEclosaoEmAndamento = false;
 
+        // --- SISTEMA DE ÁUDIO MAPEADO PARA A PRÓXIMA FASE ---
+        const SoundManager = {
+            play(effect) {
+                // Aqui serão mapeadas as URLs dos arquivos de áudio
+                console.log(`[Áudio Acionado]: Tocando som de '${effect}'`);
+                // Exemplo: if(effect === 'rachar') new Audio('url_do_som.mp3').play();
+            }
+        };
+
         const PetEngine = {
             element: null, state: 'Idle', direction: 'Left', x: 0, y: 0, containerW: 0, containerH: 0,
-            speed: 0.5, // <-- Velocidade desacelerada para um caminhar mais suave e natural
-            isRunning: false, pokemonName: '', dormindo: false, actionTimer: 0,
+            speed: 0.5, isRunning: false, pokemonName: '', dormindo: false, actionTimer: 0,
 
             init(layerId) {
                 const layer = document.getElementById(layerId);
@@ -228,6 +279,7 @@
         }
 
         function mostrarStarters(regiao) {
+            SoundManager.play('menu_click');
             const lista = document.getElementById('lista-starters');
             if (regiao === 'kanto') { lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur", "grama") + gerarBotaoStarter(4, "Charmander", "fogo") + gerarBotaoStarter(7, "Squirtle", "agua"); } 
             else if (regiao === 'johto') { lista.innerHTML = gerarBotaoStarter(152, "Chikorita", "grama") + gerarBotaoStarter(155, "Cyndaquil", "fogo") + gerarBotaoStarter(158, "Totodile", "agua"); } 
@@ -236,6 +288,7 @@
         }
 
         async function escolherStarter(id) {
+            SoundManager.play('select_pokemon');
             mascoteAtivo = new PokemonInstance(id);
             await saveGame(mascoteAtivo);
             mostrarEcra('screen-game');
@@ -247,11 +300,19 @@
             processoEclosaoEmAndamento = true;
             if(loopEclosao) clearInterval(loopEclosao);
             
-            const ovoVisual = document.getElementById('ovo-visual');
+            const ovoWrapper = document.getElementById('ovo-wrapper');
             const textoEclosao = document.getElementById('tempo-eclosao');
+            const tipo = mascoteAtivo.species.type;
             
-            textoEclosao.innerText = "Está chocando!";
-            ovoVisual.style.animation = "rachando 2s forwards";
+            textoEclosao.innerText = "Está rachando!";
+            SoundManager.play('egg_crack');
+            
+            // Injeta fisicamente a casca rachada em duas partes e a luz
+            ovoWrapper.innerHTML = `
+                <div class="luz-eclosao"></div>
+                <div class="ovo-metade ovo-base ovo-${tipo}"></div>
+                <div class="ovo-metade ovo-topo ovo-${tipo}"></div>
+            `;
 
             setTimeout(() => {
                 mostrarEcra('screen-hatch');
@@ -260,16 +321,18 @@
                 document.getElementById('btn-hatch-continuar').style.display = "none";
 
                 setTimeout(() => {
+                    SoundManager.play('pokemon_cry_' + mascoteAtivo.species.id);
                     document.getElementById('hatch-texto').innerText = `Nasceu um ${mascoteAtivo.species.name.toUpperCase()}!`;
                     const sprite = document.getElementById('hatch-sprite');
                     sprite.src = `https://play.pokemonshowdown.com/sprites/gen5ani/${mascoteAtivo.species.name.toLowerCase()}.gif`;
                     sprite.style.display = "block";
                     document.getElementById('btn-hatch-continuar').style.display = "block";
                 }, 2000);
-            }, 1800);
+            }, 1500); // 1.5s é o tempo exato para a animação das cascas sumirem
         }
 
         function concluirEclosao() {
+            SoundManager.play('menu_click');
             mascoteAtivo.isEgg = false;
             saveGame(mascoteAtivo);
             mostrarEcra('screen-game');
@@ -284,9 +347,9 @@
             document.getElementById('fome').innerText = mascoteAtivo.isEgg ? `Fome: --%` : `Fome: ${Math.floor(mascoteAtivo.hunger)}%`;
 
             const ovoContainer = document.getElementById('ovo-container');
+            const ovoWrapper = document.getElementById('ovo-wrapper');
             const spriteLayer = document.getElementById('sprite-layer');
             const textoEclosao = document.getElementById('tempo-eclosao');
-            const visualOvo = document.getElementById('ovo-visual');
 
             if (mascoteAtivo.isEgg) {
                 ovoContainer.style.display = 'flex';
@@ -296,16 +359,20 @@
                 if (tempoRestante <= 0) {
                     acionarEfeitoEclosao();
                 } else {
+                    // Garante que o ovo inteiro está renderizado (não as metades)
+                    if (!document.getElementById('ovo-visual')) {
+                        ovoWrapper.innerHTML = '<div id="ovo-visual" class="ovo"></div>';
+                    }
+                    const visualOvo = document.getElementById('ovo-visual');
                     visualOvo.className = `ovo ovo-${mascoteAtivo.species.type}`;
                     textoEclosao.innerText = `Chocando... ${Math.ceil(tempoRestante/1000)}s`;
                     
-                    // Lógica Dinâmica da Curva de Antecipação (Animação Acelerada)
                     if (tempoRestante <= 15000) {
-                        visualOvo.style.animationDuration = "0.5s"; // Faltam 15s: Tremor frenético
+                        visualOvo.style.animationDuration = "0.5s"; 
                     } else if (tempoRestante <= 30000) {
-                        visualOvo.style.animationDuration = "1.5s"; // Faltam 30s: Tremor acelerado
+                        visualOvo.style.animationDuration = "1.5s";
                     } else {
-                        visualOvo.style.animationDuration = "3s"; // Padrão: Tremor lento
+                        visualOvo.style.animationDuration = "3s";
                     }
 
                     if(!loopEclosao) loopEclosao = setInterval(atualizarInterface, 1000);
@@ -321,7 +388,7 @@
             }
         }
 
-        function abrirMenu() { document.getElementById('menu-overlay').style.display = 'flex'; }
+        function abrirMenu() { SoundManager.play('menu_open'); document.getElementById('menu-overlay').style.display = 'flex'; }
         function fecharMenu() { document.getElementById('menu-overlay').style.display = 'none'; }
 
         async function executarAcao(acao) {
@@ -329,12 +396,19 @@
             if (mascoteAtivo.isEgg) { alert("Ainda é um ovo! Espere chocar."); fecharMenu(); return; }
 
             if (acao === 'alimentar') {
-                if (PetEngine.dormindo) { alert("O monstrinho está a dormir!"); } 
-                else { mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25); await saveGame(mascoteAtivo); atualizarInterface(); }
+                if (PetEngine.dormindo) { 
+                    alert("O monstrinho está a dormir!"); 
+                } else { 
+                    SoundManager.play('eat');
+                    mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25); 
+                    await saveGame(mascoteAtivo); 
+                    atualizarInterface(); 
+                }
             } else if (acao === 'dormir') {
                 const telaJogo = document.getElementById('tela-jogo');
                 const isDormindo = telaJogo.classList.toggle('dormindo');
                 PetEngine.setDormindo(isDormindo);
+                SoundManager.play(isDormindo ? 'sleep' : 'wake_up');
             }
             fecharMenu();
         }
