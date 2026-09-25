@@ -44,10 +44,10 @@
             animation: ovo-tremendo 3s infinite; 
         }
         
-        /* PADRÕES DE MANCHAS */
-        .ovo-grama { border: 4px solid #2ecc71; background-image: radial-gradient(circle at 30% 30%, #2ecc71 12px, transparent 13px), radial-gradient(circle at 75% 60%, #2ecc71 18px, transparent 19px), radial-gradient(circle at 45% 85%, #2ecc71 10px, transparent 11px); }
-        .ovo-fogo { border: 4px solid #e74c3c; background-image: radial-gradient(circle at 30% 30%, #e74c3c 12px, transparent 13px), radial-gradient(circle at 75% 60%, #e74c3c 18px, transparent 19px), radial-gradient(circle at 45% 85%, #e74c3c 10px, transparent 11px); }
-        .ovo-agua { border: 4px solid #3498db; background-image: radial-gradient(circle at 30% 30%, #3498db 12px, transparent 13px), radial-gradient(circle at 75% 60%, #3498db 18px, transparent 19px), radial-gradient(circle at 45% 85%, #3498db 10px, transparent 11px); }
+        /* PADRÕES DE MANCHAS (Sem contorno) */
+        .ovo-grama { background-image: radial-gradient(circle at 30% 30%, #2ecc71 12px, transparent 13px), radial-gradient(circle at 75% 60%, #2ecc71 18px, transparent 19px), radial-gradient(circle at 45% 85%, #2ecc71 10px, transparent 11px); }
+        .ovo-fogo { background-image: radial-gradient(circle at 30% 30%, #e74c3c 12px, transparent 13px), radial-gradient(circle at 75% 60%, #e74c3c 18px, transparent 19px), radial-gradient(circle at 45% 85%, #e74c3c 10px, transparent 11px); }
+        .ovo-agua { background-image: radial-gradient(circle at 30% 30%, #3498db 12px, transparent 13px), radial-gradient(circle at 75% 60%, #3498db 18px, transparent 19px), radial-gradient(circle at 45% 85%, #3498db 10px, transparent 11px); }
         
         /* METADES DO OVO PARA A ANIMAÇÃO DE RACHAR */
         .ovo-metade {
@@ -183,9 +183,7 @@
         // --- SISTEMA DE ÁUDIO MAPEADO PARA A PRÓXIMA FASE ---
         const SoundManager = {
             play(effect) {
-                // Aqui serão mapeadas as URLs dos arquivos de áudio
                 console.log(`[Áudio Acionado]: Tocando som de '${effect}'`);
-                // Exemplo: if(effect === 'rachar') new Audio('url_do_som.mp3').play();
             }
         };
 
@@ -307,7 +305,6 @@
             textoEclosao.innerText = "Está rachando!";
             SoundManager.play('egg_crack');
             
-            // Injeta fisicamente a casca rachada em duas partes e a luz
             ovoWrapper.innerHTML = `
                 <div class="luz-eclosao"></div>
                 <div class="ovo-metade ovo-base ovo-${tipo}"></div>
@@ -328,7 +325,7 @@
                     sprite.style.display = "block";
                     document.getElementById('btn-hatch-continuar').style.display = "block";
                 }, 2000);
-            }, 1500); // 1.5s é o tempo exato para a animação das cascas sumirem
+            }, 1500);
         }
 
         function concluirEclosao() {
@@ -359,7 +356,6 @@
                 if (tempoRestante <= 0) {
                     acionarEfeitoEclosao();
                 } else {
-                    // Garante que o ovo inteiro está renderizado (não as metades)
                     if (!document.getElementById('ovo-visual')) {
                         ovoWrapper.innerHTML = '<div id="ovo-visual" class="ovo"></div>';
                     }
