@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PokeWeb - Premium</title>
+    <title>PokeWeb - Coisas 3D</title>
     <style>
         /* BASE & TIPOGRAFIA PREMIUM */
         body { 
@@ -164,7 +164,7 @@
         
         <!-- ECRÃ 1: ESCOLHER REGIÃO -->
         <div id="screen-region" class="screen">
-            <div class="selecao-header">SELECT REGION</div>
+            <div class="selecao-header">ESCOLHA UMA REGIÃO</div>
             <div class="opcoes-grid">
                 <button class="btn-opcao btn-regiao" onclick="mostrarStarters('kanto')">KANTO</button>
                 <button class="btn-opcao btn-regiao" onclick="mostrarStarters('johto')">JOHTO</button>
@@ -174,15 +174,15 @@
 
         <!-- ECRÃ 2: ESCOLHER STARTER -->
         <div id="screen-starter" class="screen">
-            <div class="selecao-header">SELECT PARTNER</div>
+            <div class="selecao-header">ESCOLHA SEU PARCEIRO</div>
             <div class="opcoes-grid" id="lista-starters"></div>
         </div>
 
         <!-- ECRÃ 3: JOGO PRINCIPAL -->
         <div id="screen-game" class="screen">
             <div class="status-bar">
-                <span id="nivel">LVL <strong style="color:#1e293b;">--</strong></span>
-                <span id="fome">HUNGER <strong style="color:#1e293b;">--%</strong></span>
+                <span id="nivel">Nvl <strong style="color:#1e293b;">--</strong></span>
+                <span id="fome">Fome <strong style="color:#1e293b;">--%</strong></span>
             </div>
             
             <div id="tela-jogo">
@@ -194,18 +194,18 @@
             </div>
             
             <div id="controles">
-                <button class="btn-principal" onclick="abrirMenu()">SYSTEM MENU</button>
+                <button class="btn-principal" onclick="abrirMenu()">MENU</button>
             </div>
             
             <!-- MENU PRINCIPAL GLASSMORPHISM -->
             <div id="menu-overlay" class="overlay-glass">
                 <div class="menu-grid">
-                    <button class="menu-btn" onclick="executarAcao('status')">Analytics</button>
-                    <button class="menu-btn" onclick="executarAcao('alimentar')">Feed</button>
-                    <button class="menu-btn" onclick="executarAcao('dormir')">Sleep / Wake</button>
+                    <button class="menu-btn" onclick="executarAcao('status')">Status</button>
+                    <button class="menu-btn" onclick="executarAcao('alimentar')">Alimentar</button>
+                    <button class="menu-btn" onclick="executarAcao('dormir')">Dormir / Acordar</button>
                     <button class="menu-btn" onclick="executarAcao('pc')">PC Box</button>
                 </div>
-                <button class="menu-btn btn-voltar" onclick="fecharMenu()">CLOSE</button>
+                <button class="menu-btn btn-voltar" onclick="fecharMenu()">FECHAR</button>
             </div>
 
             <!-- TELA DE STATUS ANALÍTICA PREMIUM -->
@@ -218,7 +218,7 @@
                             <div id="status-tipo" class="status-subtitle">--</div>
                         </div>
                     </div>
-                    <div class="stat-text-line"><span>Level</span> <span id="status-lvl">--</span></div>
+                    <div class="stat-text-line"><span>Nível</span> <span id="status-lvl">--</span></div>
                     <div class="stat-text-line"><span>Nature</span> <span id="status-nature" style="color: #f59e0b;">--</span></div>
                     
                     <div class="stat-bar-row" style="margin-top: 15px;">
@@ -229,7 +229,7 @@
                 </div>
                 
                 <div class="status-box" style="flex-grow: 1;">
-                    <div class="section-title">COMBAT ATTRIBUTES</div>
+                    <div class="section-title">ATRIBUTOS DE BATALHA</div>
                     
                     <div class="stat-bar-row">
                         <span class="stat-label">HP</span>
@@ -263,7 +263,7 @@
                     </div>
                 </div>
                 
-                <button class="menu-btn btn-voltar" style="width: 100%; margin-top: auto;" onclick="fecharStatus()">CLOSE SYSTEM</button>
+                <button class="menu-btn btn-voltar" style="width: 100%; margin-top: auto;" onclick="fecharStatus()">FECHAR</button>
             </div>
         </div>
 
@@ -272,7 +272,7 @@
             <div class="hatch-container">
                 <div id="hatch-texto" class="hatch-texto">Oh?...</div>
                 <img id="hatch-sprite" src="">
-                <button id="btn-hatch-continuar" class="btn-principal" style="display:none; width:100%; margin-top:20px;" onclick="concluirEclosao()">CONTINUE</button>
+                <button id="btn-hatch-continuar" class="btn-principal" style="display:none; width:100%; margin-top:20px;" onclick="concluirEclosao()">CONTINUAR</button>
             </div>
         </div>
     </div>
@@ -303,8 +303,8 @@
                     this.element.style.position = 'absolute';
                     this.element.style.imageRendering = 'pixelated';
                     this.element.style.transformOrigin = 'center center';
-                    this.element.style.height = '56px'; // Leve ajuste de tamanho
-                    this.element.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'; // Sombra dinâmica no pet
+                    this.element.style.height = '56px';
+                    this.element.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))';
                     layer.appendChild(this.element);
                 }
                 this.isRunning = true; this.loop();
@@ -408,7 +408,7 @@
             const textoEclosao = document.getElementById('tempo-eclosao');
             const tipo = mascoteAtivo.species.type;
             
-            textoEclosao.innerText = "Hatching!";
+            textoEclosao.innerText = "Está rachando!";
             SoundManager.play('egg_crack');
             
             ovoWrapper.innerHTML = `
@@ -425,7 +425,7 @@
 
                 setTimeout(() => {
                     SoundManager.play('pokemon_cry_' + mascoteAtivo.species.id);
-                    document.getElementById('hatch-texto').innerText = `${mascoteAtivo.species.name.toUpperCase()} HATCHED!`;
+                    document.getElementById('hatch-texto').innerText = `Nasceu um ${mascoteAtivo.species.name.toUpperCase()}!`;
                     const sprite = document.getElementById('hatch-sprite');
                     sprite.src = `https://play.pokemonshowdown.com/sprites/gen5ani/${mascoteAtivo.species.name.toLowerCase()}.gif`;
                     sprite.style.display = "block";
@@ -446,8 +446,8 @@
         function atualizarInterface() {
             if (!mascoteAtivo) return;
             
-            document.getElementById('nivel').innerHTML = mascoteAtivo.isEgg ? `LVL <strong style="color:#1e293b;">--</strong>` : `LVL <strong style="color:#1e293b;">${mascoteAtivo.level}</strong>`;
-            document.getElementById('fome').innerHTML = mascoteAtivo.isEgg ? `HUNGER <strong style="color:#1e293b;">--%</strong>` : `HUNGER <strong style="color:#1e293b;">${Math.floor(mascoteAtivo.hunger)}%</strong>`;
+            document.getElementById('nivel').innerHTML = mascoteAtivo.isEgg ? `Nvl <strong style="color:#1e293b;">--</strong>` : `Nvl <strong style="color:#1e293b;">${mascoteAtivo.level}</strong>`;
+            document.getElementById('fome').innerHTML = mascoteAtivo.isEgg ? `Fome <strong style="color:#1e293b;">--%</strong>` : `Fome <strong style="color:#1e293b;">${Math.floor(mascoteAtivo.hunger)}%</strong>`;
 
             const ovoContainer = document.getElementById('ovo-container');
             const ovoWrapper = document.getElementById('ovo-wrapper');
@@ -467,7 +467,7 @@
                     }
                     const visualOvo = document.getElementById('ovo-visual');
                     visualOvo.className = `ovo ovo-${mascoteAtivo.species.type}`;
-                    textoEclosao.innerText = `Hatching... ${Math.ceil(tempoRestante/1000)}s`;
+                    textoEclosao.innerText = `Chocando... ${Math.ceil(tempoRestante/1000)}s`;
                     
                     if (tempoRestante <= 15000) { visualOvo.style.animationDuration = "0.5s"; } 
                     else if (tempoRestante <= 30000) { visualOvo.style.animationDuration = "1.5s"; } 
@@ -506,7 +506,7 @@
             
             document.getElementById('status-img').src = `https://play.pokemonshowdown.com/sprites/gen5ani/${mascoteAtivo.species.name.toLowerCase()}.gif`;
             document.getElementById('status-nome').innerText = mascoteAtivo.species.name.toUpperCase();
-            document.getElementById('status-tipo').innerText = `TYPE: ${mascoteAtivo.species.type.toUpperCase()}`;
+            document.getElementById('status-tipo').innerText = `TIPO: ${mascoteAtivo.species.type.toUpperCase()}`;
             document.getElementById('status-lvl').innerText = mascoteAtivo.level;
             
             const expPercent = Math.floor(mascoteAtivo.exp * 100);
@@ -563,7 +563,7 @@
             }
             else if (acao === 'alimentar') {
                 if (PetEngine.dormindo) { 
-                    alert("O monstrinho está a dormir!"); 
+                    alert("O monstrinho está dormindo!"); 
                 } else { 
                     SoundManager.play('eat');
                     mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25); 
