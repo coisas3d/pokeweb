@@ -104,17 +104,18 @@
         
         #ovo-wrapper { 
             position: absolute; 
-            bottom: 60px; /* Alinhado perfeitamente com o chão do bioma */
+            bottom: 100px; /* ALINHADO EXATAMENTE COM A TERRA DO BIOMA */
             left: 50%;
             width: 80px; height: 100px; 
             display: flex; justify-content: center; align-items: center; 
-            transform: translateX(-50%) scale(0.65); /* Escala proporcionalizada */
+            transform: translateX(-50%) scale(0.65);
             transform-origin: bottom center;
+            filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); /* SOMBRA PARA FIXAÇÃO NO CHÃO */
         }
 
         #tempo-eclosao { 
             position: absolute;
-            bottom: 15px; /* Abaixo do ovo */
+            bottom: 45px; /* Abaixo do ovo e da linha de terra */
             left: 50%;
             transform: translateX(-50%);
             font-weight: 700; font-size: 14px; color: #475569; 
@@ -122,12 +123,12 @@
             border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
         }
 
-        /* OVO CSS */
-        .ovo { width: 80px; height: 100px; background-color: #f8fafc; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -15px -15px 25px rgba(0,0,0,0.1), 0 15px 25px rgba(0,0,0,0.15); animation: ovo-tremendo 3s infinite; }
+        /* OVO CSS - COR ESCURECIDA */
+        .ovo { width: 80px; height: 100px; background-color: #e2e8f0; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -15px -15px 25px rgba(0,0,0,0.2), 0 15px 25px rgba(0,0,0,0.15); animation: ovo-tremendo 3s infinite; }
         .ovo-grama { background-image: radial-gradient(circle at 30% 30%, #10b981 12px, transparent 13px), radial-gradient(circle at 75% 60%, #10b981 18px, transparent 19px), radial-gradient(circle at 45% 85%, #10b981 10px, transparent 11px); }
         .ovo-fogo { background-image: radial-gradient(circle at 30% 30%, #ef4444 12px, transparent 13px), radial-gradient(circle at 75% 60%, #ef4444 18px, transparent 19px), radial-gradient(circle at 45% 85%, #ef4444 10px, transparent 11px); }
         .ovo-agua { background-image: radial-gradient(circle at 30% 30%, #3b82f6 12px, transparent 13px), radial-gradient(circle at 75% 60%, #3b82f6 18px, transparent 19px), radial-gradient(circle at 45% 85%, #3b82f6 10px, transparent 11px); }
-        .ovo-metade { position: absolute; top: 0; left: 0; width: 80px; height: 100px; background-color: #f8fafc; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; }
+        .ovo-metade { position: absolute; top: 0; left: 0; width: 80px; height: 100px; background-color: #e2e8f0; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; }
         .ovo-topo { clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 80% 40%, 60% 55%, 40% 45%, 20% 60%, 0% 50%); animation: rachar-topo 1.5s forwards cubic-bezier(0.25, 1, 0.5, 1); }
         .ovo-base { clip-path: polygon(0% 50%, 20% 60%, 40% 45%, 60% 55%, 80% 40%, 100% 50%, 100% 100%, 0% 100%); animation: rachar-base 1.5s forwards cubic-bezier(0.25, 1, 0.5, 1); }
         .luz-eclosao { position: absolute; width: 20px; height: 20px; background: #ffffff; border-radius: 50%; box-shadow: 0 0 60px 60px #ffffff; opacity: 0; animation: brilho-eclosao 1.5s forwards; z-index: 10; }
@@ -310,15 +311,18 @@
                 const layer = document.getElementById(layerId);
                 this.containerW = layer.clientWidth; this.containerH = layer.clientHeight;
                 this.x = this.containerW / 2; 
-                this.y = this.containerH - 60; 
+                
+                // NOVO: Posicionamento fixado no chão exato da arte do bioma (100px)
+                this.y = this.containerH - 100; 
                 
                 if (!this.element) {
                     this.element = document.createElement('img');
                     this.element.style.position = 'absolute';
                     this.element.style.imageRendering = 'pixelated';
                     this.element.style.transformOrigin = 'center center';
-                    this.element.style.height = '56px';
-                    this.element.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.4))';
+                    // Escala aumentada para imponência
+                    this.element.style.height = '72px';
+                    this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
                     layer.appendChild(this.element);
                 }
                 this.isRunning = true; this.loop();
@@ -330,8 +334,8 @@
             },
             setDormindo(status) {
                 this.dormindo = status;
-                if (this.dormindo) { this.element.style.filter = 'brightness(0.5) drop-shadow(0 4px 6px rgba(0,0,0,0.8))'; this.changeAction('Idle'); } 
-                else { this.element.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.4))'; }
+                if (this.dormindo) { this.element.style.filter = 'brightness(0.5) drop-shadow(0 15px 5px rgba(0,0,0,0.8))'; this.changeAction('Idle'); } 
+                else { this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))'; }
             },
             changeAction(newState) {
                 this.state = newState;
@@ -356,8 +360,8 @@
                 }
             },
             draw() {
-                this.element.style.left = (this.x - 28) + 'px';
-                this.element.style.top = (this.y - 56) + 'px'; 
+                this.element.style.left = (this.x - 36) + 'px'; // Metade de 72px
+                this.element.style.top = (this.y - 72) + 'px'; 
             },
             loop() {
                 if (!this.isRunning) return;
@@ -387,7 +391,6 @@
             const isNoite = horaAtual >= 18 || horaAtual < 6;
             
             const sufixoTempo = isNoite ? '_night' : '';
-            // CORREÇÃO CRÍTICA APLICADA (.jpg) E LOG PARA DEBUG
             const urlBackground = `https://raw.githubusercontent.com/coisas3d/pokeweb/main/bioma/back_${tipoIngles}${sufixoTempo}.jpg`;
             console.log(`[BIOMA] Carregando: ${urlBackground}`);
             
