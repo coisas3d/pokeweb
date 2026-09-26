@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>COISAS 3D - POKEWEB</title>
+    <title>PokeWeb - Premium</title>
     <style>
         /* BASE & TIPOGRAFIA PREMIUM */
         body { 
@@ -73,12 +73,12 @@
         }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
 
-        /* ÁREA DO JOGO COM BIOMA FIXO */
+        /* ÁREA DO JOGO COM BIOMA FIXO (PREENCHIMENTO TOTAL) */
         #tela-jogo { 
             flex-grow: 1; 
             background-color: #cbd5e1; 
-            background-size: cover;
-            background-position: center bottom;
+            background-size: 100% 100%; /* Força o preenchimento total da tela */
+            background-position: center;
             background-repeat: no-repeat;
             display: flex; flex-direction: column; position: relative; 
             overflow: hidden;
@@ -104,18 +104,18 @@
         
         #ovo-wrapper { 
             position: absolute; 
-            bottom: 100px; /* ALINHADO EXATAMENTE COM A TERRA DO BIOMA */
+            bottom: 100px; 
             left: 50%;
             width: 80px; height: 100px; 
             display: flex; justify-content: center; align-items: center; 
             transform: translateX(-50%) scale(0.65);
             transform-origin: bottom center;
-            filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); /* SOMBRA PARA FIXAÇÃO NO CHÃO */
+            filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); 
         }
 
         #tempo-eclosao { 
             position: absolute;
-            bottom: 45px; /* Abaixo do ovo e da linha de terra */
+            bottom: 45px; 
             left: 50%;
             transform: translateX(-50%);
             font-weight: 700; font-size: 14px; color: #475569; 
@@ -123,7 +123,7 @@
             border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
         }
 
-        /* OVO CSS - COR ESCURECIDA */
+        /* OVO CSS */
         .ovo { width: 80px; height: 100px; background-color: #e2e8f0; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -15px -15px 25px rgba(0,0,0,0.2), 0 15px 25px rgba(0,0,0,0.15); animation: ovo-tremendo 3s infinite; }
         .ovo-grama { background-image: radial-gradient(circle at 30% 30%, #10b981 12px, transparent 13px), radial-gradient(circle at 75% 60%, #10b981 18px, transparent 19px), radial-gradient(circle at 45% 85%, #10b981 10px, transparent 11px); }
         .ovo-fogo { background-image: radial-gradient(circle at 30% 30%, #ef4444 12px, transparent 13px), radial-gradient(circle at 75% 60%, #ef4444 18px, transparent 19px), radial-gradient(circle at 45% 85%, #ef4444 10px, transparent 11px); }
@@ -311,8 +311,6 @@
                 const layer = document.getElementById(layerId);
                 this.containerW = layer.clientWidth; this.containerH = layer.clientHeight;
                 this.x = this.containerW / 2; 
-                
-                // NOVO: Posicionamento fixado no chão exato da arte do bioma (100px)
                 this.y = this.containerH - 100; 
                 
                 if (!this.element) {
@@ -320,7 +318,6 @@
                     this.element.style.position = 'absolute';
                     this.element.style.imageRendering = 'pixelated';
                     this.element.style.transformOrigin = 'center center';
-                    // Escala aumentada para imponência
                     this.element.style.height = '72px';
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
                     layer.appendChild(this.element);
@@ -360,7 +357,7 @@
                 }
             },
             draw() {
-                this.element.style.left = (this.x - 36) + 'px'; // Metade de 72px
+                this.element.style.left = (this.x - 36) + 'px';
                 this.element.style.top = (this.y - 72) + 'px'; 
             },
             loop() {
