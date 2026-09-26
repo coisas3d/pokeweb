@@ -73,19 +73,19 @@
         }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
 
-        /* ÁREA DO JOGO E MOTOR 2D */
+        /* ÁREA DO JOGO COM BIOMA FIXO */
         #tela-jogo { 
             flex-grow: 1; 
-            background-color: #cbd5e1; /* Cor de fundo padrão antes de carregar a imagem */
+            background-color: #cbd5e1; 
             background-size: cover;
-            background-position: bottom center;
+            background-position: center bottom;
             background-repeat: no-repeat;
             display: flex; flex-direction: column; position: relative; 
             overflow: hidden;
             transition: background-image 1s ease-in-out;
         }
         
-        /* Película Escura para o Modo Noturno/Sono */
+        /* Película Escura para o Modo Sono */
         #tela-jogo::after {
             content: ''; position: absolute; inset: 0;
             background: rgba(15, 23, 42, 0.6);
@@ -96,9 +96,33 @@
 
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; }
 
+        /* SISTEMA DE POSICIONAMENTO DO OVO NO CHÃO (FLOOR POSITIONING) */
+        #ovo-container { 
+            display: none; position: absolute; top: 0; left: 0; 
+            width: 100%; height: 100%; z-index: 2; 
+        }
+        
+        #ovo-wrapper { 
+            position: absolute; 
+            bottom: 60px; /* Alinhado perfeitamente com o chão do bioma */
+            left: 50%;
+            width: 80px; height: 100px; 
+            display: flex; justify-content: center; align-items: center; 
+            transform: translateX(-50%) scale(0.65); /* Escala proporcionalizada */
+            transform-origin: bottom center;
+        }
+
+        #tempo-eclosao { 
+            position: absolute;
+            bottom: 15px; /* Abaixo do ovo */
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 700; font-size: 14px; color: #475569; 
+            background: rgba(255,255,255,0.85); padding: 8px 20px; 
+            border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+        }
+
         /* OVO CSS */
-        #ovo-container { display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; z-index: 2; position: relative; }
-        #ovo-wrapper { position: relative; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; }
         .ovo { width: 80px; height: 100px; background-color: #f8fafc; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -15px -15px 25px rgba(0,0,0,0.1), 0 15px 25px rgba(0,0,0,0.15); animation: ovo-tremendo 3s infinite; }
         .ovo-grama { background-image: radial-gradient(circle at 30% 30%, #10b981 12px, transparent 13px), radial-gradient(circle at 75% 60%, #10b981 18px, transparent 19px), radial-gradient(circle at 45% 85%, #10b981 10px, transparent 11px); }
         .ovo-fogo { background-image: radial-gradient(circle at 30% 30%, #ef4444 12px, transparent 13px), radial-gradient(circle at 75% 60%, #ef4444 18px, transparent 19px), radial-gradient(circle at 45% 85%, #ef4444 10px, transparent 11px); }
@@ -107,15 +131,13 @@
         .ovo-topo { clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 80% 40%, 60% 55%, 40% 45%, 20% 60%, 0% 50%); animation: rachar-topo 1.5s forwards cubic-bezier(0.25, 1, 0.5, 1); }
         .ovo-base { clip-path: polygon(0% 50%, 20% 60%, 40% 45%, 60% 55%, 80% 40%, 100% 50%, 100% 100%, 0% 100%); animation: rachar-base 1.5s forwards cubic-bezier(0.25, 1, 0.5, 1); }
         .luz-eclosao { position: absolute; width: 20px; height: 20px; background: #ffffff; border-radius: 50%; box-shadow: 0 0 60px 60px #ffffff; opacity: 0; animation: brilho-eclosao 1.5s forwards; z-index: 10; }
-        
-        #tempo-eclosao { margin-top: 35px; font-weight: 700; font-size: 14px; color: #475569; background: rgba(255,255,255,0.7); padding: 8px 20px; border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
         @keyframes ovo-tremendo { 0%, 80% { transform: rotate(0deg) scale(1); } 85% { transform: rotate(-10deg) scale(1.05); } 90% { transform: rotate(10deg) scale(1.05); } 95% { transform: rotate(-10deg) scale(1.05); } 100% { transform: rotate(0deg) scale(1); } }
         @keyframes rachar-topo { 0%, 20% { transform: translateY(0) rotate(0); } 30% { transform: translateY(-5px) rotate(-5deg); } 40% { transform: translateY(-5px) rotate(5deg); } 60%, 100% { transform: translateY(-80px) rotate(-35deg); opacity: 0; } }
         @keyframes rachar-base { 0%, 20% { transform: translateY(0); } 30%, 40% { transform: translateY(2px); } 60%, 100% { transform: translateY(50px); opacity: 0; } }
         @keyframes brilho-eclosao { 0%, 40% { opacity: 0; transform: scale(1); } 60% { opacity: 1; transform: scale(5); } 100% { opacity: 1; transform: scale(25); } }
 
-        /* MENUS OVERLAY (Glassmorphism) */
+        /* MENUS OVERLAY */
         .overlay-glass { 
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -124,42 +146,26 @@
         }
         
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 85%; }
-        .menu-btn { 
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); 
-            color: white; padding: 20px 10px; border-radius: 16px; font-size: 16px; font-weight: 600; 
-            cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        .menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 20px 10px; border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .menu-btn:active { background: rgba(255, 255, 255, 0.2); transform: scale(0.95); }
         .btn-voltar { background: rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 0.5); margin-top: 30px; width: 85%; }
 
         /* TELA DE STATUS ANALÍTICA PREMIUM */
         #status-overlay { justify-content: flex-start; padding: 25px; box-sizing: border-box; overflow-y: auto; }
-        
-        .status-box { 
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); 
-            padding: 20px; border-radius: 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        
+        .status-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .status-header { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px; }
         .status-header img { width: 64px; height: 64px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
-        
         .status-title { font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; }
         .status-subtitle { font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
-        
         .stat-text-line { display: flex; justify-content: space-between; margin: 8px 0; font-size: 15px; font-weight: 600; color: #cbd5e1; }
         .stat-text-line span:last-child { color: #ffffff; font-weight: 700; font-family: 'Courier New', Courier, monospace; font-size: 16px; }
-        
         .section-title { text-align: center; font-weight: 800; font-size: 12px; color: #64748b; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase; }
         
-        /* BARRAS DE PROGRESSO DINÂMICAS */
         .stat-bar-row { display: flex; align-items: center; margin: 12px 0; }
         .stat-label { width: 55px; font-size: 13px; font-weight: 700; color: #94a3b8; }
         .stat-bar-bg { flex-grow: 1; height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; margin: 0 15px; overflow: hidden; position: relative; }
         .stat-bar-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .stat-value { width: 35px; text-align: right; font-size: 15px; font-weight: 700; font-family: 'Courier New', Courier, monospace; }
-        
-        /* Cores Premium das Barras */
         .fill-exp { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
         .fill-stat { background: linear-gradient(90deg, #10b981, #34d399); }
 
@@ -175,7 +181,6 @@
 
     <div id="app-container">
         
-        <!-- ECRÃ 1: ESCOLHER REGIÃO -->
         <div id="screen-region" class="screen">
             <div class="selecao-header">ESCOLHA UMA REGIÃO</div>
             <div class="opcoes-grid">
@@ -185,13 +190,11 @@
             </div>
         </div>
 
-        <!-- ECRÃ 2: ESCOLHER STARTER -->
         <div id="screen-starter" class="screen">
             <div class="selecao-header">ESCOLHA SEU PARCEIRO</div>
             <div class="opcoes-grid" id="lista-starters"></div>
         </div>
 
-        <!-- ECRÃ 3: JOGO PRINCIPAL -->
         <div id="screen-game" class="screen">
             <div class="status-bar">
                 <span id="nivel">Nvl <strong style="color:#1e293b;">--</strong></span>
@@ -210,7 +213,6 @@
                 <button class="btn-principal" onclick="abrirMenu()">MENU</button>
             </div>
             
-            <!-- MENU PRINCIPAL GLASSMORPHISM -->
             <div id="menu-overlay" class="overlay-glass">
                 <div class="menu-grid">
                     <button class="menu-btn" onclick="executarAcao('status')">Status</button>
@@ -221,7 +223,6 @@
                 <button class="menu-btn btn-voltar" onclick="fecharMenu()">FECHAR</button>
             </div>
 
-            <!-- TELA DE STATUS ANALÍTICA PREMIUM -->
             <div id="status-overlay" class="overlay-glass">
                 <div class="status-box">
                     <div class="status-header">
@@ -280,7 +281,6 @@
             </div>
         </div>
 
-        <!-- ECRÃ 4: NASCIMENTO -->
         <div id="screen-hatch" class="screen">
             <div class="hatch-container">
                 <div id="hatch-texto" class="hatch-texto">Oh?...</div>
@@ -309,7 +309,11 @@
             init(layerId) {
                 const layer = document.getElementById(layerId);
                 this.containerW = layer.clientWidth; this.containerH = layer.clientHeight;
-                this.x = this.containerW / 2; this.y = this.containerH / 2;
+                this.x = this.containerW / 2; 
+                
+                // NOVO: Posicionamento fixado no chão (Floor Positioning)
+                // Mantém o sprite alinhado com o eixo Y do background do cenário
+                this.y = this.containerH - 60; 
                 
                 if (!this.element) {
                     this.element = document.createElement('img');
@@ -356,7 +360,8 @@
             },
             draw() {
                 this.element.style.left = (this.x - 28) + 'px';
-                this.element.style.top = (this.y - 28) + 'px';
+                // Calculado dinamicamente para o pé do Pokémon encostar no chão matemático (y - altura)
+                this.element.style.top = (this.y - 56) + 'px'; 
             },
             loop() {
                 if (!this.isRunning) return;
@@ -370,26 +375,12 @@
             document.getElementById(idEcra).classList.add('active');
         }
 
-        // --- SISTEMA DINÂMICO DE BIOMAS ---
         const DicionarioTipos = {
-            'grama': 'grass',
-            'fogo': 'fire',
-            'agua': 'water',
-            'normal': 'normal',
-            'eletrico': 'electric',
-            'gelo': 'ice',
-            'lutador': 'fighting',
-            'veneno': 'poison',
-            'terrestre': 'ground',
-            'voador': 'flying',
-            'psiquico': 'psychic',
-            'inseto': 'bug',
-            'pedra': 'rock',
-            'fantasma': 'ghost',
-            'dragao': 'dragon',
-            'sombrio': 'dark',
-            'aco': 'steel',
-            'fada': 'fairy'
+            'grama': 'grass', 'fogo': 'fire', 'agua': 'water', 'normal': 'normal',
+            'eletrico': 'electric', 'gelo': 'ice', 'lutador': 'fighting', 'veneno': 'poison',
+            'terrestre': 'ground', 'voador': 'flying', 'psiquico': 'psychic', 'inseto': 'bug',
+            'pedra': 'rock', 'fantasma': 'ghost', 'dragao': 'dragon', 'sombrio': 'dark',
+            'aco': 'steel', 'fada': 'fairy'
         };
 
         function atualizarBioma(tipoPokemon) {
@@ -404,7 +395,6 @@
             
             telaJogo.style.backgroundImage = `url('${urlBackground}')`;
         }
-        // -----------------------------------
 
         async function iniciarJogo() {
             try {
@@ -416,6 +406,8 @@
 
                     mascoteAtivo = TimeManager.calculateOfflineProgression(mascoteAtivo);
                     await saveGame(mascoteAtivo);
+                    
+                    atualizarBioma(mascoteAtivo.species.type);
                     mostrarEcra('screen-game');
                     atualizarInterface();
                 } else {
@@ -444,6 +436,8 @@
             SoundManager.play('select_pokemon');
             mascoteAtivo = new PokemonInstance(id);
             await saveGame(mascoteAtivo);
+            
+            atualizarBioma(mascoteAtivo.species.type);
             mostrarEcra('screen-game');
             atualizarInterface();
         }
@@ -498,9 +492,6 @@
             document.getElementById('nivel').innerHTML = mascoteAtivo.isEgg ? `Nvl <strong style="color:#1e293b;">--</strong>` : `Nvl <strong style="color:#1e293b;">${mascoteAtivo.level}</strong>`;
             document.getElementById('fome').innerHTML = mascoteAtivo.isEgg ? `Fome <strong style="color:#1e293b;">--%</strong>` : `Fome <strong style="color:#1e293b;">${Math.floor(mascoteAtivo.hunger)}%</strong>`;
 
-            // Atualiza o cenário de fundo com base no tipo e no horário atual
-            atualizarBioma(mascoteAtivo.species.type);
-
             const ovoContainer = document.getElementById('ovo-container');
             const ovoWrapper = document.getElementById('ovo-wrapper');
             const spriteLayer = document.getElementById('sprite-layer');
@@ -539,14 +530,8 @@
         }
 
         // Funções de Overlay
-        function fadeIn(element) {
-            element.style.display = 'flex';
-            setTimeout(() => element.style.opacity = '1', 10);
-        }
-        function fadeOut(element) {
-            element.style.opacity = '0';
-            setTimeout(() => element.style.display = 'none', 300);
-        }
+        function fadeIn(element) { element.style.display = 'flex'; setTimeout(() => element.style.opacity = '1', 10); }
+        function fadeOut(element) { element.style.opacity = '0'; setTimeout(() => element.style.display = 'none', 300); }
 
         function abrirMenu() { SoundManager.play('menu_open'); fadeIn(document.getElementById('menu-overlay')); }
         function fecharMenu() { fadeOut(document.getElementById('menu-overlay')); }
@@ -570,14 +555,8 @@
             document.getElementById('status-nature').innerText = mascoteAtivo.nature.toUpperCase();
             
             const statsReais = mascoteAtivo.calcularStatusReais();
-            
             const maxStat = Math.max(statsReais.hp, statsReais.atk, statsReais.def, statsReais.spa, statsReais.spd, statsReais.spe) * 1.1;
             
-            // As cores continuam dependendo estritamente do retorno do Motor Genético (Natures)
-            const natureBuff = mascoteAtivo.calcularStatusReais.buff || null; // O motor matemático aplica os buffs/debuffs internamente
-            
-            // Simulação de Identificação Visual (já que as Natures alteram o valor real retornado)
-            // Para mantermos as cores, usaremos um mapeamento estático temporário baseado na Natureza
             const natureMap = {
                 Lonely: { buff: 'atk', debuff: 'def' }, Brave: { buff: 'atk', debuff: 'spe' }, Adamant: { buff: 'atk', debuff: 'spa' }, Naughty: { buff: 'atk', debuff: 'spd' },
                 Bold: { buff: 'def', debuff: 'atk' }, Relaxed: { buff: 'def', debuff: 'spe' }, Impish: { buff: 'def', debuff: 'spa' }, Lax: { buff: 'def', debuff: 'spd' },
@@ -609,7 +588,6 @@
             renderStat('stat-spe', 'bar-spe', statsReais.spe, 'spe');
 
             fadeIn(document.getElementById('status-overlay'));
-            
             setTimeout(() => { expBar.style.width = `${expPercent}%`; }, 50);
         }
 
@@ -617,14 +595,10 @@
             if (!mascoteAtivo) return;
             if (mascoteAtivo.isEgg) { alert("Ainda é um ovo! Espere chocar."); fecharMenu(); return; }
 
-            if (acao === 'status') {
-                abrirStatus();
-                return;
-            }
+            if (acao === 'status') { abrirStatus(); return; }
             else if (acao === 'alimentar') {
-                if (PetEngine.dormindo) { 
-                    alert("O monstrinho está dormindo!"); 
-                } else { 
+                if (PetEngine.dormindo) { alert("O monstrinho está dormindo!"); } 
+                else { 
                     SoundManager.play('eat');
                     mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25); 
                     await saveGame(mascoteAtivo); 
