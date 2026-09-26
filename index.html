@@ -127,6 +127,7 @@
         #screen-hatch { background-color: #0f172a; justify-content: center; align-items: center; color: white; text-align: center; z-index: 30; }
         .hatch-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; width: 85%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(10px); }
         .hatch-texto { font-size: 20px; font-weight: 700; margin-bottom: 30px; min-height: 30px; color: #f8fafc; }
+
     </style>
 </head>
 <body>
@@ -187,7 +188,7 @@
                         <div style="display:flex; align-items:center; gap:5px;"><span style="font-size:12px;color:white;width:30px;">Ale</span><input type="number" id="dev-joy" class="dev-input" min="0" max="100"></div>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="aplicarDevTools()" style="flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; background: #ef4444; color: white; border: none; font-weight: bold; font-size:13px;">Aplicar</button>
+                        <button onclick="aplicarDevTools()" style="flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; background: #ef4444; color: white; border: none; font-weight: bold; font-size:13px;">Aplicar Status</button>
                         <button onclick="adicionarCoco()" style="padding: 10px; border-radius: 8px; cursor: pointer; background: #8b4513; color: white; border: none; font-weight: bold; font-size:13px;" title="Adiciona +1 sujeira na tela">+1 💩</button>
                     </div>
                 </div>
@@ -197,8 +198,7 @@
             <div id="status-overlay" class="overlay-glass">
                 <div class="status-box">
                     <div class="status-header">
-                        <!-- CONTAINER PMD PARA TELA DE STATUS -->
-                        <div id="status-sprite-container" style="margin-right: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));"></div>
+                        <div id="status-sprite-container" style="margin-right: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); display: flex; justify-content: center; align-items: center;">⏳</div>
                         <div>
                             <div id="status-nome" class="status-title">--</div>
                             <div id="status-tipo" class="status-subtitle">--</div>
@@ -254,7 +254,6 @@
         <div id="screen-hatch" class="screen">
             <div class="hatch-container">
                 <div id="hatch-texto" class="hatch-texto">Oh?...</div>
-                <!-- CONTAINER PMD PARA TELA DE ECLOSÃO -->
                 <div id="hatch-sprite-container" style="margin-bottom: 30px; display: none; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));"></div>
                 <button id="btn-hatch-continuar" class="btn-principal" style="display:none; width:100%; margin-top:20px;" onclick="concluirEclosao()">CONTINUAR</button>
             </div>
@@ -275,18 +274,33 @@
         // O NOVO CÉREBRO UNIVERSAL DO PMDCOLLAB (SEM SHOWDOWN)
         // =======================================================
         const PMDHelper = {
+            // Path Finder Avançado: Testa as URLs do PMDCollab automaticamente
+            async getBasePath(dexId) {
+                const dexStr = dexId.toString().padStart(4, '0');
+                const bases = [
+                    `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/0000/0000/`,
+                    `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/main/sprite/${dexStr}/0000/0000/`,
+                    `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/`,
+                    `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/main/sprite/${dexStr}/`
+                ];
+                for (const b of bases) {
+                    try {
+                        const r = await fetch(b + 'AnimData.xml');
+                        if (r.ok) return { basePath: b, xmlText: await r.text() };
+                    } catch(e) {} // Ignora falhas de CORS ou 404 e tenta o próximo
+                }
+                throw new Error("Não foi possível encontrar AnimData.xml");
+            },
+
+            // Injeta a animação em qualquer DIV do sistema (Menu, Eclosão, Status)
             async playAnim(containerId, dexId, targetAnimName = 'Idle', scale = 1, flip = false) {
                 const container = document.getElementById(containerId);
                 if (!container) return;
                 
-                container.innerHTML = '';
-                const dexStr = dexId.toString().padStart(4, '0');
-                const basePath = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/0000/0000/`;
-                
                 try {
-                    const response = await fetch(basePath + 'AnimData.xml');
-                    if (!response.ok) throw new Error("XML não encontrado no PMDCollab.");
-                    const text = await response.text();
+                    const data = await this.getBasePath(dexId);
+                    const basePath = data.basePath;
+                    const text = data.xmlText;
                     
                     const parser = new DOMParser();
                     const xml = parser.parseFromString(text, "text/xml");
@@ -303,13 +317,16 @@
                         targetAnimName = 'Idle';
                     }
 
-                    if (!animNode) return;
+                    if (!animNode) throw new Error("Animação Base Não Encontrada");
 
                     const fW = parseInt(animNode.querySelector('FrameWidth').textContent);
                     const fH = parseInt(animNode.querySelector('FrameHeight').textContent);
                     const durNodes = animNode.querySelectorAll('Durations Duration');
                     const durations = Array.from(durNodes).map(d => parseInt(d.textContent));
 
+                    // Limpa o Ícone de Carregamento (Ampulheta)
+                    container.innerHTML = '';
+                    
                     container.style.width = fW + 'px';
                     container.style.height = fH + 'px';
                     container.style.backgroundImage = `url('${basePath}${targetAnimName}-Anim.png')`;
@@ -323,8 +340,9 @@
 
                     let currentFrame = 0;
                     let tick = 0;
-                    const direction = 0; // Frente (Down)
+                    const direction = 0; // Direção "Olhando para Frente" (0 = Down)
 
+                    // Limpa o loop anterior para não piscar
                     if (container.dataset.intervalId) {
                         clearInterval(parseInt(container.dataset.intervalId));
                     }
@@ -340,18 +358,20 @@
                             const bgPosY = -(direction * fH);
                             container.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
                         }
-                    }, 1000 / 60); 
+                    }, 1000 / 60); // 60 Frames Por Segundo
 
                     container.dataset.intervalId = intervalId;
 
                 } catch(e) {
                     console.error("Falha ao injetar animação do PMDCollab:", e);
+                    container.innerHTML = '❌'; // Se der erro final, mostra X vermelho
+                    container.style.fontSize = '24px';
                 }
             }
         };
 
         // =======================================================
-        // MOTOR DO MASCOTE NA TELA PRINCIPAL
+        // MOTOR DO MASCOTE NA TELA PRINCIPAL (GAME)
         // =======================================================
         const PetEngine = {
             element: null, state: 'Idle', direction: 6, 
@@ -371,6 +391,10 @@
                     this.element.style.transformOrigin = 'center bottom';
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
                     this.element.style.transform = 'scale(1.5)';
+                    this.element.style.display = 'flex';
+                    this.element.style.justifyContent = 'center';
+                    this.element.style.alignItems = 'flex-end';
+                    this.element.innerHTML = '⏳'; // Ícone de carregamento
                     layer.appendChild(this.element);
                 }
                 this.isRunning = true; this.loop();
@@ -404,17 +428,18 @@
             },
 
             async setPokemon(id) {
-                const dexStr = id.toString().padStart(4, '0');
-                this.basePath = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/0000/0000/`;
-
                 try {
-                    const response = await fetch(this.basePath + 'AnimData.xml');
-                    if (!response.ok) throw new Error("XML não encontrado no servidor.");
-                    const text = await response.text();
-                    this.parseXML(text);
+                    // Usa o Path Finder para localizar a pasta correta na internet
+                    const data = await PMDHelper.getBasePath(id);
+                    this.basePath = data.basePath;
+                    this.parseXML(data.xmlText);
+                    
+                    this.element.innerHTML = ''; // Limpa a ampulheta
                     this.changeAction('Idle');
                 } catch(e) {
-                    console.error("Falha crassa no Motor PMD:", e);
+                    console.error("Falha crassa no Motor PMD Principal:", e);
+                    this.element.innerHTML = '❌';
+                    this.element.style.fontSize = '30px';
                 }
             },
 
@@ -541,7 +566,6 @@
         async function iniciarJogo() {
             try {
                 let saveState = await loadGame();
-                // Verificação rígida para garantir que o save não está corrompido
                 if (saveState && saveState.species && saveState.species.id) {
                     mascoteAtivo = saveState;
                     Object.setPrototypeOf(mascoteAtivo, PokemonInstance.prototype);
@@ -562,9 +586,10 @@
         }
 
         function gerarBotaoStarter(id, nome, tipo) {
+            // A Div está ancorada para alinhar a base do monstrinho com o botão
             return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
                         <div style="width: 50px; height: 50px; display: flex; justify-content: center; align-items: flex-end; margin-right: 15px; position: relative;">
-                            <div id="sprite-starter-${id}" style="position: absolute; bottom: 0; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));"></div>
+                            <div id="sprite-starter-${id}" style="position: absolute; bottom: 0; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); display: flex; justify-content: center; align-items: center; font-size: 20px;">⏳</div>
                         </div>
                         <span>${nome.toUpperCase()}</span>
                     </button>`;
@@ -591,7 +616,7 @@
             mostrarEcra('screen-starter');
             
             // Injeta as animações puras do PMDCollab nos botões gerados
-            idsParaCarregar.forEach(id => PMDHelper.playAnim(`sprite-starter-${id}`, id, 'Idle', 1));
+            idsParaCarregar.forEach(id => PMDHelper.playAnim(`sprite-starter-${id}`, id, 'Idle', 1.2));
         }
 
         async function escolherStarter(id) {
@@ -633,7 +658,7 @@
                     document.getElementById('hatch-texto').innerText = `Nasceu um ${mascoteAtivo.species.name.toUpperCase()}!`;
                     
                     document.getElementById('hatch-sprite-container').style.display = "block";
-                    // Injeta a animação PMD na Eclosão! (Com escala 1.5)
+                    // Injeta a animação PMD na Eclosão!
                     PMDHelper.playAnim('hatch-sprite-container', mascoteAtivo.species.id, 'Idle', 1.5);
                     
                     document.getElementById('btn-hatch-continuar').style.display = "block";
@@ -710,7 +735,7 @@
                 
                 if (!PetEngine.isRunning) {
                     PetEngine.init('sprite-layer');
-                    PetEngine.setPokemon(mascoteAtivo.species.id); // Sempre chama o PMD
+                    PetEngine.setPokemon(mascoteAtivo.species.id); 
                     PetEngine.setDormindo(mascoteAtivo.sleep);
                 }
             }
@@ -836,6 +861,11 @@
                     mascoteAtivo.hygiene = Math.max(0, mascoteAtivo.hygiene - 5); 
                     mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 2);
                     await saveGame(mascoteAtivo); 
+                    
+                    // Opcional: Aciona animação de comer na tela do jogo
+                    PetEngine.changeAction('Eat'); 
+                    setTimeout(() => { PetEngine.changeAction('Idle'); }, 2000); // Volta ao normal
+                    
                     atualizarInterface(); 
                 }
             } 
