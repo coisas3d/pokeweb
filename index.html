@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PokeWeb - Premium</title>
+    <title>PokeWeb - Premium Game Engine</title>
     <style>
         /* BASE & TIPOGRAFIA PREMIUM */
         body { 
@@ -59,7 +59,7 @@
         .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 18px 0; width: 85%; border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
 
-        /* BIOMA COM BACKGROUND FORÇADO */
+        /* BIOMA COM BACKGROUND FORÇADO 100% */
         #tela-jogo { 
             flex-grow: 1; 
             width: 100%;
@@ -77,10 +77,9 @@
 
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; }
         
-        /* CAMADA DE SUJEIRA (COCÔS) */
+        /* CAMADA DE SUJEIRA (COCÔS) E EFEITO LIMPEZA */
         #poop-layer { position: absolute; bottom: 100px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
-
-        /* NOVO: EFEITO VISUAL DE LIMPEZA */
+        
         #efeito-limpeza {
             display: none; position: absolute; inset: 0; z-index: 15;
             background: rgba(56, 189, 248, 0.3); backdrop-filter: blur(4px);
@@ -199,6 +198,7 @@
                     <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
                 </div>
                 
+                <!-- BOTÕES DE DESENVOLVEDOR (DEV TOOLS) PARA TESTES MATEMÁTICOS -->
                 <div id="dev-tools">
                     <div style="color: #ef4444; text-align: center; font-size: 13px; font-weight: 800; margin-bottom: 12px; letter-spacing: 1px;">⚙️ MODO DESENVOLVEDOR ⚙️</div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
@@ -293,9 +293,13 @@
 
         const SoundManager = { play(effect) { console.log(`[Audio]: '${effect}'`); } };
 
+        // --- NOVO MOTOR PMD COLLAB ---
         const PetEngine = {
-            element: null, state: 'Idle', direction: 'Left', x: 0, y: 0, containerW: 0, containerH: 0,
-            speed: 0.5, isRunning: false, pokemonName: '', dormindo: false, actionTimer: 0,
+            element: null, state: 'Idle', direction: 6, // 6 = Esquerda, 2 = Direita
+            x: 0, y: 0, containerW: 0, containerH: 0, speed: 0.5, 
+            isRunning: false, dormindo: false, actionTimer: 0,
+            
+            animData: {}, currentFrame: 0, tickCounter: 0, basePath: '', currentActionName: 'Idle',
 
             init(layerId) {
                 const layer = document.getElementById(layerId);
@@ -303,42 +307,99 @@
                 this.x = this.containerW / 2; this.y = this.containerH - 100; 
                 
                 if (!this.element) {
-                    this.element = document.createElement('img');
+                    this.element = document.createElement('div');
                     this.element.style.position = 'absolute';
                     this.element.style.imageRendering = 'pixelated';
-                    this.element.style.transformOrigin = 'center center';
-                    this.element.style.height = '72px';
+                    this.element.style.transformOrigin = 'center bottom';
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
+                    this.element.style.transform = 'scale(1.5)'; // Escala PMD
                     layer.appendChild(this.element);
                 }
                 this.isRunning = true; this.loop();
             },
-            setPokemon(name) {
-                this.pokemonName = name.toLowerCase();
-                this.element.src = `https://play.pokemonshowdown.com/sprites/gen5ani/${this.pokemonName}.gif`;
-                this.changeAction('Idle');
+
+            async parseXML(xmlText) {
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(xmlText, "text/xml");
+                const anims = xml.querySelectorAll('Anim');
+                this.animData = {};
+
+                anims.forEach(anim => {
+                    const name = anim.querySelector('Name').textContent;
+                    const copyOf = anim.querySelector('CopyOf');
+                    
+                    if (copyOf) {
+                        this.animData[name] = { copyOf: copyOf.textContent };
+                    } else {
+                        const fW = parseInt(anim.querySelector('FrameWidth').textContent);
+                        const fH = parseInt(anim.querySelector('FrameHeight').textContent);
+                        const durNodes = anim.querySelectorAll('Durations Duration');
+                        const durations = Array.from(durNodes).map(d => parseInt(d.textContent));
+                        
+                        this.animData[name] = { frameWidth: fW, frameHeight: fH, durations: durations };
+                    }
+                });
+
+                Object.keys(this.animData).forEach(key => {
+                    if (this.animData[key].copyOf) {
+                        const target = this.animData[this.animData[key].copyOf];
+                        this.animData[key] = { ...target }; 
+                    }
+                });
             },
+
+            async setPokemon(id) {
+                const dexStr = id.toString().padStart(4, '0');
+                this.basePath = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/0000/0000/`;
+
+                try {
+                    const response = await fetch(this.basePath + 'AnimData.xml');
+                    const text = await response.text();
+                    this.parseXML(text);
+                    this.changeAction('Idle');
+                } catch(e) {
+                    console.error("Falha ao carregar motor PMD:", e);
+                }
+            },
+
             setDormindo(status) {
                 this.dormindo = status;
-                if (this.dormindo) { this.element.style.filter = 'brightness(0.5) drop-shadow(0 15px 5px rgba(0,0,0,0.8))'; this.changeAction('Idle'); } 
-                else { this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))'; }
+                if (this.dormindo) { 
+                    this.element.style.filter = 'brightness(0.5) drop-shadow(0 15px 5px rgba(0,0,0,0.8))'; 
+                    this.changeAction('Sleep'); 
+                } else { 
+                    this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))'; 
+                    this.changeAction('Idle');
+                }
             },
+
             changeAction(newState) {
-                this.state = newState;
-                if (this.state === 'WalkLeft') { this.direction = 'Left'; this.element.style.transform = 'scaleX(1)'; } 
-                else if (this.state === 'WalkRight') { this.direction = 'Right'; this.element.style.transform = 'scaleX(-1)'; } 
-                else { this.element.style.transform = (this.direction === 'Right') ? 'scaleX(-1)' : 'scaleX(1)'; }
-            },
-            updateLogic() {
-                if (this.dormindo) return;
+                let animName = newState;
+                if (newState === 'WalkLeft') { animName = 'Walk'; this.direction = 6; }
+                if (newState === 'WalkRight') { animName = 'Walk'; this.direction = 2; }
                 
-                // --- NOVA INTELIGÊNCIA ARTIFICIAL: ESTADO CRÍTICO ---
-                if (mascoteAtivo && !mascoteAtivo.isEgg) {
-                    const isCritical = (mascoteAtivo.food < 10 || mascoteAtivo.energy < 10 || mascoteAtivo.hygiene < 10 || mascoteAtivo.joy < 10);
-                    
-                    if (isCritical) {
+                if (this.currentActionName === animName && this.state === newState) return;
+                
+                this.state = newState;
+                this.currentActionName = animName;
+                this.currentFrame = 0;
+                this.tickCounter = 0;
+
+                const anim = this.animData[animName] || this.animData['Idle'];
+                if (!anim) return;
+
+                this.element.style.width = anim.frameWidth + 'px';
+                this.element.style.height = anim.frameHeight + 'px';
+                this.element.style.backgroundImage = `url('${this.basePath}${animName}-Anim.png')`;
+            },
+
+            updateLogic() {
+                if (!this.animData['Idle']) return; // Espera o XML carregar
+
+                if (!this.dormindo) {
+                    // IA DE ESTADO CRÍTICO
+                    if (mascoteAtivo && (mascoteAtivo.food < 10 || mascoteAtivo.energy < 10 || mascoteAtivo.hygiene < 10 || mascoteAtivo.joy < 10)) {
                         const center = this.containerW / 2;
-                        // Se estiver doente, ele caminha lentamente até o centro da tela e para (Idle)
                         if (Math.abs(this.x - center) > 2) {
                             this.changeAction(this.x > center ? 'WalkLeft' : 'WalkRight');
                             this.x += (this.x > center ? -this.speed : this.speed);
@@ -346,36 +407,53 @@
                             this.x = center;
                             this.changeAction('Idle');
                         }
-                        return; // Aborta a caminhada feliz/aleatória
+                        return; // Trava o mascote no centro
                     }
-                }
-                
-                let modSpeed = this.speed;
-                if (mascoteAtivo) {
-                    // Se não for crítico, mas estiver ruim, caminha arrastado
-                    if (mascoteAtivo.hygiene < 30 || mascoteAtivo.food < 30 || mascoteAtivo.joy < 30) {
+
+                    let modSpeed = this.speed;
+                    if (mascoteAtivo && (mascoteAtivo.hygiene < 30 || mascoteAtivo.food < 30 || mascoteAtivo.joy < 30)) {
                         modSpeed = this.speed * 0.3; 
+                    }
+
+                    if (Date.now() > this.actionTimer) {
+                        this.actionTimer = Date.now() + 2000 + Math.random() * 4000;
+                        const r = Math.random();
+                        if (r < 0.35) this.changeAction('WalkLeft');
+                        else if (r < 0.70) this.changeAction('WalkRight');
+                        else this.changeAction('Idle');
+                    }
+                    if (this.state.startsWith('Walk')) {
+                        if (this.direction === 2) this.x += modSpeed;
+                        if (this.direction === 6) this.x -= modSpeed;
+                        if (this.x < 40) { this.x = 40; this.changeAction('WalkRight'); }
+                        if (this.x > this.containerW - 40) { this.x = this.containerW - 40; this.changeAction('WalkLeft'); }
                     }
                 }
 
-                if (Date.now() > this.actionTimer) {
-                    this.actionTimer = Date.now() + 2000 + Math.random() * 4000;
-                    const r = Math.random();
-                    if (r < 0.35) this.changeAction('WalkLeft');
-                    else if (r < 0.70) this.changeAction('WalkRight');
-                    else this.changeAction('Idle');
-                }
-                if (this.state.startsWith('Walk')) {
-                    if (this.direction === 'Right') this.x += modSpeed;
-                    if (this.direction === 'Left') this.x -= modSpeed;
-                    if (this.x < 40) { this.x = 40; this.changeAction('WalkRight'); }
-                    if (this.x > this.containerW - 40) { this.x = this.containerW - 40; this.changeAction('WalkLeft'); }
+                // MOTOR DE FRAMES (PMD)
+                const anim = this.animData[this.currentActionName] || this.animData['Idle'];
+                this.tickCounter++;
+                if (this.tickCounter >= anim.durations[this.currentFrame]) {
+                    this.tickCounter = 0;
+                    this.currentFrame++;
+                    if (this.currentFrame >= anim.durations.length) {
+                        this.currentFrame = 0; 
+                    }
                 }
             },
+
             draw() {
-                this.element.style.left = (this.x - 36) + 'px';
-                this.element.style.top = (this.y - 72) + 'px'; 
+                if (!this.animData['Idle']) return;
+                
+                const anim = this.animData[this.currentActionName] || this.animData['Idle'];
+                this.element.style.left = (this.x - (anim.frameWidth / 2)) + 'px';
+                this.element.style.top = (this.y - anim.frameHeight) + 'px'; 
+                
+                const bgPosX = -(this.currentFrame * anim.frameWidth);
+                const bgPosY = -(this.direction * anim.frameHeight);
+                this.element.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
             },
+
             loop() {
                 if (!this.isRunning) return;
                 this.updateLogic(); this.draw();
@@ -555,7 +633,8 @@
                 
                 if (!PetEngine.isRunning) {
                     PetEngine.init('sprite-layer');
-                    PetEngine.setPokemon(mascoteAtivo.species.name);
+                    // NOVO: Passa o ID do Pokémon para o PMDEngine em vez do nome
+                    PetEngine.setPokemon(mascoteAtivo.species.id);
                     PetEngine.setDormindo(mascoteAtivo.sleep);
                 }
             }
@@ -689,15 +768,12 @@
                 if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); } 
                 else {
                     SoundManager.play('clean');
-                    
-                    // Dispara a animação visual na tela principal
                     const efeito = document.getElementById('efeito-limpeza');
                     efeito.style.display = 'flex';
                     efeito.style.animation = 'none';
-                    void efeito.offsetWidth; // Force reflow
+                    void efeito.offsetWidth; 
                     efeito.style.animation = 'flash-clean 1s ease-out forwards';
                     
-                    // Aplica a lógica matemática na metade da animação (quando o brilho está forte)
                     setTimeout(async () => {
                         mascoteAtivo.hygiene = 100;
                         mascoteAtivo.poops = 0;
@@ -706,7 +782,6 @@
                         atualizarInterface();
                     }, 500);
 
-                    // Esconde a div após a animação
                     setTimeout(() => { efeito.style.display = 'none'; }, 1000);
                 }
             }
