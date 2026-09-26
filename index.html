@@ -28,7 +28,6 @@
         .screen { display: none; flex-direction: column; height: 100%; }
         .screen.active { display: flex; }
 
-        /* HEADER E STATUS BAR */
         .selecao-header { 
             background: linear-gradient(90deg, #1e293b, #334155); 
             color: white; padding: 25px 20px; text-align: center; 
@@ -36,25 +35,19 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 5;
         }
         
+        /* STATUS BAR DOS 4 PILARES */
         .status-bar { 
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255, 255, 255, 0.9); padding: 15px 25px; 
-            font-weight: 700; font-size: 15px; color: #475569;
+            display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 15px;
+            background: rgba(255, 255, 255, 0.95); padding: 12px 10px; 
+            font-weight: 700; font-size: 14px; color: #475569;
             backdrop-filter: blur(10px); z-index: 5;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        .status-bar span { display: flex; align-items: center; gap: 5px; }
+        .status-bar span { display: flex; align-items: center; gap: 4px; }
+        .val-text { color:#1e293b; font-family: 'Courier New', Courier, monospace; font-weight: 800; }
 
-        /* BOTÕES PREMIUM */
         .opcoes-grid { display: flex; flex-direction: column; gap: 15px; padding: 25px; flex-grow: 1; justify-content: center; background-color: #f1f5f9; }
-        
-        .btn-opcao { 
-            display: flex; align-items: center; padding: 12px 20px; 
-            border-radius: 16px; border: none; cursor: pointer; 
-            font-size: 17px; font-weight: 700; color: #1e293b;
-            background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .btn-opcao { display: flex; align-items: center; padding: 12px 20px; border-radius: 16px; border: none; cursor: pointer; font-size: 17px; font-weight: 700; color: #1e293b; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .btn-opcao:active { transform: scale(0.97); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .btn-opcao img { width: 50px; height: 50px; object-fit: contain; margin-right: 15px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); }
         
@@ -62,68 +55,23 @@
         .btn-tipo-fogo { border-left: 6px solid #ef4444; }
         .btn-tipo-agua { border-left: 6px solid #3b82f6; }
 
-        #controles { display: flex; justify-content: center; padding: 25px; background: #ffffff; z-index: 5; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
-        
-        .btn-principal { 
-            background: linear-gradient(135deg, #ef4444, #dc2626); 
-            color: white; border: none; padding: 18px 0; width: 85%; 
-            border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px;
-            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer;
-            transition: all 0.2s;
-        }
+        #controles { display: flex; justify-content: center; padding: 20px; background: #ffffff; z-index: 5; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 18px 0; width: 85%; border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
 
-        /* ÁREA DO JOGO COM BIOMA FIXO (PREENCHIMENTO TOTAL) */
-        #tela-jogo { 
-            flex-grow: 1; 
-            background-color: #cbd5e1; 
-            background-size: 100% 100%; /* Força o preenchimento total da tela */
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex; flex-direction: column; position: relative; 
-            overflow: hidden;
-            transition: background-image 1s ease-in-out;
-        }
-        
-        /* Película Escura para o Modo Sono */
-        #tela-jogo::after {
-            content: ''; position: absolute; inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            opacity: 0; transition: opacity 1s ease;
-            pointer-events: none; z-index: 1;
-        }
+        #tela-jogo { flex-grow: 1; background-color: #cbd5e1; background-size: 100% 100%; background-position: center; background-repeat: no-repeat; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: background-image 1s ease-in-out; }
+        #tela-jogo::after { content: ''; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.6); opacity: 0; transition: opacity 1s ease; pointer-events: none; z-index: 1; }
         #tela-jogo.dormindo::after { opacity: 1; }
 
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; }
-
-        /* SISTEMA DE POSICIONAMENTO DO OVO NO CHÃO (FLOOR POSITIONING) */
-        #ovo-container { 
-            display: none; position: absolute; top: 0; left: 0; 
-            width: 100%; height: 100%; z-index: 2; 
-        }
         
-        #ovo-wrapper { 
-            position: absolute; 
-            bottom: 100px; 
-            left: 50%;
-            width: 80px; height: 100px; 
-            display: flex; justify-content: center; align-items: center; 
-            transform: translateX(-50%) scale(0.65);
-            transform-origin: bottom center;
-            filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); 
-        }
+        /* CAMADA DE SUJEIRA (COCÔS) */
+        #poop-layer { position: absolute; bottom: 100px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
 
-        #tempo-eclosao { 
-            position: absolute;
-            bottom: 45px; 
-            left: 50%;
-            transform: translateX(-50%);
-            font-weight: 700; font-size: 14px; color: #475569; 
-            background: rgba(255,255,255,0.85); padding: 8px 20px; 
-            border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-        }
+        #ovo-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+        #ovo-wrapper { position: absolute; bottom: 100px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
+        #tempo-eclosao { position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%); font-weight: 700; font-size: 14px; color: #475569; background: rgba(255,255,255,0.85); padding: 8px 20px; border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
-        /* OVO CSS */
         .ovo { width: 80px; height: 100px; background-color: #e2e8f0; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -15px -15px 25px rgba(0,0,0,0.2), 0 15px 25px rgba(0,0,0,0.15); animation: ovo-tremendo 3s infinite; }
         .ovo-grama { background-image: radial-gradient(circle at 30% 30%, #10b981 12px, transparent 13px), radial-gradient(circle at 75% 60%, #10b981 18px, transparent 19px), radial-gradient(circle at 45% 85%, #10b981 10px, transparent 11px); }
         .ovo-fogo { background-image: radial-gradient(circle at 30% 30%, #ef4444 12px, transparent 13px), radial-gradient(circle at 75% 60%, #ef4444 18px, transparent 19px), radial-gradient(circle at 45% 85%, #ef4444 10px, transparent 11px); }
@@ -138,18 +86,11 @@
         @keyframes rachar-base { 0%, 20% { transform: translateY(0); } 30%, 40% { transform: translateY(2px); } 60%, 100% { transform: translateY(50px); opacity: 0; } }
         @keyframes brilho-eclosao { 0%, 40% { opacity: 0; transform: scale(1); } 60% { opacity: 1; transform: scale(5); } 100% { opacity: 1; transform: scale(25); } }
 
-        /* MENUS OVERLAY */
-        .overlay-glass { 
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            z-index: 20; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 85%; }
-        .menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 20px 10px; border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .overlay-glass { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 20; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 85%; }
+        .menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 18px 10px; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .menu-btn:active { background: rgba(255, 255, 255, 0.2); transform: scale(0.95); }
-        .btn-voltar { background: rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 0.5); margin-top: 30px; width: 85%; }
+        .btn-voltar { background: rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 0.5); margin-top: 25px; width: 85%; }
 
         /* TELA DE STATUS ANALÍTICA PREMIUM */
         #status-overlay { justify-content: flex-start; padding: 25px; box-sizing: border-box; overflow-y: auto; }
@@ -164,13 +105,12 @@
         
         .stat-bar-row { display: flex; align-items: center; margin: 12px 0; }
         .stat-label { width: 55px; font-size: 13px; font-weight: 700; color: #94a3b8; }
-        .stat-bar-bg { flex-grow: 1; height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; margin: 0 15px; overflow: hidden; position: relative; }
-        .stat-bar-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .stat-value { width: 35px; text-align: right; font-size: 15px; font-weight: 700; font-family: 'Courier New', Courier, monospace; }
+        .stat-bar-bg { flex-grow: 1; height: 10px; background: rgba(0,0,0,0.3); border-radius: 4px; margin: 0 10px; overflow: hidden; position: relative; }
+        .stat-bar-fill { position: absolute; height: 100%; border-radius: 4px; width: 0%; transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .stat-value { width: 45px; text-align: right; font-size: 14px; font-weight: 700; font-family: 'Courier New', Courier, monospace; }
         .fill-exp { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
         .fill-stat { background: linear-gradient(90deg, #10b981, #34d399); }
 
-        /* TELA DE NASCIMENTO */
         #screen-hatch { background-color: #0f172a; justify-content: center; align-items: center; color: white; text-align: center; z-index: 30; }
         .hatch-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; width: 85%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(10px); }
         .hatch-texto { font-size: 20px; font-weight: 700; margin-bottom: 30px; min-height: 30px; color: #f8fafc; }
@@ -198,8 +138,11 @@
 
         <div id="screen-game" class="screen">
             <div class="status-bar">
-                <span id="nivel">Nvl <strong style="color:#1e293b;">--</strong></span>
-                <span id="fome">Fome <strong style="color:#1e293b;">--%</strong></span>
+                <span>Nvl <strong id="val-nivel" class="val-text">--</strong></span>
+                <span style="color:#ef4444" title="Alimentação">🍔 <strong id="val-food" class="val-text">--%</strong></span>
+                <span style="color:#eab308" title="Energia/Disposição">⚡ <strong id="val-energy" class="val-text">--%</strong></span>
+                <span style="color:#3b82f6" title="Higiene">🧼 <strong id="val-hygiene" class="val-text">--%</strong></span>
+                <span style="color:#ec4899" title="Alegria/Felicidade">❤️ <strong id="val-joy" class="val-text">--%</strong></span>
             </div>
             
             <div id="tela-jogo">
@@ -207,23 +150,25 @@
                     <div id="ovo-wrapper"></div>
                     <div id="tempo-eclosao"></div>
                 </div>
+                <div id="poop-layer"></div>
                 <div id="sprite-layer"></div>
             </div>
             
             <div id="controles">
-                <button class="btn-principal" onclick="abrirMenu()">MENU</button>
+                <button class="btn-principal" onclick="abrirMenu()">MENU PRINCIPAL</button>
             </div>
             
             <div id="menu-overlay" class="overlay-glass">
                 <div class="menu-grid">
                     <button class="menu-btn" onclick="executarAcao('status')">Status</button>
                     <button class="menu-btn" onclick="executarAcao('alimentar')">Alimentar</button>
-                    <button class="menu-btn" onclick="executarAcao('dormir')">Dormir / Acordar</button>
-                    <button class="menu-btn" onclick="executarAcao('pc')">PC Box</button>
+                    <button class="menu-btn" onclick="executarAcao('limpar')">Limpar</button>
+                    <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
                 </div>
                 <button class="menu-btn btn-voltar" onclick="fecharMenu()">FECHAR</button>
             </div>
 
+            <!-- TELA DE STATUS COM REDUÇÃO VISUAL -->
             <div id="status-overlay" class="overlay-glass">
                 <div class="status-box">
                     <div class="status-header">
@@ -249,32 +194,32 @@
                     <div class="stat-bar-row">
                         <span class="stat-label">HP</span>
                         <div class="stat-bar-bg"><div id="bar-hp" class="stat-bar-fill fill-stat"></div></div>
-                        <span class="stat-value" id="stat-hp">--</span>
+                        <span class="stat-value" id="stat-hp" style="width: 65px;">--</span>
                     </div>
                     <div class="stat-bar-row">
                         <span class="stat-label">ATK</span>
                         <div class="stat-bar-bg"><div id="bar-atk" class="stat-bar-fill fill-stat"></div></div>
-                        <span class="stat-value" id="stat-atk">--</span>
+                        <span class="stat-value" id="stat-atk" style="width: 65px;">--</span>
                     </div>
                     <div class="stat-bar-row">
                         <span class="stat-label">DEF</span>
                         <div class="stat-bar-bg"><div id="bar-def" class="stat-bar-fill fill-stat"></div></div>
-                        <span class="stat-value" id="stat-def">--</span>
+                        <span class="stat-value" id="stat-def" style="width: 65px;">--</span>
                     </div>
                     <div class="stat-bar-row">
                         <span class="stat-label">SP.A</span>
                         <div class="stat-bar-bg"><div id="bar-spa" class="stat-bar-fill fill-stat"></div></div>
-                        <span class="stat-value" id="stat-spa">--</span>
+                        <span class="stat-value" id="stat-spa" style="width: 65px;">--</span>
                     </div>
                     <div class="stat-bar-row">
                         <span class="stat-label">SP.D</span>
                         <div class="stat-bar-bg"><div id="bar-spd" class="stat-bar-fill fill-stat"></div></div>
-                        <span class="stat-value" id="stat-spd">--</span>
+                        <span class="stat-value" id="stat-spd" style="width: 65px;">--</span>
                     </div>
                     <div class="stat-bar-row">
                         <span class="stat-label">SPE</span>
                         <div class="stat-bar-bg"><div id="bar-spe" class="stat-bar-fill fill-stat"></div></div>
-                        <span class="stat-value" id="stat-spe">--</span>
+                        <span class="stat-value" id="stat-spe" style="width: 65px;">--</span>
                     </div>
                 </div>
                 
@@ -299,9 +244,7 @@
         let loopEclosao = null;
         let processoEclosaoEmAndamento = false;
 
-        const SoundManager = {
-            play(effect) { console.log(`[Audio]: '${effect}'`); }
-        };
+        const SoundManager = { play(effect) { console.log(`[Audio]: '${effect}'`); } };
 
         const PetEngine = {
             element: null, state: 'Idle', direction: 'Left', x: 0, y: 0, containerW: 0, containerH: 0,
@@ -310,8 +253,7 @@
             init(layerId) {
                 const layer = document.getElementById(layerId);
                 this.containerW = layer.clientWidth; this.containerH = layer.clientHeight;
-                this.x = this.containerW / 2; 
-                this.y = this.containerH - 100; 
+                this.x = this.containerW / 2; this.y = this.containerH - 100; 
                 
                 if (!this.element) {
                     this.element = document.createElement('img');
@@ -342,6 +284,9 @@
             },
             updateLogic() {
                 if (this.dormindo) return;
+                // Penalidade visual de caminhada se estiver muito sujo ou com fome
+                let modSpeed = (mascoteAtivo.hygiene < 30 || mascoteAtivo.food < 30) ? (this.speed * 0.5) : this.speed;
+
                 if (Date.now() > this.actionTimer) {
                     this.actionTimer = Date.now() + 2000 + Math.random() * 4000;
                     const r = Math.random();
@@ -350,8 +295,8 @@
                     else this.changeAction('Idle');
                 }
                 if (this.state.startsWith('Walk')) {
-                    if (this.direction === 'Right') this.x += this.speed;
-                    if (this.direction === 'Left') this.x -= this.speed;
+                    if (this.direction === 'Right') this.x += modSpeed;
+                    if (this.direction === 'Left') this.x -= modSpeed;
                     if (this.x < 40) { this.x = 40; this.changeAction('WalkRight'); }
                     if (this.x > this.containerW - 40) { this.x = this.containerW - 40; this.changeAction('WalkLeft'); }
                 }
@@ -383,14 +328,10 @@
         function atualizarBioma(tipoPokemon) {
             const telaJogo = document.getElementById('tela-jogo');
             const tipoIngles = DicionarioTipos[tipoPokemon] || 'normal';
-            
             const horaAtual = new Date().getHours();
             const isNoite = horaAtual >= 18 || horaAtual < 6;
-            
             const sufixoTempo = isNoite ? '_night' : '';
             const urlBackground = `https://raw.githubusercontent.com/coisas3d/pokeweb/main/bioma/back_${tipoIngles}${sufixoTempo}.jpg`;
-            console.log(`[BIOMA] Carregando: ${urlBackground}`);
-            
             telaJogo.style.backgroundImage = `url('${urlBackground}')`;
         }
 
@@ -400,8 +341,7 @@
                 if (saveState) {
                     mascoteAtivo = saveState;
                     Object.setPrototypeOf(mascoteAtivo, PokemonInstance.prototype);
-                    if (!mascoteAtivo.nature) mascoteAtivo.nature = "Hardy";
-
+                    
                     mascoteAtivo = TimeManager.calculateOfflineProgression(mascoteAtivo);
                     await saveGame(mascoteAtivo);
                     
@@ -487,8 +427,31 @@
         function atualizarInterface() {
             if (!mascoteAtivo) return;
             
-            document.getElementById('nivel').innerHTML = mascoteAtivo.isEgg ? `Nvl <strong style="color:#1e293b;">--</strong>` : `Nvl <strong style="color:#1e293b;">${mascoteAtivo.level}</strong>`;
-            document.getElementById('fome').innerHTML = mascoteAtivo.isEgg ? `Fome <strong style="color:#1e293b;">--%</strong>` : `Fome <strong style="color:#1e293b;">${Math.floor(mascoteAtivo.hunger)}%</strong>`;
+            document.getElementById('val-nivel').innerText = mascoteAtivo.isEgg ? `--` : mascoteAtivo.level;
+            document.getElementById('val-food').innerText = mascoteAtivo.isEgg ? `--%` : `${Math.floor(mascoteAtivo.food)}%`;
+            document.getElementById('val-energy').innerText = mascoteAtivo.isEgg ? `--%` : `${Math.floor(mascoteAtivo.energy)}%`;
+            document.getElementById('val-hygiene').innerText = mascoteAtivo.isEgg ? `--%` : `${Math.floor(mascoteAtivo.hygiene)}%`;
+            document.getElementById('val-joy').innerText = mascoteAtivo.isEgg ? `--%` : `${Math.floor(mascoteAtivo.joy)}%`;
+
+            // RENDERIZAÇÃO ORGÂNICA DA SUJEIRA NO CHÃO
+            const poopLayer = document.getElementById('poop-layer');
+            poopLayer.innerHTML = '';
+            if (!mascoteAtivo.isEgg && mascoteAtivo.poops > 0) {
+                for(let i=0; i<mascoteAtivo.poops; i++) {
+                    const poop = document.createElement('div');
+                    poop.innerText = '💩';
+                    poop.style.position = 'absolute';
+                    poop.style.fontSize = '26px';
+                    poop.style.bottom = '5px';
+                    poop.style.left = (30 + i * 20) + '%';
+                    poop.style.filter = 'drop-shadow(0 5px 2px rgba(0,0,0,0.6))';
+                    poopLayer.appendChild(poop);
+                }
+            }
+
+            const telaJogo = document.getElementById('tela-jogo');
+            if (mascoteAtivo.sleep) telaJogo.classList.add('dormindo');
+            else telaJogo.classList.remove('dormindo');
 
             const ovoContainer = document.getElementById('ovo-container');
             const ovoWrapper = document.getElementById('ovo-wrapper');
@@ -523,6 +486,7 @@
                 if (!PetEngine.isRunning) {
                     PetEngine.init('sprite-layer');
                     PetEngine.setPokemon(mascoteAtivo.species.name);
+                    PetEngine.setDormindo(mascoteAtivo.sleep);
                 }
             }
         }
@@ -546,44 +510,61 @@
             
             const expPercent = Math.floor(mascoteAtivo.exp * 100);
             document.getElementById('status-exp').innerText = `${expPercent}%`;
+            document.getElementById('status-nature').innerText = mascoteAtivo.nature.toUpperCase();
             
             const expBar = document.getElementById('status-exp-bar');
             expBar.style.width = '0%';
             
-            document.getElementById('status-nature').innerText = mascoteAtivo.nature.toUpperCase();
+            const stats = mascoteAtivo.calcularStatusReais();
             
-            const statsReais = mascoteAtivo.calcularStatusReais();
-            const maxStat = Math.max(statsReais.hp, statsReais.atk, statsReais.def, statsReais.spa, statsReais.spd, statsReais.spe) * 1.1;
+            // LÓGICA DE BARRA SOBREPOSTA (VERMELHA CORTANDO A VERDE)
+            const maxStat = Math.max(stats.hp.real, stats.atk.real, stats.def.real, stats.spa.real, stats.spd.real, stats.spe.real) * 1.1;
             
-            const natureMap = {
-                Lonely: { buff: 'atk', debuff: 'def' }, Brave: { buff: 'atk', debuff: 'spe' }, Adamant: { buff: 'atk', debuff: 'spa' }, Naughty: { buff: 'atk', debuff: 'spd' },
-                Bold: { buff: 'def', debuff: 'atk' }, Relaxed: { buff: 'def', debuff: 'spe' }, Impish: { buff: 'def', debuff: 'spa' }, Lax: { buff: 'def', debuff: 'spd' },
-                Timid: { buff: 'spe', debuff: 'atk' }, Hasty: { buff: 'spe', debuff: 'def' }, Jolly: { buff: 'spe', debuff: 'spa' }, Naive: { buff: 'spe', debuff: 'spd' },
-                Modest: { buff: 'spa', debuff: 'atk' }, Mild: { buff: 'spa', debuff: 'def' }, Quiet: { buff: 'spa', debuff: 'spe' }, Rash: { buff: 'spa', debuff: 'spd' },
-                Calm: { buff: 'spd', debuff: 'atk' }, Gentle: { buff: 'spd', debuff: 'def' }, Sassy: { buff: 'spd', debuff: 'spe' }, Careful: { buff: 'spd', debuff: 'spa' }
-            };
+            const natureMap = { Lonely: { buff: 'atk', debuff: 'def' }, Brave: { buff: 'atk', debuff: 'spe' }, Adamant: { buff: 'atk', debuff: 'spa' }, Naughty: { buff: 'atk', debuff: 'spd' }, Bold: { buff: 'def', debuff: 'atk' }, Relaxed: { buff: 'def', debuff: 'spe' }, Impish: { buff: 'def', debuff: 'spa' }, Lax: { buff: 'def', debuff: 'spd' }, Timid: { buff: 'spe', debuff: 'atk' }, Hasty: { buff: 'spe', debuff: 'def' }, Jolly: { buff: 'spe', debuff: 'spa' }, Naive: { buff: 'spe', debuff: 'spd' }, Modest: { buff: 'spa', debuff: 'atk' }, Mild: { buff: 'spa', debuff: 'def' }, Quiet: { buff: 'spa', debuff: 'spe' }, Rash: { buff: 'spa', debuff: 'spd' }, Calm: { buff: 'spd', debuff: 'atk' }, Gentle: { buff: 'spd', debuff: 'def' }, Sassy: { buff: 'spd', debuff: 'spe' }, Careful: { buff: 'spd', debuff: 'spa' } };
             const currentNature = natureMap[mascoteAtivo.nature] || { buff: null, debuff: null };
 
-            const renderStat = (statId, barId, value, key) => {
+            const renderStat = (statId, barId, statObj, key) => {
                 const el = document.getElementById(statId);
                 const bar = document.getElementById(barId);
                 
-                el.innerText = value;
-                bar.style.width = '0%'; 
+                const real = statObj.real;
+                const penalty = statObj.penalty;
+                const finalVal = statObj.final;
 
+                if (penalty > 0) {
+                    el.innerHTML = `${real} <span style="color: #ef4444; font-size: 0.8em; margin-left: 4px;">(-${penalty})</span>`;
+                } else {
+                    el.innerText = real;
+                }
+
+                // Cores base do número baseadas na Nature (Ignora se já estiver quebrado pela Tristeza)
                 if (currentNature.buff === key) el.style.color = "#34d399"; 
-                else if (currentNature.debuff === key) el.style.color = "#f87171"; 
-                else el.style.color = "#ffffff"; 
+                else if (currentNature.debuff === key && penalty === 0) el.style.color = "#f87171"; 
+                else if (penalty === 0) el.style.color = "#ffffff"; 
 
-                setTimeout(() => { bar.style.width = (value / maxStat * 100) + '%'; }, 50);
+                bar.style.width = '0%'; 
+                
+                setTimeout(() => { 
+                    // O Container cresce até o potencial máximo do Pokémon (Valor Real)
+                    bar.style.width = ((real / maxStat) * 100) + '%'; 
+                    bar.style.background = 'transparent';
+                    
+                    // Preenchimento duplo: Verde = O que restou | Vermelho = O que a tristeza cortou
+                    bar.innerHTML = `
+                        <div style="display:flex; width: 100%; height: 100%;">
+                            <div class="fill-stat" style="width: ${(finalVal / real) * 100}%; height: 100%; border-radius: 4px;"></div>
+                            ${penalty > 0 ? `<div style="background: rgba(239, 68, 68, 0.8); width: ${(penalty / real) * 100}%; height: 100%; border-radius: 0 4px 4px 0;"></div>` : ''}
+                        </div>
+                    `;
+                }, 50);
             };
 
-            renderStat('stat-hp', 'bar-hp', statsReais.hp, 'hp');
-            renderStat('stat-atk', 'bar-atk', statsReais.atk, 'atk');
-            renderStat('stat-def', 'bar-def', statsReais.def, 'def');
-            renderStat('stat-spa', 'bar-spa', statsReais.spa, 'spa');
-            renderStat('stat-spd', 'bar-spd', statsReais.spd, 'spd');
-            renderStat('stat-spe', 'bar-spe', statsReais.spe, 'spe');
+            renderStat('stat-hp', 'bar-hp', stats.hp, 'hp');
+            renderStat('stat-atk', 'bar-atk', stats.atk, 'atk');
+            renderStat('stat-def', 'bar-def', stats.def, 'def');
+            renderStat('stat-spa', 'bar-spa', stats.spa, 'spa');
+            renderStat('stat-spd', 'bar-spd', stats.spd, 'spd');
+            renderStat('stat-spe', 'bar-spe', stats.spe, 'spe');
 
             fadeIn(document.getElementById('status-overlay'));
             setTimeout(() => { expBar.style.width = `${expPercent}%`; }, 50);
@@ -595,19 +576,34 @@
 
             if (acao === 'status') { abrirStatus(); return; }
             else if (acao === 'alimentar') {
-                if (PetEngine.dormindo) { alert("O monstrinho está dormindo!"); } 
+                if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); } 
                 else { 
                     SoundManager.play('eat');
-                    mascoteAtivo.hunger = Math.min(100, mascoteAtivo.hunger + 25); 
+                    mascoteAtivo.food = Math.min(100, mascoteAtivo.food + 25);
+                    // Comer piora levemente a higiene e melhora a alegria
+                    mascoteAtivo.hygiene = Math.max(0, mascoteAtivo.hygiene - 5); 
+                    mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 2);
                     await saveGame(mascoteAtivo); 
                     atualizarInterface(); 
                 }
             } 
+            else if (acao === 'limpar') {
+                if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); } 
+                else {
+                    SoundManager.play('clean');
+                    mascoteAtivo.hygiene = 100;
+                    mascoteAtivo.poops = 0;
+                    mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 5);
+                    await saveGame(mascoteAtivo);
+                    atualizarInterface();
+                }
+            }
             else if (acao === 'dormir') {
-                const telaJogo = document.getElementById('tela-jogo');
-                const isDormindo = telaJogo.classList.toggle('dormindo');
-                PetEngine.setDormindo(isDormindo);
-                SoundManager.play(isDormindo ? 'sleep' : 'wake_up');
+                mascoteAtivo.sleep = !mascoteAtivo.sleep;
+                await saveGame(mascoteAtivo);
+                PetEngine.setDormindo(mascoteAtivo.sleep);
+                SoundManager.play(mascoteAtivo.sleep ? 'sleep' : 'wake_up');
+                atualizarInterface();
             }
             fecharMenu();
         }
