@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PokeWeb - Coisas 3D</title>
+    <title>PokeWeb - Premium</title>
     <style>
         /* BASE & TIPOGRAFIA PREMIUM */
         body { 
@@ -33,7 +33,7 @@
             background: linear-gradient(90deg, #1e293b, #334155); 
             color: white; padding: 25px 20px; text-align: center; 
             font-weight: 800; font-size: 16px; letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 2;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 5;
         }
         
         .status-bar { 
@@ -75,16 +75,29 @@
 
         /* ÁREA DO JOGO E MOTOR 2D */
         #tela-jogo { 
-            flex-grow: 1; background: radial-gradient(circle at center, #e2e8f0 0%, #cbd5e1 100%); 
+            flex-grow: 1; 
+            background-color: #cbd5e1; /* Cor de fundo padrão antes de carregar a imagem */
+            background-size: cover;
+            background-position: bottom center;
+            background-repeat: no-repeat;
             display: flex; flex-direction: column; position: relative; 
-            transition: background 1s ease; overflow: hidden;
+            overflow: hidden;
+            transition: background-image 1s ease-in-out;
         }
-        #tela-jogo.dormindo { background: radial-gradient(circle at center, #334155 0%, #0f172a 100%); }
+        
+        /* Película Escura para o Modo Noturno/Sono */
+        #tela-jogo::after {
+            content: ''; position: absolute; inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            opacity: 0; transition: opacity 1s ease;
+            pointer-events: none; z-index: 1;
+        }
+        #tela-jogo.dormindo::after { opacity: 1; }
 
-        #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
+        #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; }
 
         /* OVO CSS */
-        #ovo-container { display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; z-index: 2; }
+        #ovo-container { display: none; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; z-index: 2; position: relative; }
         #ovo-wrapper { position: relative; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; }
         .ovo { width: 80px; height: 100px; background-color: #f8fafc; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -15px -15px 25px rgba(0,0,0,0.1), 0 15px 25px rgba(0,0,0,0.15); animation: ovo-tremendo 3s infinite; }
         .ovo-grama { background-image: radial-gradient(circle at 30% 30%, #10b981 12px, transparent 13px), radial-gradient(circle at 75% 60%, #10b981 18px, transparent 19px), radial-gradient(circle at 45% 85%, #10b981 10px, transparent 11px); }
@@ -151,7 +164,7 @@
         .fill-stat { background: linear-gradient(90deg, #10b981, #34d399); }
 
         /* TELA DE NASCIMENTO */
-        #screen-hatch { background-color: #0f172a; justify-content: center; align-items: center; color: white; text-align: center; }
+        #screen-hatch { background-color: #0f172a; justify-content: center; align-items: center; color: white; text-align: center; z-index: 30; }
         .hatch-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; width: 85%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(10px); }
         .hatch-texto { font-size: 20px; font-weight: 700; margin-bottom: 30px; min-height: 30px; color: #f8fafc; }
         #hatch-sprite { width: 96px; height: 96px; object-fit: contain; image-rendering: pixelated; margin-bottom: 30px; display: none; animation: ovo-tremendo 2s infinite; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
@@ -304,7 +317,7 @@
                     this.element.style.imageRendering = 'pixelated';
                     this.element.style.transformOrigin = 'center center';
                     this.element.style.height = '56px';
-                    this.element.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))';
+                    this.element.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.4))';
                     layer.appendChild(this.element);
                 }
                 this.isRunning = true; this.loop();
@@ -316,8 +329,8 @@
             },
             setDormindo(status) {
                 this.dormindo = status;
-                if (this.dormindo) { this.element.style.filter = 'brightness(0.3) drop-shadow(0 4px 6px rgba(0,0,0,0.5))'; this.changeAction('Idle'); } 
-                else { this.element.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'; }
+                if (this.dormindo) { this.element.style.filter = 'brightness(0.5) drop-shadow(0 4px 6px rgba(0,0,0,0.8))'; this.changeAction('Idle'); } 
+                else { this.element.style.filter = 'drop-shadow(0 4px 6px rgba(0,0,0,0.4))'; }
             },
             changeAction(newState) {
                 this.state = newState;
@@ -356,6 +369,42 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(idEcra).classList.add('active');
         }
+
+        // --- SISTEMA DINÂMICO DE BIOMAS ---
+        const DicionarioTipos = {
+            'grama': 'grass',
+            'fogo': 'fire',
+            'agua': 'water',
+            'normal': 'normal',
+            'eletrico': 'electric',
+            'gelo': 'ice',
+            'lutador': 'fighting',
+            'veneno': 'poison',
+            'terrestre': 'ground',
+            'voador': 'flying',
+            'psiquico': 'psychic',
+            'inseto': 'bug',
+            'pedra': 'rock',
+            'fantasma': 'ghost',
+            'dragao': 'dragon',
+            'sombrio': 'dark',
+            'aco': 'steel',
+            'fada': 'fairy'
+        };
+
+        function atualizarBioma(tipoPokemon) {
+            const telaJogo = document.getElementById('tela-jogo');
+            const tipoIngles = DicionarioTipos[tipoPokemon] || 'normal';
+            
+            const horaAtual = new Date().getHours();
+            const isNoite = horaAtual >= 18 || horaAtual < 6;
+            
+            const sufixoTempo = isNoite ? '_night' : '';
+            const urlBackground = `https://raw.githubusercontent.com/coisas3d/pokeweb/main/bioma/back_${tipoIngles}${sufixoTempo}.jpeg`;
+            
+            telaJogo.style.backgroundImage = `url('${urlBackground}')`;
+        }
+        // -----------------------------------
 
         async function iniciarJogo() {
             try {
@@ -408,7 +457,7 @@
             const textoEclosao = document.getElementById('tempo-eclosao');
             const tipo = mascoteAtivo.species.type;
             
-            textoEclosao.innerText = "Está rachando!";
+            textoEclosao.innerText = "Rachando!";
             SoundManager.play('egg_crack');
             
             ovoWrapper.innerHTML = `
@@ -448,6 +497,9 @@
             
             document.getElementById('nivel').innerHTML = mascoteAtivo.isEgg ? `Nvl <strong style="color:#1e293b;">--</strong>` : `Nvl <strong style="color:#1e293b;">${mascoteAtivo.level}</strong>`;
             document.getElementById('fome').innerHTML = mascoteAtivo.isEgg ? `Fome <strong style="color:#1e293b;">--%</strong>` : `Fome <strong style="color:#1e293b;">${Math.floor(mascoteAtivo.hunger)}%</strong>`;
+
+            // Atualiza o cenário de fundo com base no tipo e no horário atual
+            atualizarBioma(mascoteAtivo.species.type);
 
             const ovoContainer = document.getElementById('ovo-container');
             const ovoWrapper = document.getElementById('ovo-wrapper');
@@ -512,34 +564,43 @@
             const expPercent = Math.floor(mascoteAtivo.exp * 100);
             document.getElementById('status-exp').innerText = `${expPercent}%`;
             
-            // Zera as barras antes de animar
             const expBar = document.getElementById('status-exp-bar');
             expBar.style.width = '0%';
             
             document.getElementById('status-nature').innerText = mascoteAtivo.nature.toUpperCase();
             
             const statsReais = mascoteAtivo.calcularStatusReais();
-            const natureData = Natures[mascoteAtivo.nature] || { buff: null, debuff: null };
             
-            // Lógica para as Barras Gráficas Dinâmicas
-            const maxStat = Math.max(statsReais.hp, statsReais.atk, statsReais.def, statsReais.spa, statsReais.spd, statsReais.spe) * 1.1; // 10% de folga
+            const maxStat = Math.max(statsReais.hp, statsReais.atk, statsReais.def, statsReais.spa, statsReais.spd, statsReais.spe) * 1.1;
             
+            // As cores continuam dependendo estritamente do retorno do Motor Genético (Natures)
+            const natureBuff = mascoteAtivo.calcularStatusReais.buff || null; // O motor matemático aplica os buffs/debuffs internamente
+            
+            // Simulação de Identificação Visual (já que as Natures alteram o valor real retornado)
+            // Para mantermos as cores, usaremos um mapeamento estático temporário baseado na Natureza
+            const natureMap = {
+                Lonely: { buff: 'atk', debuff: 'def' }, Brave: { buff: 'atk', debuff: 'spe' }, Adamant: { buff: 'atk', debuff: 'spa' }, Naughty: { buff: 'atk', debuff: 'spd' },
+                Bold: { buff: 'def', debuff: 'atk' }, Relaxed: { buff: 'def', debuff: 'spe' }, Impish: { buff: 'def', debuff: 'spa' }, Lax: { buff: 'def', debuff: 'spd' },
+                Timid: { buff: 'spe', debuff: 'atk' }, Hasty: { buff: 'spe', debuff: 'def' }, Jolly: { buff: 'spe', debuff: 'spa' }, Naive: { buff: 'spe', debuff: 'spd' },
+                Modest: { buff: 'spa', debuff: 'atk' }, Mild: { buff: 'spa', debuff: 'def' }, Quiet: { buff: 'spa', debuff: 'spe' }, Rash: { buff: 'spa', debuff: 'spd' },
+                Calm: { buff: 'spd', debuff: 'atk' }, Gentle: { buff: 'spd', debuff: 'def' }, Sassy: { buff: 'spd', debuff: 'spe' }, Careful: { buff: 'spd', debuff: 'spa' }
+            };
+            const currentNature = natureMap[mascoteAtivo.nature] || { buff: null, debuff: null };
+
             const renderStat = (statId, barId, value, key) => {
                 const el = document.getElementById(statId);
                 const bar = document.getElementById(barId);
                 
                 el.innerText = value;
-                bar.style.width = '0%'; // Reseta
+                bar.style.width = '0%'; 
 
-                if (natureData.buff === key) el.style.color = "#34d399"; // Verde Claro
-                else if (natureData.debuff === key) el.style.color = "#f87171"; // Vermelho Claro
+                if (currentNature.buff === key) el.style.color = "#34d399"; 
+                else if (currentNature.debuff === key) el.style.color = "#f87171"; 
                 else el.style.color = "#ffffff"; 
 
-                // Anima as barras 50ms após a tela abrir
                 setTimeout(() => { bar.style.width = (value / maxStat * 100) + '%'; }, 50);
             };
 
-            // Preenche e anima os atributos
             renderStat('stat-hp', 'bar-hp', statsReais.hp, 'hp');
             renderStat('stat-atk', 'bar-atk', statsReais.atk, 'atk');
             renderStat('stat-def', 'bar-def', statsReais.def, 'def');
@@ -549,7 +610,6 @@
 
             fadeIn(document.getElementById('status-overlay'));
             
-            // Anima barra de EXP separada
             setTimeout(() => { expBar.style.width = `${expPercent}%`; }, 50);
         }
 
