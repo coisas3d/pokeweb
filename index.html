@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PokeWeb - PMD Engine</title>
+    <title>PokeWeb - PMD Engine Local</title>
     <style>
         /* BASE & TIPOGRAFIA PREMIUM */
         body { 
@@ -271,36 +271,21 @@
         const SoundManager = { play(effect) { console.log(`[Audio]: '${effect}'`); } };
 
         // =======================================================
-        // O NOVO CÉREBRO UNIVERSAL DO PMDCOLLAB (SEM SHOWDOWN)
+        // O NOVO CÉREBRO UNIVERSAL DO PMDCOLLAB (ARQUIVOS LOCAIS)
         // =======================================================
         const PMDHelper = {
-            // Path Finder Avançado: Testa as URLs do PMDCollab automaticamente
-            async getBasePath(dexId) {
-                const dexStr = dexId.toString().padStart(4, '0');
-                const bases = [
-                    `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/0000/0000/`,
-                    `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/main/sprite/${dexStr}/0000/0000/`,
-                    `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/`,
-                    `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/main/sprite/${dexStr}/`
-                ];
-                for (const b of bases) {
-                    try {
-                        const r = await fetch(b + 'AnimData.xml');
-                        if (r.ok) return { basePath: b, xmlText: await r.text() };
-                    } catch(e) {} // Ignora falhas de CORS ou 404 e tenta o próximo
-                }
-                throw new Error("Não foi possível encontrar AnimData.xml");
-            },
-
-            // Injeta a animação em qualquer DIV do sistema (Menu, Eclosão, Status)
             async playAnim(containerId, dexId, targetAnimName = 'Idle', scale = 1, flip = false) {
                 const container = document.getElementById(containerId);
                 if (!container) return;
                 
+                container.innerHTML = '';
+                const dexStr = dexId.toString().padStart(4, '0');
+                const basePath = `./sprites/${dexStr}/`;
+                
                 try {
-                    const data = await this.getBasePath(dexId);
-                    const basePath = data.basePath;
-                    const text = data.xmlText;
+                    const response = await fetch(basePath + 'AnimData.xml');
+                    if (!response.ok) throw new Error("XML não encontrado na pasta local.");
+                    const text = await response.text();
                     
                     const parser = new DOMParser();
                     const xml = parser.parseFromString(text, "text/xml");
@@ -317,16 +302,13 @@
                         targetAnimName = 'Idle';
                     }
 
-                    if (!animNode) throw new Error("Animação Base Não Encontrada");
+                    if (!animNode) return;
 
                     const fW = parseInt(animNode.querySelector('FrameWidth').textContent);
                     const fH = parseInt(animNode.querySelector('FrameHeight').textContent);
                     const durNodes = animNode.querySelectorAll('Durations Duration');
                     const durations = Array.from(durNodes).map(d => parseInt(d.textContent));
 
-                    // Limpa o Ícone de Carregamento (Ampulheta)
-                    container.innerHTML = '';
-                    
                     container.style.width = fW + 'px';
                     container.style.height = fH + 'px';
                     container.style.backgroundImage = `url('${basePath}${targetAnimName}-Anim.png')`;
@@ -340,9 +322,8 @@
 
                     let currentFrame = 0;
                     let tick = 0;
-                    const direction = 0; // Direção "Olhando para Frente" (0 = Down)
+                    const direction = 0; // Frente (Down)
 
-                    // Limpa o loop anterior para não piscar
                     if (container.dataset.intervalId) {
                         clearInterval(parseInt(container.dataset.intervalId));
                     }
@@ -358,13 +339,13 @@
                             const bgPosY = -(direction * fH);
                             container.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
                         }
-                    }, 1000 / 60); // 60 Frames Por Segundo
+                    }, 1000 / 60); 
 
                     container.dataset.intervalId = intervalId;
 
                 } catch(e) {
-                    console.error("Falha ao injetar animação do PMDCollab:", e);
-                    container.innerHTML = '❌'; // Se der erro final, mostra X vermelho
+                    console.error("Falha ao injetar animação local:", e);
+                    container.innerHTML = '❌'; 
                     container.style.fontSize = '24px';
                 }
             }
@@ -394,7 +375,7 @@
                     this.element.style.display = 'flex';
                     this.element.style.justifyContent = 'center';
                     this.element.style.alignItems = 'flex-end';
-                    this.element.innerHTML = '⏳'; // Ícone de carregamento
+                    this.element.innerHTML = '⏳'; 
                     layer.appendChild(this.element);
                 }
                 this.isRunning = true; this.loop();
@@ -428,16 +409,19 @@
             },
 
             async setPokemon(id) {
+                const dexStr = id.toString().padStart(4, '0');
+                this.basePath = `./sprites/${dexStr}/`;
+
                 try {
-                    // Usa o Path Finder para localizar a pasta correta na internet
-                    const data = await PMDHelper.getBasePath(id);
-                    this.basePath = data.basePath;
-                    this.parseXML(data.xmlText);
+                    const response = await fetch(this.basePath + 'AnimData.xml');
+                    if (!response.ok) throw new Error("XML local não encontrado.");
+                    const text = await response.text();
+                    this.parseXML(text);
                     
-                    this.element.innerHTML = ''; // Limpa a ampulheta
+                    this.element.innerHTML = ''; 
                     this.changeAction('Idle');
                 } catch(e) {
-                    console.error("Falha crassa no Motor PMD Principal:", e);
+                    console.error("Falha crassa no Motor PMD Local:", e);
                     this.element.innerHTML = '❌';
                     this.element.style.fontSize = '30px';
                 }
@@ -586,7 +570,6 @@
         }
 
         function gerarBotaoStarter(id, nome, tipo) {
-            // A Div está ancorada para alinhar a base do monstrinho com o botão
             return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
                         <div style="width: 50px; height: 50px; display: flex; justify-content: center; align-items: flex-end; margin-right: 15px; position: relative;">
                             <div id="sprite-starter-${id}" style="position: absolute; bottom: 0; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); display: flex; justify-content: center; align-items: center; font-size: 20px;">⏳</div>
@@ -614,8 +597,6 @@
             }
             
             mostrarEcra('screen-starter');
-            
-            // Injeta as animações puras do PMDCollab nos botões gerados
             idsParaCarregar.forEach(id => PMDHelper.playAnim(`sprite-starter-${id}`, id, 'Idle', 1.2));
         }
 
@@ -658,7 +639,6 @@
                     document.getElementById('hatch-texto').innerText = `Nasceu um ${mascoteAtivo.species.name.toUpperCase()}!`;
                     
                     document.getElementById('hatch-sprite-container').style.display = "block";
-                    // Injeta a animação PMD na Eclosão!
                     PMDHelper.playAnim('hatch-sprite-container', mascoteAtivo.species.id, 'Idle', 1.5);
                     
                     document.getElementById('btn-hatch-continuar').style.display = "block";
@@ -789,7 +769,6 @@
             SoundManager.play('menu_click');
             fecharMenu();
             
-            // Injeta o PMD no cabeçalho do Status
             PMDHelper.playAnim('status-sprite-container', mascoteAtivo.species.id, 'Idle', 1.5);
             
             document.getElementById('status-nome').innerText = mascoteAtivo.species.name.toUpperCase();
@@ -862,9 +841,8 @@
                     mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 2);
                     await saveGame(mascoteAtivo); 
                     
-                    // Opcional: Aciona animação de comer na tela do jogo
                     PetEngine.changeAction('Eat'); 
-                    setTimeout(() => { PetEngine.changeAction('Idle'); }, 2000); // Volta ao normal
+                    setTimeout(() => { PetEngine.changeAction('Idle'); }, 2000); 
                     
                     atualizarInterface(); 
                 }
