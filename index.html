@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PokeWeb - Premium Game Engine</title>
+    <title>PokeWeb - PMD Engine</title>
     <style>
         /* BASE & TIPOGRAFIA PREMIUM */
         body { 
@@ -110,7 +110,6 @@
         #status-overlay { justify-content: flex-start; padding: 25px; box-sizing: border-box; overflow-y: auto; }
         .status-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .status-header { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px; }
-        .status-header img { width: 64px; height: 64px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
         .status-title { font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; }
         .status-subtitle { font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
         .stat-text-line { display: flex; justify-content: space-between; margin: 8px 0; font-size: 15px; font-weight: 600; color: #cbd5e1; }
@@ -128,8 +127,6 @@
         #screen-hatch { background-color: #0f172a; justify-content: center; align-items: center; color: white; text-align: center; z-index: 30; }
         .hatch-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; width: 85%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(10px); }
         .hatch-texto { font-size: 20px; font-weight: 700; margin-bottom: 30px; min-height: 30px; color: #f8fafc; }
-        #hatch-sprite { width: 96px; height: 96px; object-fit: contain; image-rendering: pixelated; margin-bottom: 30px; display: none; animation: ovo-tremendo 2s infinite; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
-
     </style>
 </head>
 <body>
@@ -182,7 +179,7 @@
                 </div>
                 
                 <div id="dev-tools">
-                    <div style="color: #ef4444; text-align: center; font-size: 13px; font-weight: 800; margin-bottom: 12px; letter-spacing: 1px;">⚙️ MODO DESENVOLVEDOR ⚙️</div>
+                    <div style="color: #ef4444; text-align: center; font-size: 13px; font-weight: 800; margin-bottom: 12px; letter-spacing: 1px;">⚙️ MODO DEV ⚙️</div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
                         <div style="display:flex; align-items:center; gap:5px;"><span style="font-size:12px;color:white;width:30px;">Fome</span><input type="number" id="dev-food" class="dev-input" min="0" max="100"></div>
                         <div style="display:flex; align-items:center; gap:5px;"><span style="font-size:12px;color:white;width:30px;">Ene</span><input type="number" id="dev-energy" class="dev-input" min="0" max="100"></div>
@@ -190,7 +187,7 @@
                         <div style="display:flex; align-items:center; gap:5px;"><span style="font-size:12px;color:white;width:30px;">Ale</span><input type="number" id="dev-joy" class="dev-input" min="0" max="100"></div>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="aplicarDevTools()" style="flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; background: #ef4444; color: white; border: none; font-weight: bold; font-size:13px;">Aplicar Status</button>
+                        <button onclick="aplicarDevTools()" style="flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; background: #ef4444; color: white; border: none; font-weight: bold; font-size:13px;">Aplicar</button>
                         <button onclick="adicionarCoco()" style="padding: 10px; border-radius: 8px; cursor: pointer; background: #8b4513; color: white; border: none; font-weight: bold; font-size:13px;" title="Adiciona +1 sujeira na tela">+1 💩</button>
                     </div>
                 </div>
@@ -200,7 +197,8 @@
             <div id="status-overlay" class="overlay-glass">
                 <div class="status-box">
                     <div class="status-header">
-                        <img id="status-img" src="" alt="Pokemon">
+                        <!-- CONTAINER PMD PARA TELA DE STATUS -->
+                        <div id="status-sprite-container" style="margin-right: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));"></div>
                         <div>
                             <div id="status-nome" class="status-title">--</div>
                             <div id="status-tipo" class="status-subtitle">--</div>
@@ -256,7 +254,8 @@
         <div id="screen-hatch" class="screen">
             <div class="hatch-container">
                 <div id="hatch-texto" class="hatch-texto">Oh?...</div>
-                <img id="hatch-sprite" src="">
+                <!-- CONTAINER PMD PARA TELA DE ECLOSÃO -->
+                <div id="hatch-sprite-container" style="margin-bottom: 30px; display: none; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));"></div>
                 <button id="btn-hatch-continuar" class="btn-principal" style="display:none; width:100%; margin-top:20px;" onclick="concluirEclosao()">CONTINUAR</button>
             </div>
         </div>
@@ -272,118 +271,93 @@
 
         const SoundManager = { play(effect) { console.log(`[Audio]: '${effect}'`); } };
 
-        // --- SISTEMA ROBUSTO: SELEÇÃO COM FALLBACK SHOWDOWN -> PMD COLLAB ---
-        async function carregarSpriteMenu(id) {
-            const container = document.getElementById(`sprite-starter-${id}`);
-            const fallback = document.getElementById(`fallback-starter-${id}`);
-            if (!container || !fallback) return;
-
-            const dexStr = id.toString().padStart(4, '0');
-            const basePath = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/0000/0000/`;
-
-            try {
-                const response = await fetch(basePath + 'AnimData.xml');
-                if (!response.ok) throw new Error("XML não encontrado no servidor.");
-                const text = await response.text();
+        // =======================================================
+        // O NOVO CÉREBRO UNIVERSAL DO PMDCOLLAB (SEM SHOWDOWN)
+        // =======================================================
+        const PMDHelper = {
+            async playAnim(containerId, dexId, targetAnimName = 'Idle', scale = 1, flip = false) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
                 
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(text, "text/xml");
+                container.innerHTML = '';
+                const dexStr = dexId.toString().padStart(4, '0');
+                const basePath = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/0000/0000/`;
                 
-                let animNode = Array.from(xml.querySelectorAll('Anim')).find(a => a.querySelector('Name').textContent === 'Idle');
-                let targetAnimName = 'Idle';
-                
-                if (animNode && animNode.querySelector('CopyOf')) {
-                    targetAnimName = animNode.querySelector('CopyOf').textContent;
-                    animNode = Array.from(xml.querySelectorAll('Anim')).find(a => a.querySelector('Name').textContent === targetAnimName);
-                }
-                
-                if (!animNode) throw new Error("Animação Idle não detectada no XML.");
-
-                const fW = parseInt(animNode.querySelector('FrameWidth').textContent);
-                const fH = parseInt(animNode.querySelector('FrameHeight').textContent);
-                const durNodes = animNode.querySelectorAll('Durations Duration');
-                const durations = Array.from(durNodes).map(d => parseInt(d.textContent));
-
-                // SUcesso! Oculta o GIF do Showdown e revela a Engine PMD Collab
-                fallback.style.display = 'none';
-                container.style.display = 'block';
-
-                container.style.width = fW + 'px';
-                container.style.height = fH + 'px';
-                container.style.backgroundImage = `url('${basePath}${targetAnimName}-Anim.png')`;
-                container.style.backgroundRepeat = 'no-repeat';
-                container.style.imageRendering = 'pixelated';
-                
-                container.style.transformOrigin = 'center bottom';
-                container.style.transform = 'scale(1.2)';
-
-                let currentFrame = 0;
-                let tick = 0;
-                const direction = 0; // Frente
-
-                setInterval(() => {
-                    tick++;
-                    if (tick >= durations[currentFrame]) {
-                        tick = 0;
-                        currentFrame++;
-                        if (currentFrame >= durations.length) currentFrame = 0;
-                        
-                        const bgPosX = -(currentFrame * fW);
-                        const bgPosY = -(direction * fH);
-                        container.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+                try {
+                    const response = await fetch(basePath + 'AnimData.xml');
+                    if (!response.ok) throw new Error("XML não encontrado no PMDCollab.");
+                    const text = await response.text();
+                    
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(text, "text/xml");
+                    
+                    let animNode = Array.from(xml.querySelectorAll('Anim')).find(a => a.querySelector('Name').textContent === targetAnimName);
+                    
+                    if (animNode && animNode.querySelector('CopyOf')) {
+                        const copyName = animNode.querySelector('CopyOf').textContent;
+                        animNode = Array.from(xml.querySelectorAll('Anim')).find(a => a.querySelector('Name').textContent === copyName);
                     }
-                }, 1000 / 60); 
+                    
+                    if (!animNode) {
+                        animNode = Array.from(xml.querySelectorAll('Anim')).find(a => a.querySelector('Name').textContent === 'Idle');
+                        targetAnimName = 'Idle';
+                    }
 
-            } catch(e) {
-                console.warn(`[Fallback] Mantendo Showdown para ID ${id}. Motivo:`, e);
-                // Se der erro, o catch faz com que o GIF do Showdown continue na tela normalmente.
+                    if (!animNode) return;
+
+                    const fW = parseInt(animNode.querySelector('FrameWidth').textContent);
+                    const fH = parseInt(animNode.querySelector('FrameHeight').textContent);
+                    const durNodes = animNode.querySelectorAll('Durations Duration');
+                    const durations = Array.from(durNodes).map(d => parseInt(d.textContent));
+
+                    container.style.width = fW + 'px';
+                    container.style.height = fH + 'px';
+                    container.style.backgroundImage = `url('${basePath}${targetAnimName}-Anim.png')`;
+                    container.style.backgroundRepeat = 'no-repeat';
+                    container.style.imageRendering = 'pixelated';
+                    container.style.transformOrigin = 'center bottom';
+                    
+                    let transformStr = `scale(${scale})`;
+                    if (flip) transformStr += ' scaleX(-1)';
+                    container.style.transform = transformStr;
+
+                    let currentFrame = 0;
+                    let tick = 0;
+                    const direction = 0; // Frente (Down)
+
+                    if (container.dataset.intervalId) {
+                        clearInterval(parseInt(container.dataset.intervalId));
+                    }
+
+                    const intervalId = setInterval(() => {
+                        tick++;
+                        if (tick >= durations[currentFrame]) {
+                            tick = 0;
+                            currentFrame++;
+                            if (currentFrame >= durations.length) currentFrame = 0;
+                            
+                            const bgPosX = -(currentFrame * fW);
+                            const bgPosY = -(direction * fH);
+                            container.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+                        }
+                    }, 1000 / 60); 
+
+                    container.dataset.intervalId = intervalId;
+
+                } catch(e) {
+                    console.error("Falha ao injetar animação do PMDCollab:", e);
+                }
             }
-        }
+        };
 
-        // NOVO: Geração de botão injetando o Fallback visível por padrão
-        function gerarBotaoStarter(id, nome, tipo) {
-            const imgUrlShowdown = `https://play.pokemonshowdown.com/sprites/gen5ani/${nome.toLowerCase()}.gif`;
-            return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
-                        <div style="width: 50px; height: 50px; display: flex; justify-content: center; align-items: flex-end; margin-right: 15px; position: relative;">
-                            <img id="fallback-starter-${id}" src="${imgUrlShowdown}" style="max-width: 50px; max-height: 50px; object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));">
-                            <div id="sprite-starter-${id}" style="position: absolute; bottom: 0; display: none;"></div>
-                        </div>
-                        <span>${nome.toUpperCase()}</span>
-                    </button>`;
-        }
-
-        function mostrarStarters(regiao) {
-            SoundManager.play('menu_click');
-            const lista = document.getElementById('lista-starters');
-            let idsParaCarregar = [];
-            
-            if (regiao === 'kanto') { 
-                lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur", "grama") + gerarBotaoStarter(4, "Charmander", "fogo") + gerarBotaoStarter(7, "Squirtle", "agua"); 
-                idsParaCarregar = [1, 4, 7];
-            } 
-            else if (regiao === 'johto') { 
-                lista.innerHTML = gerarBotaoStarter(152, "Chikorita", "grama") + gerarBotaoStarter(155, "Cyndaquil", "fogo") + gerarBotaoStarter(158, "Totodile", "agua"); 
-                idsParaCarregar = [152, 155, 158];
-            } 
-            else if (regiao === 'hoenn') { 
-                lista.innerHTML = gerarBotaoStarter(252, "Treecko", "grama") + gerarBotaoStarter(255, "Torchic", "fogo") + gerarBotaoStarter(258, "Mudkip", "agua"); 
-                idsParaCarregar = [252, 255, 258];
-            }
-            
-            mostrarEcra('screen-starter');
-            
-            // Dispara o motor PMD isolado para cada botão desta região
-            idsParaCarregar.forEach(id => carregarSpriteMenu(id));
-        }
-
-        // MOTOR PMD COLLAB DO JOGO PRINCIPAL (COM FALLBACK)
+        // =======================================================
+        // MOTOR DO MASCOTE NA TELA PRINCIPAL
+        // =======================================================
         const PetEngine = {
             element: null, state: 'Idle', direction: 6, 
             x: 0, y: 0, containerW: 0, containerH: 0, speed: 0.5, 
             isRunning: false, dormindo: false, actionTimer: 0,
-            
             animData: {}, currentFrame: 0, tickCounter: 0, basePath: '', currentActionName: 'Idle',
-            useFallback: false, fallbackUrl: '',
 
             init(layerId) {
                 const layer = document.getElementById(layerId);
@@ -411,15 +385,12 @@
                 anims.forEach(anim => {
                     const name = anim.querySelector('Name').textContent;
                     const copyOf = anim.querySelector('CopyOf');
-                    
-                    if (copyOf) {
-                        this.animData[name] = { copyOf: copyOf.textContent };
-                    } else {
+                    if (copyOf) { this.animData[name] = { copyOf: copyOf.textContent }; } 
+                    else {
                         const fW = parseInt(anim.querySelector('FrameWidth').textContent);
                         const fH = parseInt(anim.querySelector('FrameHeight').textContent);
                         const durNodes = anim.querySelectorAll('Durations Duration');
                         const durations = Array.from(durNodes).map(d => parseInt(d.textContent));
-                        
                         this.animData[name] = { frameWidth: fW, frameHeight: fH, durations: durations };
                     }
                 });
@@ -432,28 +403,18 @@
                 });
             },
 
-            async setPokemon(id, fallbackName) {
+            async setPokemon(id) {
                 const dexStr = id.toString().padStart(4, '0');
                 this.basePath = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/0000/0000/`;
-                this.fallbackUrl = `https://play.pokemonshowdown.com/sprites/gen5ani/${fallbackName.toLowerCase()}.gif`;
 
                 try {
                     const response = await fetch(this.basePath + 'AnimData.xml');
-                    if (!response.ok) throw new Error("XML Not Found");
+                    if (!response.ok) throw new Error("XML não encontrado no servidor.");
                     const text = await response.text();
                     this.parseXML(text);
-                    this.useFallback = false;
-                    this.element.style.backgroundImage = 'none'; // Reseta o fallback
                     this.changeAction('Idle');
                 } catch(e) {
-                    console.warn("[PMDCollab] Falha principal. Engatando Fallback Showdown.", e);
-                    this.useFallback = true;
-                    this.element.style.width = '72px';
-                    this.element.style.height = '72px';
-                    this.element.style.backgroundImage = `url('${this.fallbackUrl}')`;
-                    this.element.style.backgroundSize = 'contain';
-                    this.element.style.backgroundRepeat = 'no-repeat';
-                    this.element.style.backgroundPosition = 'center bottom';
+                    console.error("Falha crassa no Motor PMD:", e);
                 }
             },
 
@@ -461,16 +422,14 @@
                 this.dormindo = status;
                 if (this.dormindo) { 
                     this.element.style.filter = 'brightness(0.5) drop-shadow(0 15px 5px rgba(0,0,0,0.8))'; 
-                    if (!this.useFallback) this.changeAction('Sleep'); 
+                    this.changeAction('Sleep'); 
                 } else { 
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))'; 
-                    if (!this.useFallback) this.changeAction('Idle');
+                    this.changeAction('Idle');
                 }
             },
 
             changeAction(newState) {
-                if (this.useFallback) { this.state = newState; return; }
-
                 let animName = newState;
                 if (newState === 'WalkLeft') { animName = 'Walk'; this.direction = 6; }
                 if (newState === 'WalkRight') { animName = 'Walk'; this.direction = 2; }
@@ -491,7 +450,7 @@
             },
 
             updateLogic() {
-                if (!this.useFallback && !this.animData['Idle']) return; 
+                if (!this.animData['Idle']) return; 
 
                 if (!this.dormindo) {
                     if (mascoteAtivo && (mascoteAtivo.food < 10 || mascoteAtivo.energy < 10 || mascoteAtivo.hygiene < 10 || mascoteAtivo.joy < 10)) {
@@ -526,29 +485,20 @@
                     }
                 }
 
-                if (!this.useFallback) {
-                    const anim = this.animData[this.currentActionName] || this.animData['Idle'];
-                    this.tickCounter++;
-                    if (this.tickCounter >= anim.durations[this.currentFrame]) {
-                        this.tickCounter = 0;
-                        this.currentFrame++;
-                        if (this.currentFrame >= anim.durations.length) {
-                            this.currentFrame = 0; 
-                        }
+                const anim = this.animData[this.currentActionName] || this.animData['Idle'];
+                this.tickCounter++;
+                if (this.tickCounter >= anim.durations[this.currentFrame]) {
+                    this.tickCounter = 0;
+                    this.currentFrame++;
+                    if (this.currentFrame >= anim.durations.length) {
+                        this.currentFrame = 0; 
                     }
                 }
             },
 
             draw() {
-                if (this.useFallback) {
-                    this.element.style.left = (this.x - 36) + 'px';
-                    this.element.style.top = (this.y - 72) + 'px'; 
-                    // Espelhamento simples para o GIF Fallback
-                    this.element.style.transform = (this.direction === 2) ? 'scaleX(-1) scale(1.5)' : 'scaleX(1) scale(1.5)';
-                    return;
-                }
-
                 if (!this.animData['Idle']) return;
+                
                 const anim = this.animData[this.currentActionName] || this.animData['Idle'];
                 this.element.style.left = (this.x - (anim.frameWidth / 2)) + 'px';
                 this.element.style.top = (this.y - anim.frameHeight) + 'px'; 
@@ -564,6 +514,11 @@
                 requestAnimationFrame(() => this.loop());
             }
         };
+
+        function mostrarEcra(idEcra) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(idEcra).classList.add('active');
+        }
 
         const DicionarioTipos = {
             'grama': 'grass', 'fogo': 'fire', 'agua': 'water', 'normal': 'normal',
@@ -586,7 +541,8 @@
         async function iniciarJogo() {
             try {
                 let saveState = await loadGame();
-                if (saveState) {
+                // Verificação rígida para garantir que o save não está corrompido
+                if (saveState && saveState.species && saveState.species.id) {
                     mascoteAtivo = saveState;
                     Object.setPrototypeOf(mascoteAtivo, PokemonInstance.prototype);
                     
@@ -599,7 +555,43 @@
                 } else {
                     mostrarEcra('screen-region');
                 }
-            } catch (erro) { console.error("Erro fatal ao iniciar:", erro); }
+            } catch (erro) { 
+                console.error("Erro fatal ao iniciar, forçando tela de região:", erro); 
+                mostrarEcra('screen-region');
+            }
+        }
+
+        function gerarBotaoStarter(id, nome, tipo) {
+            return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
+                        <div style="width: 50px; height: 50px; display: flex; justify-content: center; align-items: flex-end; margin-right: 15px; position: relative;">
+                            <div id="sprite-starter-${id}" style="position: absolute; bottom: 0; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));"></div>
+                        </div>
+                        <span>${nome.toUpperCase()}</span>
+                    </button>`;
+        }
+
+        function mostrarStarters(regiao) {
+            SoundManager.play('menu_click');
+            const lista = document.getElementById('lista-starters');
+            let idsParaCarregar = [];
+            
+            if (regiao === 'kanto') { 
+                lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur", "grama") + gerarBotaoStarter(4, "Charmander", "fogo") + gerarBotaoStarter(7, "Squirtle", "agua"); 
+                idsParaCarregar = [1, 4, 7];
+            } 
+            else if (regiao === 'johto') { 
+                lista.innerHTML = gerarBotaoStarter(152, "Chikorita", "grama") + gerarBotaoStarter(155, "Cyndaquil", "fogo") + gerarBotaoStarter(158, "Totodile", "agua"); 
+                idsParaCarregar = [152, 155, 158];
+            } 
+            else if (regiao === 'hoenn') { 
+                lista.innerHTML = gerarBotaoStarter(252, "Treecko", "grama") + gerarBotaoStarter(255, "Torchic", "fogo") + gerarBotaoStarter(258, "Mudkip", "agua"); 
+                idsParaCarregar = [252, 255, 258];
+            }
+            
+            mostrarEcra('screen-starter');
+            
+            // Injeta as animações puras do PMDCollab nos botões gerados
+            idsParaCarregar.forEach(id => PMDHelper.playAnim(`sprite-starter-${id}`, id, 'Idle', 1));
         }
 
         async function escolherStarter(id) {
@@ -633,16 +625,16 @@
             setTimeout(() => {
                 mostrarEcra('screen-hatch');
                 document.getElementById('hatch-texto').innerText = "Oh?...";
-                document.getElementById('hatch-sprite').style.display = "none";
+                document.getElementById('hatch-sprite-container').style.display = "none";
                 document.getElementById('btn-hatch-continuar').style.display = "none";
 
                 setTimeout(() => {
                     SoundManager.play('pokemon_cry_' + mascoteAtivo.species.id);
                     document.getElementById('hatch-texto').innerText = `Nasceu um ${mascoteAtivo.species.name.toUpperCase()}!`;
                     
-                    const sprite = document.getElementById('hatch-sprite');
-                    sprite.src = `https://play.pokemonshowdown.com/sprites/gen5ani/${mascoteAtivo.species.name.toLowerCase()}.gif`;
-                    sprite.style.display = "block";
+                    document.getElementById('hatch-sprite-container').style.display = "block";
+                    // Injeta a animação PMD na Eclosão! (Com escala 1.5)
+                    PMDHelper.playAnim('hatch-sprite-container', mascoteAtivo.species.id, 'Idle', 1.5);
                     
                     document.getElementById('btn-hatch-continuar').style.display = "block";
                 }, 2000);
@@ -718,8 +710,7 @@
                 
                 if (!PetEngine.isRunning) {
                     PetEngine.init('sprite-layer');
-                    // NOVO: Passa o ID e o Nome para o Fallback funcionar na Main Engine!
-                    PetEngine.setPokemon(mascoteAtivo.species.id, mascoteAtivo.species.name);
+                    PetEngine.setPokemon(mascoteAtivo.species.id); // Sempre chama o PMD
                     PetEngine.setDormindo(mascoteAtivo.sleep);
                 }
             }
@@ -773,7 +764,9 @@
             SoundManager.play('menu_click');
             fecharMenu();
             
-            document.getElementById('status-img').src = `https://play.pokemonshowdown.com/sprites/gen5ani/${mascoteAtivo.species.name.toLowerCase()}.gif`;
+            // Injeta o PMD no cabeçalho do Status
+            PMDHelper.playAnim('status-sprite-container', mascoteAtivo.species.id, 'Idle', 1.5);
+            
             document.getElementById('status-nome').innerText = mascoteAtivo.species.name.toUpperCase();
             document.getElementById('status-tipo').innerText = `TIPO: ${mascoteAtivo.species.type.toUpperCase()}`;
             document.getElementById('status-lvl').innerText = mascoteAtivo.level;
