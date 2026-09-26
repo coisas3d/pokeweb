@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PokeWeb - Premium Game Engine</title>
+    <title>PokeWeb - Premium</title>
     <style>
         /* BASE & TIPOGRAFIA PREMIUM */
         body { 
@@ -49,7 +49,6 @@
         .opcoes-grid { display: flex; flex-direction: column; gap: 15px; padding: 25px; flex-grow: 1; justify-content: center; background-color: #f1f5f9; }
         .btn-opcao { display: flex; align-items: center; padding: 12px 20px; border-radius: 16px; border: none; cursor: pointer; font-size: 17px; font-weight: 700; color: #1e293b; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .btn-opcao:active { transform: scale(0.97); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .btn-opcao img { width: 50px; height: 50px; object-fit: contain; margin-right: 15px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); }
         
         .btn-tipo-grama { border-left: 6px solid #10b981; }
         .btn-tipo-fogo { border-left: 6px solid #ef4444; }
@@ -59,25 +58,21 @@
         .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 18px 0; width: 85%; border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
 
-        /* BIOMA COM BACKGROUND FORÇADO 100% */
         #tela-jogo { 
             flex-grow: 1; 
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background-color: #cbd5e1; 
             background-size: 100% 100% !important; 
             background-position: center bottom; 
             background-repeat: no-repeat; 
             display: flex; flex-direction: column; position: relative; 
-            overflow: hidden; 
-            transition: background-image 1s ease-in-out; 
+            overflow: hidden; transition: background-image 1s ease-in-out; 
         }
         #tela-jogo::after { content: ''; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.6); opacity: 0; transition: opacity 1s ease; pointer-events: none; z-index: 1; }
         #tela-jogo.dormindo::after { opacity: 1; }
 
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; }
         
-        /* CAMADA DE SUJEIRA (COCÔS) E EFEITO LIMPEZA */
         #poop-layer { position: absolute; bottom: 100px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
         
         #efeito-limpeza {
@@ -86,12 +81,7 @@
             justify-content: center; align-items: center; font-size: 70px;
             pointer-events: none;
         }
-        @keyframes flash-clean {
-            0% { opacity: 0; transform: scale(0.8); }
-            30% { opacity: 1; transform: scale(1.1); }
-            70% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.2); }
-        }
+        @keyframes flash-clean { 0% { opacity: 0; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1.1); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.2); } }
 
         #ovo-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
         #ovo-wrapper { position: absolute; bottom: 100px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
@@ -117,11 +107,9 @@
         .menu-btn:active { background: rgba(255, 255, 255, 0.2); transform: scale(0.95); }
         .btn-voltar { background: rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 0.5); margin-top: 15px; width: 85%; }
 
-        /* PAINEL DEV TOOLS */
         #dev-tools { margin-top: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 15px; width: 85%; border: 1px dashed #ef4444; box-sizing: border-box; }
         .dev-input { width: 100%; border-radius: 5px; border: none; padding: 5px; font-weight: bold; text-align: center; }
 
-        /* TELA DE STATUS ANALÍTICA PREMIUM */
         #status-overlay { justify-content: flex-start; padding: 25px; box-sizing: border-box; overflow-y: auto; }
         .status-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .status-header { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px; }
@@ -143,6 +131,8 @@
         #screen-hatch { background-color: #0f172a; justify-content: center; align-items: center; color: white; text-align: center; z-index: 30; }
         .hatch-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; width: 85%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(10px); }
         .hatch-texto { font-size: 20px; font-weight: 700; margin-bottom: 30px; min-height: 30px; color: #f8fafc; }
+        
+        /* Modificado para aceitar o Sprite do PMD na eclosão depois (por enquanto ainda carrega a <img>) */
         #hatch-sprite { width: 96px; height: 96px; object-fit: contain; image-rendering: pixelated; margin-bottom: 30px; display: none; animation: ovo-tremendo 2s infinite; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
 
     </style>
@@ -179,9 +169,7 @@
                     <div id="ovo-wrapper"></div>
                     <div id="tempo-eclosao"></div>
                 </div>
-                <!-- Efeito Visual Limpeza -->
                 <div id="efeito-limpeza">✨🧼✨</div>
-                
                 <div id="poop-layer"></div>
                 <div id="sprite-layer"></div>
             </div>
@@ -198,7 +186,6 @@
                     <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
                 </div>
                 
-                <!-- BOTÕES DE DESENVOLVEDOR (DEV TOOLS) PARA TESTES MATEMÁTICOS -->
                 <div id="dev-tools">
                     <div style="color: #ef4444; text-align: center; font-size: 13px; font-weight: 800; margin-bottom: 12px; letter-spacing: 1px;">⚙️ MODO DESENVOLVEDOR ⚙️</div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
@@ -293,9 +280,70 @@
 
         const SoundManager = { play(effect) { console.log(`[Audio]: '${effect}'`); } };
 
-        // --- NOVO MOTOR PMD COLLAB ---
+        // --- SISTEMA ISOLADO PARA ANIMAR OS BOTÕES DE SELEÇÃO COM PMD COLLAB ---
+        async function carregarSpriteMenu(id) {
+            const container = document.getElementById(`sprite-starter-${id}`);
+            if (!container) return;
+
+            const dexStr = id.toString().padStart(4, '0');
+            const basePath = `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/${dexStr}/0000/0000/`;
+
+            try {
+                const response = await fetch(basePath + 'AnimData.xml');
+                const text = await response.text();
+                
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(text, "text/xml");
+                
+                let animNode = Array.from(xml.querySelectorAll('Anim')).find(a => a.querySelector('Name').textContent === 'Idle');
+                if (animNode && animNode.querySelector('CopyOf')) {
+                    const copyName = animNode.querySelector('CopyOf').textContent;
+                    animNode = Array.from(xml.querySelectorAll('Anim')).find(a => a.querySelector('Name').textContent === copyName);
+                }
+                
+                if (!animNode) return;
+
+                const fW = parseInt(animNode.querySelector('FrameWidth').textContent);
+                const fH = parseInt(animNode.querySelector('FrameHeight').textContent);
+                const durNodes = animNode.querySelectorAll('Durations Duration');
+                const durations = Array.from(durNodes).map(d => parseInt(d.textContent));
+
+                container.style.width = fW + 'px';
+                container.style.height = fH + 'px';
+                container.style.backgroundImage = `url('${basePath}Idle-Anim.png')`;
+                container.style.backgroundRepeat = 'no-repeat';
+                container.style.imageRendering = 'pixelated';
+                
+                // Alinha pela base para o botão não quebrar visualmente
+                container.style.transformOrigin = 'center bottom';
+                container.style.transform = 'scale(1.2)';
+
+                let currentFrame = 0;
+                let tick = 0;
+                const direction = 0; // 0 = Frente (Down)
+
+                // Loop de animação independente para o Menu
+                setInterval(() => {
+                    tick++;
+                    if (tick >= durations[currentFrame]) {
+                        tick = 0;
+                        currentFrame++;
+                        if (currentFrame >= durations.length) currentFrame = 0;
+                        
+                        const bgPosX = -(currentFrame * fW);
+                        const bgPosY = -(direction * fH);
+                        container.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+                    }
+                }, 1000 / 60); 
+
+            } catch(e) {
+                console.error(`Erro ao carregar sprite PMD do ID ${id}:`, e);
+            }
+        }
+
+        // MOTOR PMD COLLAB DO JOGO PRINCIPAL
         const PetEngine = {
-            element: null, state: 'Idle', direction: 6, // 6 = Esquerda, 2 = Direita
+            element: null, state: 'Idle', direction: 6, 
             x: 0, y: 0, containerW: 0, containerH: 0, speed: 0.5, 
             isRunning: false, dormindo: false, actionTimer: 0,
             
@@ -312,7 +360,7 @@
                     this.element.style.imageRendering = 'pixelated';
                     this.element.style.transformOrigin = 'center bottom';
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
-                    this.element.style.transform = 'scale(1.5)'; // Escala PMD
+                    this.element.style.transform = 'scale(1.5)';
                     layer.appendChild(this.element);
                 }
                 this.isRunning = true; this.loop();
@@ -394,10 +442,9 @@
             },
 
             updateLogic() {
-                if (!this.animData['Idle']) return; // Espera o XML carregar
+                if (!this.animData['Idle']) return; 
 
                 if (!this.dormindo) {
-                    // IA DE ESTADO CRÍTICO
                     if (mascoteAtivo && (mascoteAtivo.food < 10 || mascoteAtivo.energy < 10 || mascoteAtivo.hygiene < 10 || mascoteAtivo.joy < 10)) {
                         const center = this.containerW / 2;
                         if (Math.abs(this.x - center) > 2) {
@@ -407,7 +454,7 @@
                             this.x = center;
                             this.changeAction('Idle');
                         }
-                        return; // Trava o mascote no centro
+                        return; 
                     }
 
                     let modSpeed = this.speed;
@@ -430,7 +477,6 @@
                     }
                 }
 
-                // MOTOR DE FRAMES (PMD)
                 const anim = this.animData[this.currentActionName] || this.animData['Idle'];
                 this.tickCounter++;
                 if (this.tickCounter >= anim.durations[this.currentFrame]) {
@@ -504,19 +550,38 @@
         }
 
         function gerarBotaoStarter(id, nome, tipo) {
-            const imgUrl = `https://play.pokemonshowdown.com/sprites/gen5ani/${nome.toLowerCase()}.gif`;
+            // Removido o <img> hardcoded. Injetado um contêiner vazio que será animado pelo carregarSpriteMenu.
             return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
-                        <img src="${imgUrl}" alt="${nome}"><span>${nome.toUpperCase()}</span>
+                        <div style="width: 50px; height: 50px; display: flex; justify-content: center; align-items: flex-end; margin-right: 15px; overflow: visible;">
+                            <div id="sprite-starter-${id}"></div>
+                        </div>
+                        <span>${nome.toUpperCase()}</span>
                     </button>`;
         }
 
         function mostrarStarters(regiao) {
             SoundManager.play('menu_click');
             const lista = document.getElementById('lista-starters');
-            if (regiao === 'kanto') { lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur", "grama") + gerarBotaoStarter(4, "Charmander", "fogo") + gerarBotaoStarter(7, "Squirtle", "agua"); } 
-            else if (regiao === 'johto') { lista.innerHTML = gerarBotaoStarter(152, "Chikorita", "grama") + gerarBotaoStarter(155, "Cyndaquil", "fogo") + gerarBotaoStarter(158, "Totodile", "agua"); } 
-            else if (regiao === 'hoenn') { lista.innerHTML = gerarBotaoStarter(252, "Treecko", "grama") + gerarBotaoStarter(255, "Torchic", "fogo") + gerarBotaoStarter(258, "Mudkip", "agua"); }
+            
+            let idsParaCarregar = [];
+            
+            if (regiao === 'kanto') { 
+                lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur", "grama") + gerarBotaoStarter(4, "Charmander", "fogo") + gerarBotaoStarter(7, "Squirtle", "agua"); 
+                idsParaCarregar = [1, 4, 7];
+            } 
+            else if (regiao === 'johto') { 
+                lista.innerHTML = gerarBotaoStarter(152, "Chikorita", "grama") + gerarBotaoStarter(155, "Cyndaquil", "fogo") + gerarBotaoStarter(158, "Totodile", "agua"); 
+                idsParaCarregar = [152, 155, 158];
+            } 
+            else if (regiao === 'hoenn') { 
+                lista.innerHTML = gerarBotaoStarter(252, "Treecko", "grama") + gerarBotaoStarter(255, "Torchic", "fogo") + gerarBotaoStarter(258, "Mudkip", "agua"); 
+                idsParaCarregar = [252, 255, 258];
+            }
+            
             mostrarEcra('screen-starter');
+            
+            // Dispara o motor PMD isolado para cada botão desta região
+            idsParaCarregar.forEach(id => carregarSpriteMenu(id));
         }
 
         async function escolherStarter(id) {
@@ -556,9 +621,12 @@
                 setTimeout(() => {
                     SoundManager.play('pokemon_cry_' + mascoteAtivo.species.id);
                     document.getElementById('hatch-texto').innerText = `Nasceu um ${mascoteAtivo.species.name.toUpperCase()}!`;
+                    
+                    // Aviso: O hatch-sprite ainda usa Showdown. Modificaremos isso no próximo passo, conforme combinado!
                     const sprite = document.getElementById('hatch-sprite');
                     sprite.src = `https://play.pokemonshowdown.com/sprites/gen5ani/${mascoteAtivo.species.name.toLowerCase()}.gif`;
                     sprite.style.display = "block";
+                    
                     document.getElementById('btn-hatch-continuar').style.display = "block";
                 }, 2000);
             }, 1500);
@@ -633,8 +701,7 @@
                 
                 if (!PetEngine.isRunning) {
                     PetEngine.init('sprite-layer');
-                    // NOVO: Passa o ID do Pokémon para o PMDEngine em vez do nome
-                    PetEngine.setPokemon(mascoteAtivo.species.id);
+                    PetEngine.setPokemon(mascoteAtivo.species.id); // Certificando que usa o ID
                     PetEngine.setDormindo(mascoteAtivo.sleep);
                 }
             }
@@ -688,6 +755,7 @@
             SoundManager.play('menu_click');
             fecharMenu();
             
+            // O Status ainda usa Showdown, será atualizado na etapa de Refinamento Geral
             document.getElementById('status-img').src = `https://play.pokemonshowdown.com/sprites/gen5ani/${mascoteAtivo.species.name.toLowerCase()}.gif`;
             document.getElementById('status-nome').innerText = mascoteAtivo.species.name.toUpperCase();
             document.getElementById('status-tipo').innerText = `TIPO: ${mascoteAtivo.species.type.toUpperCase()}`;
@@ -713,11 +781,8 @@
                 const penalty = statObj.penalty;
                 const finalVal = statObj.final;
 
-                if (penalty > 0) {
-                    el.innerHTML = `${real} <span style="color: #ef4444; font-size: 0.8em; margin-left: 4px;">(-${penalty})</span>`;
-                } else {
-                    el.innerText = real;
-                }
+                if (penalty > 0) { el.innerHTML = `${real} <span style="color: #ef4444; font-size: 0.8em; margin-left: 4px;">(-${penalty})</span>`; } 
+                else { el.innerText = real; }
 
                 if (currentNature.buff === key) el.style.color = "#34d399"; 
                 else if (currentNature.debuff === key && penalty === 0) el.style.color = "#f87171"; 
