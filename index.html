@@ -59,13 +59,14 @@
         .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 18px 0; width: 85%; border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
 
-        /* CORREÇÃO DO FUNDO DO BIOMA */
+        /* CORREÇÃO DO FUNDO DO BIOMA FORÇADO A 100% */
         #tela-jogo { 
             flex-grow: 1; 
             width: 100%;
+            height: 100%;
             background-color: #cbd5e1; 
-            /* COVER garante que qualquer imagem expanda até sumir com as bordas vazias */
-            background-size: cover; 
+            /* FORÇA O PREENCHIMENTO TOTAL DA TELA INDEPENDENTE DA PROPORÇÃO */
+            background-size: 100% 100% !important; 
             background-position: center bottom; 
             background-repeat: no-repeat; 
             display: flex; flex-direction: column; position: relative; 
@@ -316,7 +317,6 @@
             updateLogic() {
                 if (this.dormindo) return;
                 
-                // Reduz velocidade de caminhada se estiver triste, sujo ou com fome
                 let modSpeed = this.speed;
                 if (mascoteAtivo) {
                     if (mascoteAtivo.hygiene < 30 || mascoteAtivo.food < 30 || mascoteAtivo.joy < 30) {
@@ -480,7 +480,6 @@
                     poop.style.position = 'absolute';
                     poop.style.fontSize = '26px';
                     poop.style.bottom = '5px';
-                    // Distribui a sujeira pela tela
                     poop.style.left = (20 + (i * 25)) + '%';
                     poop.style.filter = 'drop-shadow(0 5px 2px rgba(0,0,0,0.6))';
                     poopLayer.appendChild(poop);
@@ -536,7 +535,6 @@
             SoundManager.play('menu_open'); 
             fadeIn(document.getElementById('menu-overlay')); 
             
-            // Popula os campos do Painel DEV com os valores atuais
             if(mascoteAtivo && !mascoteAtivo.isEgg) {
                 document.getElementById('dev-food').value = Math.floor(mascoteAtivo.food);
                 document.getElementById('dev-energy').value = Math.floor(mascoteAtivo.energy);
@@ -572,7 +570,6 @@
             SoundManager.play('menu_click');
             
             mascoteAtivo.poops = Math.min(3, mascoteAtivo.poops + 1);
-            // Sujar a tela reduz automaticamente a higiene em 15% como penalidade extra
             mascoteAtivo.hygiene = Math.max(0, mascoteAtivo.hygiene - 15); 
             
             await saveGame(mascoteAtivo);
@@ -598,6 +595,8 @@
             expBar.style.width = '0%';
             
             const stats = mascoteAtivo.calcularStatusReais();
+            
+            // LÓGICA DE BARRA SOBREPOSTA
             const maxStat = Math.max(stats.hp.real, stats.atk.real, stats.def.real, stats.spa.real, stats.spd.real, stats.spe.real) * 1.1;
             
             const natureMap = { Lonely: { buff: 'atk', debuff: 'def' }, Brave: { buff: 'atk', debuff: 'spe' }, Adamant: { buff: 'atk', debuff: 'spa' }, Naughty: { buff: 'atk', debuff: 'spd' }, Bold: { buff: 'def', debuff: 'atk' }, Relaxed: { buff: 'def', debuff: 'spe' }, Impish: { buff: 'def', debuff: 'spa' }, Lax: { buff: 'def', debuff: 'spd' }, Timid: { buff: 'spe', debuff: 'atk' }, Hasty: { buff: 'spe', debuff: 'def' }, Jolly: { buff: 'spe', debuff: 'spa' }, Naive: { buff: 'spe', debuff: 'spd' }, Modest: { buff: 'spa', debuff: 'atk' }, Mild: { buff: 'spa', debuff: 'def' }, Quiet: { buff: 'spa', debuff: 'spe' }, Rash: { buff: 'spa', debuff: 'spd' }, Calm: { buff: 'spd', debuff: 'atk' }, Gentle: { buff: 'spd', debuff: 'def' }, Sassy: { buff: 'spd', debuff: 'spe' }, Careful: { buff: 'spd', debuff: 'spa' } };
