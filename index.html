@@ -59,13 +59,12 @@
         .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 18px 0; width: 85%; border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
 
-        /* CORREÇÃO DO FUNDO DO BIOMA FORÇADO A 100% */
+        /* BIOMA COM BACKGROUND FORÇADO */
         #tela-jogo { 
             flex-grow: 1; 
             width: 100%;
             height: 100%;
             background-color: #cbd5e1; 
-            /* FORÇA O PREENCHIMENTO TOTAL DA TELA INDEPENDENTE DA PROPORÇÃO */
             background-size: 100% 100% !important; 
             background-position: center bottom; 
             background-repeat: no-repeat; 
@@ -80,6 +79,20 @@
         
         /* CAMADA DE SUJEIRA (COCÔS) */
         #poop-layer { position: absolute; bottom: 100px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
+
+        /* NOVO: EFEITO VISUAL DE LIMPEZA */
+        #efeito-limpeza {
+            display: none; position: absolute; inset: 0; z-index: 15;
+            background: rgba(56, 189, 248, 0.3); backdrop-filter: blur(4px);
+            justify-content: center; align-items: center; font-size: 70px;
+            pointer-events: none;
+        }
+        @keyframes flash-clean {
+            0% { opacity: 0; transform: scale(0.8); }
+            30% { opacity: 1; transform: scale(1.1); }
+            70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.2); }
+        }
 
         #ovo-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
         #ovo-wrapper { position: absolute; bottom: 100px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
@@ -167,6 +180,9 @@
                     <div id="ovo-wrapper"></div>
                     <div id="tempo-eclosao"></div>
                 </div>
+                <!-- Efeito Visual Limpeza -->
+                <div id="efeito-limpeza">✨🧼✨</div>
+                
                 <div id="poop-layer"></div>
                 <div id="sprite-layer"></div>
             </div>
@@ -183,7 +199,6 @@
                     <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
                 </div>
                 
-                <!-- BOTÕES DE DESENVOLVEDOR (DEV TOOLS) PARA TESTES MATEMÁTICOS -->
                 <div id="dev-tools">
                     <div style="color: #ef4444; text-align: center; font-size: 13px; font-weight: 800; margin-bottom: 12px; letter-spacing: 1px;">⚙️ MODO DESENVOLVEDOR ⚙️</div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
@@ -317,10 +332,29 @@
             updateLogic() {
                 if (this.dormindo) return;
                 
+                // --- NOVA INTELIGÊNCIA ARTIFICIAL: ESTADO CRÍTICO ---
+                if (mascoteAtivo && !mascoteAtivo.isEgg) {
+                    const isCritical = (mascoteAtivo.food < 10 || mascoteAtivo.energy < 10 || mascoteAtivo.hygiene < 10 || mascoteAtivo.joy < 10);
+                    
+                    if (isCritical) {
+                        const center = this.containerW / 2;
+                        // Se estiver doente, ele caminha lentamente até o centro da tela e para (Idle)
+                        if (Math.abs(this.x - center) > 2) {
+                            this.changeAction(this.x > center ? 'WalkLeft' : 'WalkRight');
+                            this.x += (this.x > center ? -this.speed : this.speed);
+                        } else {
+                            this.x = center;
+                            this.changeAction('Idle');
+                        }
+                        return; // Aborta a caminhada feliz/aleatória
+                    }
+                }
+                
                 let modSpeed = this.speed;
                 if (mascoteAtivo) {
+                    // Se não for crítico, mas estiver ruim, caminha arrastado
                     if (mascoteAtivo.hygiene < 30 || mascoteAtivo.food < 30 || mascoteAtivo.joy < 30) {
-                        modSpeed = this.speed * 0.3; // Caminha arrastado
+                        modSpeed = this.speed * 0.3; 
                     }
                 }
 
@@ -470,7 +504,6 @@
             document.getElementById('val-hygiene').innerText = mascoteAtivo.isEgg ? `--%` : `${Math.floor(mascoteAtivo.hygiene)}%`;
             document.getElementById('val-joy').innerText = mascoteAtivo.isEgg ? `--%` : `${Math.floor(mascoteAtivo.joy)}%`;
 
-            // RENDERIZAÇÃO ORGÂNICA DA SUJEIRA NO CHÃO
             const poopLayer = document.getElementById('poop-layer');
             poopLayer.innerHTML = '';
             if (!mascoteAtivo.isEgg && mascoteAtivo.poops > 0) {
@@ -549,16 +582,13 @@
         function fecharMenu() { fadeOut(document.getElementById('menu-overlay')); }
         function fecharStatus() { fadeOut(document.getElementById('status-overlay')); }
 
-        // --- FUNÇÕES DEV TOOLS ---
         async function aplicarDevTools() {
             if(!mascoteAtivo || mascoteAtivo.isEgg) return;
             SoundManager.play('menu_click');
-            
             mascoteAtivo.food = Math.min(100, Math.max(0, Number(document.getElementById('dev-food').value)));
             mascoteAtivo.energy = Math.min(100, Math.max(0, Number(document.getElementById('dev-energy').value)));
             mascoteAtivo.hygiene = Math.min(100, Math.max(0, Number(document.getElementById('dev-hygiene').value)));
             mascoteAtivo.joy = Math.min(100, Math.max(0, Number(document.getElementById('dev-joy').value)));
-            
             await saveGame(mascoteAtivo);
             atualizarInterface();
             fecharMenu();
@@ -568,15 +598,12 @@
         async function adicionarCoco() {
             if(!mascoteAtivo || mascoteAtivo.isEgg) return;
             SoundManager.play('menu_click');
-            
             mascoteAtivo.poops = Math.min(3, mascoteAtivo.poops + 1);
             mascoteAtivo.hygiene = Math.max(0, mascoteAtivo.hygiene - 15); 
-            
             await saveGame(mascoteAtivo);
             atualizarInterface();
             fecharMenu();
         }
-        // ------------------------
 
         function abrirStatus() {
             SoundManager.play('menu_click');
@@ -595,8 +622,6 @@
             expBar.style.width = '0%';
             
             const stats = mascoteAtivo.calcularStatusReais();
-            
-            // LÓGICA DE BARRA SOBREPOSTA
             const maxStat = Math.max(stats.hp.real, stats.atk.real, stats.def.real, stats.spa.real, stats.spd.real, stats.spe.real) * 1.1;
             
             const natureMap = { Lonely: { buff: 'atk', debuff: 'def' }, Brave: { buff: 'atk', debuff: 'spe' }, Adamant: { buff: 'atk', debuff: 'spa' }, Naughty: { buff: 'atk', debuff: 'spd' }, Bold: { buff: 'def', debuff: 'atk' }, Relaxed: { buff: 'def', debuff: 'spe' }, Impish: { buff: 'def', debuff: 'spa' }, Lax: { buff: 'def', debuff: 'spd' }, Timid: { buff: 'spe', debuff: 'atk' }, Hasty: { buff: 'spe', debuff: 'def' }, Jolly: { buff: 'spe', debuff: 'spa' }, Naive: { buff: 'spe', debuff: 'spd' }, Modest: { buff: 'spa', debuff: 'atk' }, Mild: { buff: 'spa', debuff: 'def' }, Quiet: { buff: 'spa', debuff: 'spe' }, Rash: { buff: 'spa', debuff: 'spd' }, Calm: { buff: 'spd', debuff: 'atk' }, Gentle: { buff: 'spd', debuff: 'def' }, Sassy: { buff: 'spd', debuff: 'spe' }, Careful: { buff: 'spd', debuff: 'spa' } };
@@ -605,7 +630,6 @@
             const renderStat = (statId, barId, statObj, key) => {
                 const el = document.getElementById(statId);
                 const bar = document.getElementById(barId);
-                
                 const real = statObj.real;
                 const penalty = statObj.penalty;
                 const finalVal = statObj.final;
@@ -625,7 +649,6 @@
                 setTimeout(() => { 
                     bar.style.width = ((real / maxStat) * 100) + '%'; 
                     bar.style.background = 'transparent';
-                    
                     bar.innerHTML = `
                         <div style="display:flex; width: 100%; height: 100%;">
                             <div class="fill-stat" style="width: ${(finalVal / real) * 100}%; height: 100%; border-radius: 4px;"></div>
@@ -666,11 +689,25 @@
                 if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); } 
                 else {
                     SoundManager.play('clean');
-                    mascoteAtivo.hygiene = 100;
-                    mascoteAtivo.poops = 0;
-                    mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 5);
-                    await saveGame(mascoteAtivo);
-                    atualizarInterface();
+                    
+                    // Dispara a animação visual na tela principal
+                    const efeito = document.getElementById('efeito-limpeza');
+                    efeito.style.display = 'flex';
+                    efeito.style.animation = 'none';
+                    void efeito.offsetWidth; // Force reflow
+                    efeito.style.animation = 'flash-clean 1s ease-out forwards';
+                    
+                    // Aplica a lógica matemática na metade da animação (quando o brilho está forte)
+                    setTimeout(async () => {
+                        mascoteAtivo.hygiene = 100;
+                        mascoteAtivo.poops = 0;
+                        mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 5);
+                        await saveGame(mascoteAtivo);
+                        atualizarInterface();
+                    }, 500);
+
+                    // Esconde a div após a animação
+                    setTimeout(() => { efeito.style.display = 'none'; }, 1000);
                 }
             }
             else if (acao === 'dormir') {
