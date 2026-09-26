@@ -310,9 +310,6 @@
                 const layer = document.getElementById(layerId);
                 this.containerW = layer.clientWidth; this.containerH = layer.clientHeight;
                 this.x = this.containerW / 2; 
-                
-                // NOVO: Posicionamento fixado no chão (Floor Positioning)
-                // Mantém o sprite alinhado com o eixo Y do background do cenário
                 this.y = this.containerH - 60; 
                 
                 if (!this.element) {
@@ -360,7 +357,6 @@
             },
             draw() {
                 this.element.style.left = (this.x - 28) + 'px';
-                // Calculado dinamicamente para o pé do Pokémon encostar no chão matemático (y - altura)
                 this.element.style.top = (this.y - 56) + 'px'; 
             },
             loop() {
@@ -391,7 +387,9 @@
             const isNoite = horaAtual >= 18 || horaAtual < 6;
             
             const sufixoTempo = isNoite ? '_night' : '';
-            const urlBackground = `https://raw.githubusercontent.com/coisas3d/pokeweb/main/bioma/back_${tipoIngles}${sufixoTempo}.jpeg`;
+            // CORREÇÃO CRÍTICA APLICADA (.jpg) E LOG PARA DEBUG
+            const urlBackground = `https://raw.githubusercontent.com/coisas3d/pokeweb/main/bioma/back_${tipoIngles}${sufixoTempo}.jpg`;
+            console.log(`[BIOMA] Carregando: ${urlBackground}`);
             
             telaJogo.style.backgroundImage = `url('${urlBackground}')`;
         }
