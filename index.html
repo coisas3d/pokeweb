@@ -12,7 +12,7 @@
             display: flex; justify-content: center; align-items: center; 
             height: 100dvh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             color: #333; overflow: hidden;
-            user-select: none; /* Previne selecao de texto ao fazer touch longo */
+            user-select: none;
         }
         
         #app-container { 
@@ -100,9 +100,12 @@
         .btn-tipo-fogo { border-left: 6px solid #ef4444; }
         .btn-tipo-agua { border-left: 6px solid #3b82f6; }
 
-        #controles { display: flex; justify-content: center; padding: 15px 20px 20px 20px; background: #ffffff; z-index: 5; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
-        .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 18px 0; width: 85%; border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; }
+        /* NOVA ÁREA DE CONTROLES INFERIOR */
+        #controles { display: flex; justify-content: space-between; gap: 12px; padding: 15px 20px 20px 20px; background: #ffffff; z-index: 5; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 16px 0; border-radius: 16px; font-size: 16px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 8px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; flex: 1; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
+        .btn-azul { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 8px 15px -3px rgba(59, 130, 246, 0.4); }
+        .btn-azul:active { box-shadow: 0 4px 6px -2px rgba(59, 130, 246, 0.4); }
 
         #tela-jogo { 
             flex-grow: 1; width: 100%; height: 100%;
@@ -152,12 +155,14 @@
         @keyframes brilho-eclosao { 0%, 40% { opacity: 0; transform: scale(1); } 60% { opacity: 1; transform: scale(5); } 100% { opacity: 1; transform: scale(25); } }
 
         .overlay-glass { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 20; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 85%; }
+        
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; width: 85%; }
+        .menu-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 85%; }
+        
         .menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 18px 10px; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .menu-btn:active { background: rgba(255, 255, 255, 0.2); transform: scale(0.95); }
         .btn-voltar { background: rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 0.5); margin-top: 15px; width: 85%; }
 
-        /* Estilos do Menu de Time (Party HGSS Style) */
         .party-container { width: 90%; max-height: 80%; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
         .party-slot { 
             background: linear-gradient(135deg, #f8fafc, #e2e8f0); border: 2px solid #cbd5e1; 
@@ -266,13 +271,14 @@
             </div>
             
             <div id="controles">
-                <button class="btn-principal" onclick="abrirMenu()">MENU PRINCIPAL</button>
+                <button class="btn-principal" onclick="abrirMenu()">INTERAÇÕES</button>
+                <button id="btn-main-time" class="btn-principal btn-azul" onclick="abrirParty()">TIME</button>
             </div>
             
             <div id="menu-overlay" class="overlay-glass">
+                
                 <div id="menu-principal-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                     <div class="menu-grid">
-                        <button class="menu-btn" onclick="abrirParty()">Time</button>
                         <button class="menu-btn" onclick="abrirSubMenu('alimentar')">Alimentar</button>
                         <button class="menu-btn" onclick="executarAcao('limpar')">Limpar</button>
                         <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
@@ -282,31 +288,28 @@
 
                 <div id="submenu-alimentar" style="display: none; width: 100%; flex-direction: column; align-items: center;">
                     <div style="color: white; font-weight: bold; margin-bottom: 15px; font-size: 16px; letter-spacing: 1px;">ESCOLHA A BERRIE</div>
-                    <div class="menu-grid">
-                        <button class="menu-btn" style="color: #ef4444" onclick="darComida('berrie_vermelha')">🍒 Cheri Berry</button>
-                        <button class="menu-btn" style="color: #3b82f6" onclick="darComida('berrie_azul')">🫐 Oran Berry</button>
-                        <button class="menu-btn" style="color: #10b981" onclick="darComida('berrie_verde')">🍏 Durin Berry</button>
-                        <button class="menu-btn" style="color: #eab308" onclick="darComida('berrie_amarela')">🍋 Aspear Berry</button>
+                    <div class="menu-grid-2">
+                        <button class="menu-btn" style="color: #ef4444" onclick="darComida('berrie_vermelha')">🍒 Cheri</button>
+                        <button class="menu-btn" style="color: #3b82f6" onclick="darComida('berrie_azul')">🫐 Oran</button>
+                        <button class="menu-btn" style="color: #10b981" onclick="darComida('berrie_verde')">🍏 Durin</button>
+                        <button class="menu-btn" style="color: #eab308" onclick="darComida('berrie_amarela')">🍋 Aspear</button>
                     </div>
                     <button class="menu-btn btn-voltar" onclick="voltarMenuPrincipal()">VOLTAR</button>
                 </div>
+
             </div>
 
-            <!-- TELA DE TIME (PARTY) -->
             <div id="party-overlay" class="overlay-glass" style="justify-content: flex-start; padding-top: 20px;">
                 <div style="color: white; font-weight: 800; font-size: 18px; letter-spacing: 1px; margin-bottom: 15px;">SEU TIME</div>
-                <div class="party-container" id="party-list-container">
-                    <!-- Gerado pelo JS -->
-                </div>
+                <div class="party-container" id="party-list-container"></div>
                 <div style="margin-top: auto; padding-bottom: 20px; width: 100%; display: flex; justify-content: center;">
                     <button class="menu-btn btn-voltar" style="width: 85%;" onclick="fecharParty()">VOLTAR</button>
                 </div>
 
-                <!-- Modal de Ação do Slot (Long Press) -->
                 <div id="slot-action-modal" class="action-modal">
                     <div class="action-modal-box">
                         <h3 style="margin: 0; color: #1e293b;" id="modal-pokemon-name">Pokemon</h3>
-                        <button class="menu-btn" style="color: #3b82f6; border: 1px solid #cbd5e1;" onclick="ativarModoMover()">Mover</button>
+                        <button class="menu-btn" style="color: #3b82f6; border: 1px solid #cbd5e1;" onclick="ativarModoMover()">Mover (Trocar)</button>
                         <button class="menu-btn" style="color: #10b981; border: 1px solid #cbd5e1;" onclick="verStatusParty()">Status</button>
                         <button class="menu-btn" style="color: #ef4444; border: 1px solid #cbd5e1; margin-top: 10px;" onclick="fecharModalSlot()">Cancelar</button>
                     </div>
@@ -378,18 +381,15 @@
             </div>
         </div>
     </div>
-
-    <!-- SCRIPTS NAS PRÓXIMAS MENSAGENS -->
     <script src="database.js"></script>
     <script src="pokemon_engine.js"></script>
-    
+
     <script>
         let mascotes = [];
         let mascoteAtivo = null;
         let loopEclosao = null;
         let processoEclosaoEmAndamento = false;
         
-        // Variáveis do Time (Party)
         let pressTimer = null;
         let slotAcao = null;
         let modoMover = false;
@@ -771,7 +771,6 @@
                         return TimeManager.calculateOfflineProgression(p);
                     });
                 } else {
-                    // Migração de save antigo caso exista
                     let oldSave = await loadGame();
                     if (oldSave && oldSave.species) {
                         Object.setPrototypeOf(oldSave, PokemonInstance.prototype);
@@ -782,7 +781,7 @@
                 }
 
                 if (mascotes.length > 0) {
-                    mascoteAtivo = mascotes[0]; // Líder do time
+                    mascoteAtivo = mascotes[0];
                     atualizarBioma(mascoteAtivo.species.type);
                     mostrarEcra('screen-game');
                     atualizarInterface();
@@ -938,10 +937,17 @@
             const ovoWrapper = document.getElementById('ovo-wrapper');
             const spriteLayer = document.getElementById('sprite-layer');
             const textoEclosao = document.getElementById('tempo-eclosao');
+            const btnTime = document.getElementById('btn-main-time');
 
             if (mascoteAtivo.isEgg) {
                 ovoContainer.style.display = 'flex';
                 spriteLayer.style.display = 'none';
+                
+                // BLOQUEIA O BOTÃO DE TIME ENQUANTO É OVO
+                if(btnTime) {
+                    btnTime.style.opacity = '0.5';
+                    btnTime.style.pointerEvents = 'none';
+                }
 
                 const tempoRestante = mascoteAtivo.hatchTime - Date.now();
                 if (tempoRestante <= 0) {
@@ -963,6 +969,12 @@
             } else {
                 ovoContainer.style.display = 'none';
                 spriteLayer.style.display = 'block';
+                
+                // LIBERA O BOTÃO DE TIME
+                if(btnTime) {
+                    btnTime.style.opacity = '1';
+                    btnTime.style.pointerEvents = 'auto';
+                }
                 
                 if (loopEclosao) {
                     clearInterval(loopEclosao);
@@ -1007,10 +1019,8 @@
         
         function fecharStatus() { fadeOut(document.getElementById('status-overlay')); }
 
-        // ==========================================
-        // LÓGICA DO TIME (PARTY) HG/SS STYLE
-        // ==========================================
         function abrirParty() {
+            if(mascoteAtivo && mascoteAtivo.isEgg) return;
             SoundManager.play('menu_click');
             document.getElementById('menu-principal-wrapper').style.display = 'none';
             document.getElementById('party-overlay').style.display = 'flex';
@@ -1045,7 +1055,6 @@
 
         function clicarSlot(index) {
             if (modoMover && slotAcao !== null && slotAcao !== index) {
-                // Troca de posição
                 const temp = mascotes[slotAcao];
                 mascotes[slotAcao] = mascotes[index];
                 mascotes[index] = temp;
@@ -1062,7 +1071,6 @@
                 PetEngine.setPokemon(mascoteAtivo.species.id);
                 atualizarInterface();
             } else if (modoMover && slotAcao === index) {
-                // Cancelar mover se clicar no mesmo
                 modoMover = false;
                 slotAcao = null;
                 renderParty();
@@ -1073,7 +1081,7 @@
             SoundManager.play('menu_click');
             modoMover = true;
             document.getElementById('slot-action-modal').style.display = 'none';
-            renderParty(); // Re-renderiza para destacar o slot selecionado
+            renderParty(); 
         }
 
         function fecharModalSlot() {
@@ -1123,14 +1131,12 @@
                 PMDHelper.playAnim(`party-sprite-${index}`, poke.species.id, 'Idle', 1);
             });
         }
-        // ==========================================
 
         const maxValores = { hp: 255, atk: 190, def: 230, spa: 194, spd: 230, spe: 200 };
 
         function abrirStatus(index = 0) {
             SoundManager.play('menu_click');
             
-            // Fecha os outros menus, mas garante que a overlay continue caso venha do Time
             document.getElementById('menu-principal-wrapper').style.display = 'none';
             document.getElementById('party-overlay').style.display = 'none';
             
@@ -1183,8 +1189,10 @@
                 bar.style.width = '0%'; 
                 
                 setTimeout(() => { 
-                    const maxStat = maxValores[key];
-                    const pct = Math.min(100, (real / maxStat) * 100);
+                    const lvl = p.level;
+                    const maxLocal = key === 'hp' ? Math.floor(((2 * maxValores[key] + 94) * lvl) / 100 + lvl + 10) : Math.floor((((2 * maxValores[key] + 94) * lvl) / 100 + 5) * 1.1);
+                    const pct = Math.min(100, (real / maxLocal) * 100);
+                    
                     bar.style.width = pct + '%'; 
                     bar.style.background = 'transparent';
                     bar.innerHTML = `
@@ -1203,7 +1211,7 @@
             renderStat('stat-spd', 'bar-spd', stats.spd, 'spd');
             renderStat('stat-spe', 'bar-spe', stats.spe, 'spe');
 
-            document.getElementById('menu-overlay').style.display = 'flex'; // Garante o fundo de vidro
+            document.getElementById('menu-overlay').style.display = 'flex'; 
             fadeIn(document.getElementById('status-overlay'));
             
             if(!p.isEgg) {
@@ -1292,8 +1300,7 @@
             if (!mascoteAtivo) return;
             if (mascoteAtivo.isEgg) { alert("Ainda é um ovo! Espere chocar."); fecharMenu(); return; }
 
-            if (acao === 'status') { abrirStatus(0); return; } // Por defeito abre o Status do Ativo (0)
-            else if (acao === 'limpar') {
+            if (acao === 'limpar') {
                 if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); } 
                 else {
                     SoundManager.play('clean');
