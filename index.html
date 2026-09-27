@@ -183,7 +183,7 @@
 
     <div id="app-container">
         
-        <!-- NOVA TELA DE REGISTRO DO TREINADOR -->
+        <!-- TELA DE REGISTRO DO TREINADOR -->
         <div id="screen-trainer" class="screen">
             <div class="selecao-header">REGISTRO DE TREINADOR</div>
             <div class="opcoes-grid" style="align-items: center; text-align: center;">
@@ -286,7 +286,6 @@
                     </div>
                     <div class="stat-text-line"><span>Nível</span> <span id="status-lvl">--</span></div>
                     <div class="stat-text-line"><span>Nature</span> <span id="status-nature" style="color: #f59e0b;">--</span></div>
-                    <!-- NOVO CAMPO: ID DO TREINADOR E OT -->
                     <div class="stat-text-line"><span>Treinador ID</span> <span id="status-tid" style="color: #94a3b8; font-family: 'Courier New', Courier, monospace;">-- / --</span></div>
                     
                     <div class="stat-bar-row" style="margin-top: 15px;">
@@ -690,7 +689,6 @@
             telaJogo.style.backgroundImage = `url('${urlBackground}')`;
         }
 
-        // FUNÇÃO DE REGISTRO DO TREINADOR
         function registrarTreinador() {
             const nomeStr = document.getElementById('input-trainer-name').value.trim().toUpperCase();
             if (nomeStr.length < 2) {
@@ -699,7 +697,6 @@
             }
             SoundManager.play('menu_click');
             
-            // Gera ID Aleatório de Treinador (5 dígitos)
             const randomTid = Math.floor(10000 + Math.random() * 90000).toString();
             window.trainerData = { name: nomeStr, tid: randomTid };
             localStorage.setItem('pmd_trainer', JSON.stringify(window.trainerData));
@@ -709,7 +706,6 @@
 
         async function iniciarJogo() {
             try {
-                // VERIFICA PERFIL DE TREINADOR
                 const trainerRaw = localStorage.getItem('pmd_trainer');
                 if (!trainerRaw) {
                     mostrarEcra('screen-trainer');
@@ -765,7 +761,6 @@
             SoundManager.play('select_pokemon');
             mascoteAtivo = new PokemonInstance(id);
             
-            // Grava a licença do treinador no monstrinho
             if (window.trainerData) {
                 mascoteAtivo.otName = window.trainerData.name;
                 mascoteAtivo.trainerId = window.trainerData.tid;
@@ -949,6 +944,9 @@
         
         function fecharStatus() { fadeOut(document.getElementById('status-overlay')); }
 
+        // BARRAS RELATIVAS AOS MÁXIMOS ABSOLUTOS DA FRANQUIA
+        const maxValores = { hp: 255, atk: 190, def: 230, spa: 194, spd: 230, spe: 200 };
+
         function abrirStatus() {
             SoundManager.play('menu_click');
             fecharMenu();
@@ -963,7 +961,6 @@
             document.getElementById('status-exp').innerText = `${expPercent}%`;
             document.getElementById('status-nature').innerText = mascoteAtivo.nature.toUpperCase();
             
-            // PREENCHE A LICENÇA DE TREINADOR (OT) NO STATUS
             const trainerName = mascoteAtivo.otName || 'DESCONHECIDO';
             const trainerId = mascoteAtivo.trainerId || '00000';
             document.getElementById('status-tid').innerText = `${trainerName} / ${trainerId}`;
@@ -972,7 +969,6 @@
             expBar.style.width = '0%';
             
             const stats = mascoteAtivo.calcularStatusReais();
-            const maxStat = Math.max(stats.hp.real, stats.atk.real, stats.def.real, stats.spa.real, stats.spd.real, stats.spe.real) * 1.1;
             
             const natureMap = { Lonely: { buff: 'atk', debuff: 'def' }, Brave: { buff: 'atk', debuff: 'spe' }, Adamant: { buff: 'atk', debuff: 'spa' }, Naughty: { buff: 'atk', debuff: 'spd' }, Bold: { buff: 'def', debuff: 'atk' }, Relaxed: { buff: 'def', debuff: 'spe' }, Impish: { buff: 'def', debuff: 'spa' }, Lax: { buff: 'def', debuff: 'spd' }, Timid: { buff: 'spe', debuff: 'atk' }, Hasty: { buff: 'spe', debuff: 'def' }, Jolly: { buff: 'spe', debuff: 'spa' }, Naive: { buff: 'spe', debuff: 'spd' }, Modest: { buff: 'spa', debuff: 'atk' }, Mild: { buff: 'spa', debuff: 'def' }, Quiet: { buff: 'spa', debuff: 'spe' }, Rash: { buff: 'spa', debuff: 'spd' }, Calm: { buff: 'spd', debuff: 'atk' }, Gentle: { buff: 'spd', debuff: 'def' }, Sassy: { buff: 'spd', debuff: 'spe' }, Careful: { buff: 'spd', debuff: 'spa' } };
             const currentNature = natureMap[mascoteAtivo.nature] || { buff: null, debuff: null };
@@ -994,7 +990,9 @@
                 bar.style.width = '0%'; 
                 
                 setTimeout(() => { 
-                    bar.style.width = ((real / maxStat) * 100) + '%'; 
+                    const maxStat = maxValores[key];
+                    const pct = Math.min(100, (real / maxStat) * 100);
+                    bar.style.width = pct + '%'; 
                     bar.style.background = 'transparent';
                     bar.innerHTML = `
                         <div style="display:flex; width: 100%; height: 100%;">
@@ -1052,7 +1050,6 @@
             else if (['grama', 'inseto', 'veneno', 'normal'].includes(pType)) favBerry = 'berrie_verde';
             else favBerry = 'berrie_amarela';
 
-            // LÓGICA DE ALIMENTAÇÃO CORRIGIDA (Só dá buff se a fome for < 100%)
             const foodBeforeEat = mascoteAtivo.food;
             let foodGain = 25;
             let joyGain = 0;
@@ -1060,19 +1057,18 @@
 
             if (isFavorite) {
                 if (foodBeforeEat < 100) {
-                    joyGain = 5; // Com fome e favorito = Bónus
+                    joyGain = 5; 
                 } else {
-                    joyGain = 0; // Já está de estômago cheio
+                    joyGain = 0; 
                 }
             } else {
-                joyGain = -5; // Castigo por comer a fruta errada
+                joyGain = -5; 
             }
 
             mascoteAtivo.food = Math.min(100, mascoteAtivo.food + foodGain);
             mascoteAtivo.joy = Math.min(100, Math.max(0, mascoteAtivo.joy + joyGain));
             await saveGame(mascoteAtivo); 
 
-            // Animação do coração só ocorre se o bónus foi realmente aplicado
             if (isFavorite && joyGain > 0) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
