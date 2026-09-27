@@ -127,7 +127,6 @@
         
         @keyframes flash-clean { 0% { opacity: 0; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1.1); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.2); } }
         
-        /* ANIMAÇÃO DE INTERAÇÃO DO CORAÇÃO */
         @keyframes floatUp { 
             0% { opacity: 1; transform: translate(-50%, 0) scale(1); } 
             100% { opacity: 0; transform: translate(-50%, -30px) scale(1.5); } 
@@ -239,13 +238,33 @@
             </div>
             
             <div id="menu-overlay" class="overlay-glass">
-                <div class="menu-grid">
-                    <button class="menu-btn" onclick="executarAcao('status')">Status</button>
-                    <button class="menu-btn" onclick="executarAcao('alimentar')">Alimentar</button>
-                    <button class="menu-btn" onclick="executarAcao('limpar')">Limpar</button>
-                    <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
+                
+                <!-- MENU PRINCIPAL -->
+                <div id="menu-principal-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <div class="menu-grid">
+                        <button class="menu-btn" onclick="executarAcao('status')">Status</button>
+                        <button class="menu-btn" onclick="abrirSubMenu('alimentar')">Alimentar</button>
+                        <button class="menu-btn" onclick="executarAcao('limpar')">Limpar</button>
+                        <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
+                    </div>
+                    <button class="menu-btn btn-voltar" onclick="fecharMenu()">FECHAR</button>
                 </div>
-                <button class="menu-btn btn-voltar" onclick="fecharMenu()">FECHAR</button>
+
+                <!-- SUBMENU ALIMENTAÇÃO (BERRIES E CANDIES) -->
+                <div id="submenu-alimentar" style="display: none; width: 100%; flex-direction: column; align-items: center;">
+                    <div style="color: white; font-weight: bold; margin-bottom: 15px; font-size: 16px; letter-spacing: 1px;">ESCOLHA O ALIMENTO</div>
+                    <div class="menu-grid" style="grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button class="menu-btn" style="color: #ef4444" onclick="darComida('berrie_vermelha')">🍒 Fruta Vermelha</button>
+                        <button class="menu-btn" style="color: #3b82f6" onclick="darComida('berrie_azul')">🫐 Fruta Azul</button>
+                        <button class="menu-btn" style="color: #10b981" onclick="darComida('berrie_verde')">🍏 Fruta Verde</button>
+                        <button class="menu-btn" style="color: #eab308" onclick="darComida('berrie_amarela')">🍋 Fruta Amarela</button>
+                        <button class="menu-btn" onclick="darComida('candy_1')">🍬 Doce Comum</button>
+                        <button class="menu-btn" onclick="darComida('candy_2')">⚡ Doce Energia</button>
+                        <button class="menu-btn" style="grid-column: span 2;" onclick="darComida('candy_3')">💎 Doce Raro</button>
+                    </div>
+                    <button class="menu-btn btn-voltar" onclick="voltarMenuPrincipal()">VOLTAR</button>
+                </div>
+
             </div>
 
             <div id="status-overlay" class="overlay-glass">
@@ -427,19 +446,14 @@
                     this.element.style.transformOrigin = 'center bottom';
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
                     this.element.style.transform = 'scale(2.5)';
-                    
-                    // AJUSTE: Altura corrigida para 30px
-                    this.element.style.bottom = '30px';
-                    
+                    this.element.style.bottom = '30px'; // Subiu para assentar
                     this.element.style.display = 'flex';
                     this.element.style.justifyContent = 'center';
                     this.element.style.alignItems = 'flex-end';
                     
-                    // Permite Interação de Toque/Clique no Pokémon
                     this.element.style.pointerEvents = 'auto';
                     this.element.style.cursor = 'pointer';
                     
-                    // Ouve os toques e executa a função de carinho
                     this.element.addEventListener('click', () => this.interagir());
                     this.element.addEventListener('touchstart', (e) => {
                         e.preventDefault(); 
@@ -453,18 +467,15 @@
                 this.isRunning = true; this.loop();
             },
 
-            // NOVA FUNÇÃO: Reação do Touchscreen
             interagir() {
                 if (this.dormindo || this.state === 'Interacting' || mascoteAtivo.isEgg) return;
                 
                 SoundManager.play('menu_click');
                 
-                // Força o mascote a olhar para a frente e pausar os movimentos
                 this.changeAction('IdleFront');
                 this.state = 'Interacting';
                 this.actionTimer = Date.now() + 2000; 
                 
-                // Criação do Coração
                 const heart = document.createElement('div');
                 heart.innerText = '❤️';
                 heart.style.position = 'absolute';
@@ -477,12 +488,21 @@
                 
                 this.element.appendChild(heart);
                 
-                // Benefício da interação: +2 Alegria
-                mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 2);
-                saveGame(mascoteAtivo);
-                atualizarInterface();
+                if (!mascoteAtivo.interacoes) mascoteAtivo.interacoes = [];
+                const now = Date.now();
+                // Limpa interações que ocorreram há mais de 1 hora
+                mascoteAtivo.interacoes = mascoteAtivo.interacoes.filter(t => now - t < 3600000);
                 
-                // Desfaz a interação após 1 segundo
+                // Limite de 5 carinhos por hora
+                if (mascoteAtivo.interacoes.length < 5) {
+                    mascoteAtivo.interacoes.push(now);
+                    mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 0.5);
+                    saveGame(mascoteAtivo);
+                    atualizarInterface();
+                } else {
+                    console.log("Limite de carinho atingido por hora.");
+                }
+                
                 setTimeout(() => {
                     if (heart.parentNode) heart.parentNode.removeChild(heart);
                     if (this.state === 'Interacting') this.state = 'IdleFront';
@@ -527,7 +547,6 @@
                     this.parseXML(text);
                     
                     this.element.innerHTML = ''; 
-                    
                     this.state = null; 
                     this.changeAction(this.dormindo ? 'Sleep' : 'IdleFront');
                 } catch(e) {
@@ -606,19 +625,15 @@
                     }
                 }
 
-                // OBTÉM QUADRO ESTÁTICO (Trava no frame zero se estiver a interagir, senão respira)
-                if (this.state !== 'IdleFront' && this.state !== 'Interacting') {
-                    const anim = this.animData[this.currentActionName] || this.animData['Idle'];
-                    this.tickCounter += 0.5; 
-                    if (this.tickCounter >= anim.durations[this.currentFrame]) {
-                        this.tickCounter = 0;
-                        this.currentFrame++;
-                        if (this.currentFrame >= anim.durations.length) {
-                            this.currentFrame = 0; 
-                        }
+                // ANIMAÇÃO PERPÉTUA (O Pokémon nunca congela, respira sempre!)
+                const anim = this.animData[this.currentActionName] || this.animData['Idle'];
+                this.tickCounter += 0.5; 
+                if (this.tickCounter >= anim.durations[this.currentFrame]) {
+                    this.tickCounter = 0;
+                    this.currentFrame++;
+                    if (this.currentFrame >= anim.durations.length) {
+                        this.currentFrame = 0; 
                     }
-                } else {
-                    this.currentFrame = 0; 
                 }
             },
 
@@ -867,7 +882,26 @@
             fadeIn(document.getElementById('menu-overlay')); 
         }
         
-        function fecharMenu() { fadeOut(document.getElementById('menu-overlay')); }
+        function abrirSubMenu(menuId) {
+            SoundManager.play('menu_click');
+            document.getElementById('menu-principal-wrapper').style.display = 'none';
+            document.getElementById('submenu-' + menuId).style.display = 'flex';
+        }
+
+        function voltarMenuPrincipal() {
+            SoundManager.play('menu_click');
+            document.getElementById('submenu-alimentar').style.display = 'none';
+            document.getElementById('menu-principal-wrapper').style.display = 'flex';
+        }
+
+        function fecharMenu() { 
+            fadeOut(document.getElementById('menu-overlay')); 
+            setTimeout(() => {
+                document.getElementById('submenu-alimentar').style.display = 'none';
+                document.getElementById('menu-principal-wrapper').style.display = 'flex';
+            }, 300);
+        }
+        
         function fecharStatus() { fadeOut(document.getElementById('status-overlay')); }
 
         function abrirStatus() {
@@ -932,26 +966,53 @@
             setTimeout(() => { expBar.style.width = `${expPercent}%`; }, 50);
         }
 
+        async function darComida(tipoItem) {
+            if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); return; }
+            
+            SoundManager.play('eat');
+            
+            // O sistema lê o STAB primário do mascote
+            const pType = mascoteAtivo.species.type; 
+            let favBerry = '';
+            
+            if (['fogo', 'lutador', 'pedra', 'voador'].includes(pType)) favBerry = 'berrie_vermelha';
+            else if (['agua', 'gelo', 'psiquico', 'dragao'].includes(pType)) favBerry = 'berrie_azul';
+            else if (['grama', 'inseto', 'veneno', 'normal'].includes(pType)) favBerry = 'berrie_verde';
+            else favBerry = 'berrie_amarela';
+
+            let foodGain = 0;
+            let joyGain = 0;
+            let energyGain = 0;
+
+            if (tipoItem.startsWith('berrie')) {
+                foodGain = 25;
+                if (tipoItem === favBerry) { joyGain = 5; } 
+                else { joyGain = -5; }
+            } else if (tipoItem === 'candy_1') {
+                foodGain = 15; joyGain = 2; // Doce Comum
+            } else if (tipoItem === 'candy_2') {
+                foodGain = 10; energyGain = 20; joyGain = 2; // Doce de Energia
+            } else if (tipoItem === 'candy_3') {
+                foodGain = 30; joyGain = 10; // Doce Raro
+            }
+
+            mascoteAtivo.food = Math.min(100, mascoteAtivo.food + foodGain);
+            mascoteAtivo.energy = Math.min(100, mascoteAtivo.energy + energyGain);
+            mascoteAtivo.joy = Math.min(100, Math.max(0, mascoteAtivo.joy + joyGain));
+            await saveGame(mascoteAtivo); 
+            
+            PetEngine.changeAction('Eat'); 
+            setTimeout(() => { PetEngine.changeAction('IdleFront'); }, 2000); 
+            
+            atualizarInterface(); 
+            fecharMenu();
+        }
+
         async function executarAcao(acao) {
             if (!mascoteAtivo) return;
             if (mascoteAtivo.isEgg) { alert("Ainda é um ovo! Espere chocar."); fecharMenu(); return; }
 
             if (acao === 'status') { abrirStatus(); return; }
-            else if (acao === 'alimentar') {
-                if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); } 
-                else { 
-                    SoundManager.play('eat');
-                    mascoteAtivo.food = Math.min(100, mascoteAtivo.food + 25);
-                    mascoteAtivo.hygiene = Math.max(0, mascoteAtivo.hygiene - 5); 
-                    mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 2);
-                    await saveGame(mascoteAtivo); 
-                    
-                    PetEngine.changeAction('Eat'); 
-                    setTimeout(() => { PetEngine.changeAction('IdleFront'); }, 2000); 
-                    
-                    atualizarInterface(); 
-                }
-            } 
             else if (acao === 'limpar') {
                 if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); } 
                 else {
