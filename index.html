@@ -183,7 +183,6 @@
 
     <div id="app-container">
         
-        <!-- TELA DE REGISTRO DO TREINADOR -->
         <div id="screen-trainer" class="screen">
             <div class="selecao-header">REGISTRO DE TREINADOR</div>
             <div class="opcoes-grid" style="align-items: center; text-align: center;">
@@ -944,9 +943,6 @@
         
         function fecharStatus() { fadeOut(document.getElementById('status-overlay')); }
 
-        // BARRAS RELATIVAS AOS MÁXIMOS ABSOLUTOS DA FRANQUIA
-        const maxValores = { hp: 255, atk: 190, def: 230, spa: 194, spd: 230, spe: 200 };
-
         function abrirStatus() {
             SoundManager.play('menu_click');
             fecharMenu();
@@ -969,6 +965,17 @@
             expBar.style.width = '0%';
             
             const stats = mascoteAtivo.calcularStatusReais();
+            const lvl = mascoteAtivo.level;
+            
+            // TETO MÁXIMO PROPORCIONAL AO NÍVEL (Usa a fórmula base de Nv100 calculada para o Nível atual)
+            const maxValores = {
+                hp: Math.floor(((2 * 255 + 94) * lvl) / 100 + lvl + 10),
+                atk: Math.floor((((2 * 190 + 94) * lvl) / 100 + 5) * 1.1),
+                def: Math.floor((((2 * 230 + 94) * lvl) / 100 + 5) * 1.1),
+                spa: Math.floor((((2 * 194 + 94) * lvl) / 100 + 5) * 1.1),
+                spd: Math.floor((((2 * 230 + 94) * lvl) / 100 + 5) * 1.1),
+                spe: Math.floor((((2 * 200 + 94) * lvl) / 100 + 5) * 1.1)
+            };
             
             const natureMap = { Lonely: { buff: 'atk', debuff: 'def' }, Brave: { buff: 'atk', debuff: 'spe' }, Adamant: { buff: 'atk', debuff: 'spa' }, Naughty: { buff: 'atk', debuff: 'spd' }, Bold: { buff: 'def', debuff: 'atk' }, Relaxed: { buff: 'def', debuff: 'spe' }, Impish: { buff: 'def', debuff: 'spa' }, Lax: { buff: 'def', debuff: 'spd' }, Timid: { buff: 'spe', debuff: 'atk' }, Hasty: { buff: 'spe', debuff: 'def' }, Jolly: { buff: 'spe', debuff: 'spa' }, Naive: { buff: 'spe', debuff: 'spd' }, Modest: { buff: 'spa', debuff: 'atk' }, Mild: { buff: 'spa', debuff: 'def' }, Quiet: { buff: 'spa', debuff: 'spe' }, Rash: { buff: 'spa', debuff: 'spd' }, Calm: { buff: 'spd', debuff: 'atk' }, Gentle: { buff: 'spd', debuff: 'def' }, Sassy: { buff: 'spd', debuff: 'spe' }, Careful: { buff: 'spd', debuff: 'spa' } };
             const currentNature = natureMap[mascoteAtivo.nature] || { buff: null, debuff: null };
@@ -990,8 +997,7 @@
                 bar.style.width = '0%'; 
                 
                 setTimeout(() => { 
-                    const maxStat = maxValores[key];
-                    const pct = Math.min(100, (real / maxStat) * 100);
+                    const pct = Math.min(100, (real / maxValores[key]) * 100);
                     bar.style.width = pct + '%'; 
                     bar.style.background = 'transparent';
                     bar.innerHTML = `
