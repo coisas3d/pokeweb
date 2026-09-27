@@ -10,7 +10,6 @@
             margin: 0; padding: 0; 
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
             display: flex; justify-content: center; align-items: center; 
-            /* Uso de dvh para evitar corte do botão em smartphones */
             height: 100dvh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             color: #333; overflow: hidden;
         }
@@ -100,7 +99,6 @@
         .btn-tipo-fogo { border-left: 6px solid #ef4444; }
         .btn-tipo-agua { border-left: 6px solid #3b82f6; }
 
-        /* Ajuste de espaçamento inferior reduzido para proteger o botão */
         #controles { display: flex; justify-content: center; padding: 15px 20px 20px 20px; background: #ffffff; z-index: 5; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
         .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 18px 0; width: 85%; border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
@@ -119,7 +117,6 @@
 
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; pointer-events: none; }
         
-        /* Linha de terra principal em 55px */
         #poop-layer { position: absolute; bottom: 55px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
         
         #efeito-limpeza {
@@ -132,10 +129,7 @@
 
         #ovo-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
         
-        /* Ovo subiu para 55px (desenterrado) */
         #ovo-wrapper { position: absolute; bottom: 55px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
-        
-        /* Texto desceu para 15px (descolado do ovo) */
         #tempo-eclosao { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-weight: 700; font-size: 14px; color: #475569; background: rgba(255,255,255,0.85); padding: 8px 20px; border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
         .ovo { width: 80px; height: 100px; background-color: #e2e8f0; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -15px -15px 25px rgba(0,0,0,0.2), 0 15px 25px rgba(0,0,0,0.15); animation: ovo-tremendo 3s infinite; }
@@ -157,9 +151,6 @@
         .menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 18px 10px; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .menu-btn:active { background: rgba(255, 255, 255, 0.2); transform: scale(0.95); }
         .btn-voltar { background: rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 0.5); margin-top: 15px; width: 85%; }
-
-        #dev-tools { margin-top: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 15px; width: 85%; border: 1px dashed #ef4444; box-sizing: border-box; }
-        .dev-input { width: 100%; border-radius: 5px; border: none; padding: 5px; font-weight: bold; text-align: center; }
 
         #status-overlay { justify-content: flex-start; padding: 25px; box-sizing: border-box; overflow-y: auto; }
         .status-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
@@ -248,20 +239,6 @@
                     <button class="menu-btn" onclick="executarAcao('alimentar')">Alimentar</button>
                     <button class="menu-btn" onclick="executarAcao('limpar')">Limpar</button>
                     <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
-                </div>
-                
-                <div id="dev-tools">
-                    <div style="color: #ef4444; text-align: center; font-size: 13px; font-weight: 800; margin-bottom: 12px; letter-spacing: 1px;">⚙️ MODO DEV ⚙️</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                        <div style="display:flex; align-items:center; gap:5px;"><span style="font-size:12px;color:white;width:30px;">Fome</span><input type="number" id="dev-food" class="dev-input" min="0" max="100"></div>
-                        <div style="display:flex; align-items:center; gap:5px;"><span style="font-size:12px;color:white;width:30px;">Ene</span><input type="number" id="dev-energy" class="dev-input" min="0" max="100"></div>
-                        <div style="display:flex; align-items:center; gap:5px;"><span style="font-size:12px;color:white;width:30px;">Hig</span><input type="number" id="dev-hygiene" class="dev-input" min="0" max="100"></div>
-                        <div style="display:flex; align-items:center; gap:5px;"><span style="font-size:12px;color:white;width:30px;">Ale</span><input type="number" id="dev-joy" class="dev-input" min="0" max="100"></div>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="aplicarDevTools()" style="flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; background: #ef4444; color: white; border: none; font-weight: bold; font-size:13px;">Aplicar Status</button>
-                        <button onclick="adicionarCoco()" style="padding: 10px; border-radius: 8px; cursor: pointer; background: #8b4513; color: white; border: none; font-weight: bold; font-size:13px;" title="Adiciona +1 sujeira na tela">+1 💩</button>
-                    </div>
                 </div>
                 <button class="menu-btn btn-voltar" onclick="fecharMenu()">FECHAR</button>
             </div>
@@ -429,8 +406,7 @@
 
         const PetEngine = {
             element: null, state: 'Idle', direction: 6, 
-            x: 0, containerW: 0, containerH: 0, 
-            speed: 0.15, // Movimento muito mais suave e lento
+            x: 0, containerW: 0, containerH: 0, speed: 0.15, 
             isRunning: false, dormindo: false, actionTimer: 0,
             animData: {}, currentFrame: 0, tickCounter: 0, basePath: '', currentActionName: 'Idle',
 
@@ -447,14 +423,16 @@
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
                     this.element.style.transform = 'scale(2.5)';
                     
-                    /* LINHA BASE EM 55PX PARA ALINHAR COM O CHÃO */
-                    this.element.style.bottom = '55px';
+                    // COMPENSAÇÃO DE GRAVIDADE: Ajustado para 20px para ignorar a transparência base do SpriteCollab
+                    this.element.style.bottom = '20px';
                     
                     this.element.style.display = 'flex';
                     this.element.style.justifyContent = 'center';
                     this.element.style.alignItems = 'flex-end';
                     layer.appendChild(this.element);
                 }
+                
+                this.actionTimer = Date.now() + 2000;
                 this.isRunning = true; this.loop();
             },
 
@@ -496,7 +474,9 @@
                     this.parseXML(text);
                     
                     this.element.innerHTML = ''; 
-                    this.changeAction('IdleFront');
+                    
+                    this.state = null; 
+                    this.changeAction(this.dormindo ? 'Sleep' : 'IdleFront');
                 } catch(e) {
                     console.error("Falha crassa no Motor PMD Local:", e);
                     this.element.innerHTML = '❌';
@@ -559,11 +539,8 @@
                     }
 
                     if (Date.now() > this.actionTimer) {
-                        // INTERVALOS MUITO MAIORES: Pausas de 4 a 10 segundos
                         this.actionTimer = Date.now() + 4000 + Math.random() * 6000;
                         const r = Math.random();
-                        
-                        // MAIOR PROBABILIDADE DE FICAR PARADO (70% do tempo)
                         if (r < 0.15) this.changeAction('WalkLeft');
                         else if (r < 0.30) this.changeAction('WalkRight');
                         else this.changeAction('IdleFront');
@@ -576,7 +553,6 @@
                     }
                 }
 
-                // OBTÉM QUADRO ESTÁTICO PERFEITO QUANDO OLHA PARA A FRENTE
                 if (this.state !== 'IdleFront') {
                     const anim = this.animData[this.currentActionName] || this.animData['Idle'];
                     this.tickCounter++;
@@ -588,7 +564,7 @@
                         }
                     }
                 } else {
-                    this.currentFrame = 0; // Trava no primeiro frame ao olhar para a tela
+                    this.currentFrame = 0; 
                 }
             },
 
@@ -730,6 +706,12 @@
             saveGame(mascoteAtivo);
             mostrarEcra('screen-game');
             processoEclosaoEmAndamento = false;
+            
+            if (loopEclosao) {
+                clearInterval(loopEclosao);
+                loopEclosao = null;
+            }
+            
             atualizarInterface();
         }
 
@@ -809,6 +791,11 @@
                 ovoContainer.style.display = 'none';
                 spriteLayer.style.display = 'block';
                 
+                if (loopEclosao) {
+                    clearInterval(loopEclosao);
+                    loopEclosao = null;
+                }
+                
                 if (!PetEngine.isRunning) {
                     PetEngine.init('sprite-layer');
                     PetEngine.setPokemon(mascoteAtivo.species.id); 
@@ -823,43 +810,10 @@
         function abrirMenu() { 
             SoundManager.play('menu_open'); 
             fadeIn(document.getElementById('menu-overlay')); 
-            
-            if(mascoteAtivo && !mascoteAtivo.isEgg) {
-                document.getElementById('dev-food').value = Math.floor(mascoteAtivo.food);
-                document.getElementById('dev-energy').value = Math.floor(mascoteAtivo.energy);
-                document.getElementById('dev-hygiene').value = Math.floor(mascoteAtivo.hygiene);
-                document.getElementById('dev-joy').value = Math.floor(mascoteAtivo.joy);
-                document.getElementById('dev-tools').style.display = 'block';
-            } else {
-                document.getElementById('dev-tools').style.display = 'none';
-            }
         }
         
         function fecharMenu() { fadeOut(document.getElementById('menu-overlay')); }
         function fecharStatus() { fadeOut(document.getElementById('status-overlay')); }
-
-        async function aplicarDevTools() {
-            if(!mascoteAtivo || mascoteAtivo.isEgg) return;
-            SoundManager.play('menu_click');
-            mascoteAtivo.food = Math.min(100, Math.max(0, Number(document.getElementById('dev-food').value)));
-            mascoteAtivo.energy = Math.min(100, Math.max(0, Number(document.getElementById('dev-energy').value)));
-            mascoteAtivo.hygiene = Math.min(100, Math.max(0, Number(document.getElementById('dev-hygiene').value)));
-            mascoteAtivo.joy = Math.min(100, Math.max(0, Number(document.getElementById('dev-joy').value)));
-            await saveGame(mascoteAtivo);
-            atualizarInterface();
-            fecharMenu();
-            alert("Sistema DEV: Status atualizados com sucesso!");
-        }
-
-        async function adicionarCoco() {
-            if(!mascoteAtivo || mascoteAtivo.isEgg) return;
-            SoundManager.play('menu_click');
-            mascoteAtivo.poops = Math.min(3, mascoteAtivo.poops + 1);
-            mascoteAtivo.hygiene = Math.max(0, mascoteAtivo.hygiene - 15); 
-            await saveGame(mascoteAtivo);
-            atualizarInterface();
-            fecharMenu();
-        }
 
         function abrirStatus() {
             SoundManager.play('menu_click');
