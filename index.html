@@ -35,7 +35,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 5;
         }
         
-        /* NOVA DASHBOARD COM RELÓGIO E BARRAS DE STATUS */
         .top-dashboard {
             background: rgba(255, 255, 255, 0.95);
             padding: 15px 20px;
@@ -100,7 +99,6 @@
         .btn-tipo-fogo { border-left: 6px solid #ef4444; }
         .btn-tipo-agua { border-left: 6px solid #3b82f6; }
 
-        /* AFASTAMENTO EXTRA NO FUNDO PARA EVITAR CORTES NOS TELEMÓVEIS */
         #controles { display: flex; justify-content: center; padding: 20px 20px 35px 20px; background: #ffffff; z-index: 5; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
         .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 18px 0; width: 85%; border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
@@ -118,7 +116,9 @@
         #tela-jogo.dormindo::after { opacity: 1; }
 
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; pointer-events: none; }
-        #poop-layer { position: absolute; bottom: 70px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
+        
+        /* AJUSTE: Base descida para 35px para assentar no meio da terra */
+        #poop-layer { position: absolute; bottom: 35px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
         
         #efeito-limpeza {
             display: none; position: absolute; inset: 0; z-index: 15;
@@ -129,7 +129,9 @@
         @keyframes flash-clean { 0% { opacity: 0; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1.1); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.2); } }
 
         #ovo-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
-        #ovo-wrapper { position: absolute; bottom: 70px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
+        
+        /* AJUSTE: Ovo ancorado em 35px */
+        #ovo-wrapper { position: absolute; bottom: 35px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
         #tempo-eclosao { position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%); font-weight: 700; font-size: 14px; color: #475569; background: rgba(255,255,255,0.85); padding: 8px 20px; border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
         .ovo { width: 80px; height: 100px; background-color: #e2e8f0; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -15px -15px 25px rgba(0,0,0,0.2), 0 15px 25px rgba(0,0,0,0.15); animation: ovo-tremendo 3s infinite; }
@@ -197,7 +199,6 @@
         </div>
 
         <div id="screen-game" class="screen">
-            <!-- NOVA DASHBOARD SUPERIOR -->
             <div class="top-dashboard">
                 <div class="dashboard-header">
                     <div class="nvl-badge">Nvl <span id="val-nivel">--</span></div>
@@ -336,7 +337,6 @@
 
         const SoundManager = { play(effect) { console.log(`[Audio]: '${effect}'`); } };
 
-        // RELÓGIO DO JOGO
         function updateClock() {
             const now = new Date();
             const hs = String(now.getHours()).padStart(2, '0');
@@ -425,7 +425,7 @@
 
         const PetEngine = {
             element: null, state: 'Idle', direction: 6, 
-            x: 0, containerW: 0, containerH: 0, speed: 0.5, 
+            x: 0, containerW: 0, containerH: 0, speed: 0.2, 
             isRunning: false, dormindo: false, actionTimer: 0,
             animData: {}, currentFrame: 0, tickCounter: 0, basePath: '', currentActionName: 'Idle',
 
@@ -440,12 +440,8 @@
                     this.element.style.imageRendering = 'pixelated';
                     this.element.style.transformOrigin = 'center bottom';
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
-                    // ESCALA DO POKÉMON AUMENTADA PARA 2.5
                     this.element.style.transform = 'scale(2.5)';
-                    
-                    // GRAVIDADE CORRIGIDA E ANCORADA NO MESMO PONTO DO OVO (70px)
-                    this.element.style.bottom = '70px';
-                    
+                    this.element.style.bottom = '35px';
                     this.element.style.display = 'flex';
                     this.element.style.justifyContent = 'center';
                     this.element.style.alignItems = 'flex-end';
@@ -515,10 +511,8 @@
                 let animName = newState;
                 if (newState === 'WalkLeft') { animName = 'Walk'; this.direction = 6; }
                 if (newState === 'WalkRight') { animName = 'Walk'; this.direction = 2; }
-                
-                // NOVO ESTADO: O POKÉMON PARA E OLHA PARA A FRENTE!
                 if (newState === 'IdleFront') { animName = 'Idle'; this.direction = 0; }
-                if (newState === 'Idle') { animName = 'Idle'; } // Mantém a direção atual se for só Idle
+                if (newState === 'Idle') { animName = 'Idle'; } 
                 
                 if (this.currentActionName === animName && this.state === newState) return;
                 
@@ -546,7 +540,7 @@
                             this.x += (this.x > center ? -this.speed : this.speed);
                         } else {
                             this.x = center;
-                            this.changeAction('IdleFront'); // Chora olhando para a frente
+                            this.changeAction('IdleFront'); 
                         }
                         return; 
                     }
@@ -557,11 +551,10 @@
                     }
 
                     if (Date.now() > this.actionTimer) {
-                        this.actionTimer = Date.now() + 2000 + Math.random() * 4000;
+                        this.actionTimer = Date.now() + 3000 + Math.random() * 5000;
                         const r = Math.random();
-                        if (r < 0.30) this.changeAction('WalkLeft');
-                        else if (r < 0.60) this.changeAction('WalkRight');
-                        // Substituímos o Idle padrão para o IdleFront (parar e olhar pra frente)
+                        if (r < 0.15) this.changeAction('WalkLeft');
+                        else if (r < 0.30) this.changeAction('WalkRight');
                         else this.changeAction('IdleFront');
                     }
                     if (this.state.startsWith('Walk')) {
@@ -572,14 +565,18 @@
                     }
                 }
 
-                const anim = this.animData[this.currentActionName] || this.animData['Idle'];
-                this.tickCounter++;
-                if (this.tickCounter >= anim.durations[this.currentFrame]) {
-                    this.tickCounter = 0;
-                    this.currentFrame++;
-                    if (this.currentFrame >= anim.durations.length) {
-                        this.currentFrame = 0; 
+                if (this.state !== 'IdleFront') {
+                    const anim = this.animData[this.currentActionName] || this.animData['Idle'];
+                    this.tickCounter++;
+                    if (this.tickCounter >= anim.durations[this.currentFrame]) {
+                        this.tickCounter = 0;
+                        this.currentFrame++;
+                        if (this.currentFrame >= anim.durations.length) {
+                            this.currentFrame = 0; 
+                        }
                     }
+                } else {
+                    this.currentFrame = 0;
                 }
             },
 
@@ -588,8 +585,6 @@
                 
                 const anim = this.animData[this.currentActionName] || this.animData['Idle'];
                 this.element.style.left = (this.x - (anim.frameWidth / 2)) + 'px';
-                
-                // Removido o cálculo do TOP que causava o "Pulo". O elemento está fixo no Bottom = 70px perfeitamente ancorado!
                 
                 const bgPosX = -(this.currentFrame * anim.frameWidth);
                 const bgPosY = -(this.direction * anim.frameHeight);
@@ -643,7 +638,7 @@
                     mostrarEcra('screen-region');
                 }
             } catch (erro) { 
-                console.error("Erro fatal ao iniciar, forçando tela de região:", erro); 
+                console.error("Erro fatal ao iniciar:", erro); 
                 mostrarEcra('screen-region');
             }
         }
@@ -734,11 +729,10 @@
             atualizarInterface();
         }
 
-        // LÓGICA DE CORES DA BARRA
         function obterCorStatus(valor) {
-            if (valor > 50) return '#10b981'; // Verde
-            if (valor > 10) return '#f59e0b'; // Amarelo
-            return '#ef4444'; // Vermelho
+            if (valor > 50) return '#10b981'; 
+            if (valor > 10) return '#f59e0b'; 
+            return '#ef4444'; 
         }
 
         function atualizarInterface() {
@@ -746,7 +740,6 @@
             
             document.getElementById('val-nivel').innerText = mascoteAtivo.isEgg ? `--` : mascoteAtivo.level;
             
-            // ATUALIZAR BARRAS DE STATUS (Esconde no ovo, mostra no Pokémon)
             if (mascoteAtivo.isEgg) {
                 ['food', 'energy', 'hygiene', 'joy'].forEach(stat => {
                     const barra = document.getElementById(`bar-${stat}`);
