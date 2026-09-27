@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PokeWeb - PMD Engine Local</title>
     <style>
+        /* BASE & TIPOGRAFIA PREMIUM */
         body { 
             margin: 0; padding: 0; 
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
@@ -123,7 +124,14 @@
             justify-content: center; align-items: center; font-size: 70px;
             pointer-events: none;
         }
+        
         @keyframes flash-clean { 0% { opacity: 0; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1.1); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.2); } }
+        
+        /* ANIMAÇÃO DE INTERAÇÃO DO CORAÇÃO */
+        @keyframes floatUp { 
+            0% { opacity: 1; transform: translate(-50%, 0) scale(1); } 
+            100% { opacity: 0; transform: translate(-50%, -30px) scale(1.5); } 
+        }
 
         #ovo-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
         #ovo-wrapper { position: absolute; bottom: 55px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
@@ -237,7 +245,6 @@
                     <button class="menu-btn" onclick="executarAcao('limpar')">Limpar</button>
                     <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
                 </div>
-                <!-- MODO DEV REMOVIDO PARA PRODUÇÃO -->
                 <button class="menu-btn btn-voltar" onclick="fecharMenu()">FECHAR</button>
             </div>
 
@@ -380,7 +387,7 @@
                     if (container.dataset.intervalId) { clearInterval(parseInt(container.dataset.intervalId)); }
 
                     const intervalId = setInterval(() => {
-                        tick += 0.5; // Ajuste de velocidade mais natural
+                        tick += 0.5; 
                         if (tick >= durations[currentFrame]) {
                             tick = 0;
                             currentFrame++;
@@ -421,17 +428,65 @@
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
                     this.element.style.transform = 'scale(2.5)';
                     
-                    // ALTURA CORRIGIDA PARA BAIXAR MAIS O POKEMON (Compensando transparência da imagem)
-                    this.element.style.bottom = '10px';
+                    // AJUSTE: Altura corrigida para 30px
+                    this.element.style.bottom = '30px';
                     
                     this.element.style.display = 'flex';
                     this.element.style.justifyContent = 'center';
                     this.element.style.alignItems = 'flex-end';
+                    
+                    // Permite Interação de Toque/Clique no Pokémon
+                    this.element.style.pointerEvents = 'auto';
+                    this.element.style.cursor = 'pointer';
+                    
+                    // Ouve os toques e executa a função de carinho
+                    this.element.addEventListener('click', () => this.interagir());
+                    this.element.addEventListener('touchstart', (e) => {
+                        e.preventDefault(); 
+                        this.interagir();
+                    });
+
                     layer.appendChild(this.element);
                 }
                 
                 this.actionTimer = Date.now() + 2000;
                 this.isRunning = true; this.loop();
+            },
+
+            // NOVA FUNÇÃO: Reação do Touchscreen
+            interagir() {
+                if (this.dormindo || this.state === 'Interacting' || mascoteAtivo.isEgg) return;
+                
+                SoundManager.play('menu_click');
+                
+                // Força o mascote a olhar para a frente e pausar os movimentos
+                this.changeAction('IdleFront');
+                this.state = 'Interacting';
+                this.actionTimer = Date.now() + 2000; 
+                
+                // Criação do Coração
+                const heart = document.createElement('div');
+                heart.innerText = '❤️';
+                heart.style.position = 'absolute';
+                heart.style.left = '50%';
+                heart.style.top = '-20px';
+                heart.style.transform = 'translateX(-50%)';
+                heart.style.fontSize = '12px';
+                heart.style.pointerEvents = 'none';
+                heart.style.animation = 'floatUp 1s ease-out forwards';
+                
+                this.element.appendChild(heart);
+                
+                // Benefício da interação: +2 Alegria
+                mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 2);
+                saveGame(mascoteAtivo);
+                atualizarInterface();
+                
+                // Desfaz a interação após 1 segundo
+                setTimeout(() => {
+                    if (heart.parentNode) heart.parentNode.removeChild(heart);
+                    if (this.state === 'Interacting') this.state = 'IdleFront';
+                }, 1000);
             },
 
             async parseXML(xmlText) {
@@ -518,7 +573,7 @@
             updateLogic() {
                 if (!this.animData['Idle']) return; 
 
-                if (!this.dormindo) {
+                if (!this.dormindo && this.state !== 'Interacting') {
                     if (mascoteAtivo && (mascoteAtivo.food < 10 || mascoteAtivo.energy < 10 || mascoteAtivo.hygiene < 10 || mascoteAtivo.joy < 10)) {
                         const center = this.containerW / 2;
                         if (Math.abs(this.x - center) > 2) {
@@ -551,17 +606,19 @@
                     }
                 }
 
-                const anim = this.animData[this.currentActionName] || this.animData['Idle'];
-                
-                // VELOCIDADE CORRIGIDA (Reduzida pela metade para ficar idêntico ao jogo GBA/DS)
-                this.tickCounter += 0.5; 
-                
-                if (this.tickCounter >= anim.durations[this.currentFrame]) {
-                    this.tickCounter = 0;
-                    this.currentFrame++;
-                    if (this.currentFrame >= anim.durations.length) {
-                        this.currentFrame = 0; 
+                // OBTÉM QUADRO ESTÁTICO (Trava no frame zero se estiver a interagir, senão respira)
+                if (this.state !== 'IdleFront' && this.state !== 'Interacting') {
+                    const anim = this.animData[this.currentActionName] || this.animData['Idle'];
+                    this.tickCounter += 0.5; 
+                    if (this.tickCounter >= anim.durations[this.currentFrame]) {
+                        this.tickCounter = 0;
+                        this.currentFrame++;
+                        if (this.currentFrame >= anim.durations.length) {
+                            this.currentFrame = 0; 
+                        }
                     }
+                } else {
+                    this.currentFrame = 0; 
                 }
             },
 
