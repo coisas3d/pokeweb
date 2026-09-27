@@ -231,7 +231,7 @@
                 <div id="efeito-limpeza">✨🧼✨</div>
                 
                 <!-- CONTAINER DA BERRIE ANIMADA -->
-                <div id="berry-container" style="display: none; position: absolute; bottom: 55px; left: 50%; transform: translateX(35px); z-index: 4; font-size: 28px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));"></div>
+                <div id="berry-container" style="display: none; position: absolute; bottom: 55px; left: 50%; transform: translateX(35px) scale(1); z-index: 4; font-size: 28px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); transition: transform 0.1s;"></div>
 
                 <div id="poop-layer"></div>
                 <div id="sprite-layer"></div>
@@ -454,7 +454,6 @@
                     this.element.style.pointerEvents = 'auto';
                     this.element.style.cursor = 'pointer';
                     
-                    // REQUISITO: DUPLO CLIQUE PARA INTERAGIR (Evita esbarrões)
                     const handleDoubleTap = (e) => {
                         if (e.type === 'touchstart') e.preventDefault();
                         const now = Date.now();
@@ -499,7 +498,6 @@
                 const now = Date.now();
                 mascoteAtivo.interacoes = mascoteAtivo.interacoes.filter(t => now - t < 3600000);
                 
-                // REQUISITO: Limite de 5 cliques por hora e ganho ajustado para 0.5 pontos
                 if (mascoteAtivo.interacoes.length < 5) {
                     mascoteAtivo.interacoes.push(now);
                     mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 0.5);
@@ -969,40 +967,38 @@
             setTimeout(() => { expBar.style.width = `${expPercent}%`; }, 50);
         }
 
-        // ANIMAÇÃO DE ALIMENTAÇÃO EM 3 ETAPAS COM AS BERRIES ESPECÍFICAS
         async function darComida(tipoItem) {
             if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); return; }
             
             fecharMenu();
             SoundManager.play('eat');
 
-            // Mapeamento visual das Berries e seus estados (Inteira -> Mordida)
             const berrySprites = {
-                'berrie_vermelha': { inteira: '🍒', mordida: '🍎' },
-                'berrie_azul': { inteira: '🫐', mordida: '🍇' },
-                'berrie_verde': { inteira: '🍏', mordida: '🍐' },
-                'berrie_amarela': { inteira: '🍋', mordida: '🍊' }
+                'berrie_vermelha': '🍒',
+                'berrie_azul': '🫐',
+                'berrie_verde': '🍏',
+                'berrie_amarela': '🍋'
             };
 
             const berryEl = document.getElementById('berry-container');
             berryEl.style.display = 'block';
-
-            // ETAPA 1: Berrie Inteira (0s a 0.7s)
-            berryEl.innerText = berrySprites[tipoItem].inteira;
+            berryEl.style.transform = 'translateX(35px) scale(1)'; // Reseta o tamanho
+            
+            // ETAPA 1: Berrie Inteira
+            berryEl.innerText = berrySprites[tipoItem];
 
             PetEngine.changeAction('Eat'); 
 
-            // ETAPA 2: Berrie Mordida no Meio (0.7s a 1.4s)
+            // ETAPA 2: Berrie "Mordida" (reduz o tamanho)
             setTimeout(() => {
-                berryEl.innerText = berrySprites[tipoItem].mordida;
+                berryEl.style.transform = 'translateX(35px) scale(0.6)';
             }, 700);
 
-            // ETAPA 3: Berrie some (1.4s a 2.0s)
+            // ETAPA 3: Berrie some
             setTimeout(() => {
                 berryEl.style.display = 'none';
             }, 1400);
 
-            // Regra dos Tipos (STAB Primário)
             const pType = mascoteAtivo.species.type; 
             let favBerry = '';
             
@@ -1018,7 +1014,6 @@
             mascoteAtivo.joy = Math.min(100, Math.max(0, mascoteAtivo.joy + joyGain));
             await saveGame(mascoteAtivo); 
 
-            // Se for a berrie preferida, faz subir um coração da cabeça no fim
             if (tipoItem === favBerry) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
