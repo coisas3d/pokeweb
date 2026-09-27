@@ -183,6 +183,16 @@
 
     <div id="app-container">
         
+        <!-- NOVA TELA DE REGISTRO DO TREINADOR -->
+        <div id="screen-trainer" class="screen">
+            <div class="selecao-header">REGISTRO DE TREINADOR</div>
+            <div class="opcoes-grid" style="align-items: center; text-align: center;">
+                <p style="color: #64748b; font-weight: 600; margin-bottom: 20px; font-size: 15px;">Como você se chama?</p>
+                <input type="text" id="input-trainer-name" maxlength="12" style="width: 80%; padding: 15px; border-radius: 12px; border: 2px solid #cbd5e1; font-size: 18px; font-weight: bold; text-align: center; color: #1e293b; text-transform: uppercase;" placeholder="SEU NOME">
+                <button class="btn-principal" style="margin-top: 30px; width: 85%;" onclick="registrarTreinador()">INICIAR JORNADA</button>
+            </div>
+        </div>
+
         <div id="screen-region" class="screen">
             <div class="selecao-header">ESCOLHA UMA REGIÃO</div>
             <div class="opcoes-grid">
@@ -230,7 +240,6 @@
                 </div>
                 <div id="efeito-limpeza">✨🧼✨</div>
                 
-                <!-- CONTAINER DA BERRIE ANIMADA -->
                 <div id="berry-container" style="display: none; position: absolute; bottom: 55px; left: 50%; transform: translateX(35px) scale(1); z-index: 4; font-size: 28px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); transition: transform 0.1s;"></div>
 
                 <div id="poop-layer"></div>
@@ -256,10 +265,10 @@
                 <div id="submenu-alimentar" style="display: none; width: 100%; flex-direction: column; align-items: center;">
                     <div style="color: white; font-weight: bold; margin-bottom: 15px; font-size: 16px; letter-spacing: 1px;">ESCOLHA A BERRIE</div>
                     <div class="menu-grid">
-                        <button class="menu-btn" style="color: #ef4444" onclick="darComida('berrie_vermelha')">🍒 Fruta Vermelha</button>
-                        <button class="menu-btn" style="color: #3b82f6" onclick="darComida('berrie_azul')">🫐 Fruta Azul</button>
-                        <button class="menu-btn" style="color: #10b981" onclick="darComida('berrie_verde')">🍏 Fruta Verde</button>
-                        <button class="menu-btn" style="color: #eab308" onclick="darComida('berrie_amarela')">🍋 Fruta Amarela</button>
+                        <button class="menu-btn" style="color: #ef4444" onclick="darComida('berrie_vermelha')">🍒 Cheri Berry</button>
+                        <button class="menu-btn" style="color: #3b82f6" onclick="darComida('berrie_azul')">🫐 Oran Berry</button>
+                        <button class="menu-btn" style="color: #10b981" onclick="darComida('berrie_verde')">🍏 Durin Berry</button>
+                        <button class="menu-btn" style="color: #eab308" onclick="darComida('berrie_amarela')">🍋 Aspear Berry</button>
                     </div>
                     <button class="menu-btn btn-voltar" onclick="voltarMenuPrincipal()">VOLTAR</button>
                 </div>
@@ -277,6 +286,8 @@
                     </div>
                     <div class="stat-text-line"><span>Nível</span> <span id="status-lvl">--</span></div>
                     <div class="stat-text-line"><span>Nature</span> <span id="status-nature" style="color: #f59e0b;">--</span></div>
+                    <!-- NOVO CAMPO: ID DO TREINADOR E OT -->
+                    <div class="stat-text-line"><span>Treinador ID</span> <span id="status-tid" style="color: #94a3b8; font-family: 'Courier New', Courier, monospace;">-- / --</span></div>
                     
                     <div class="stat-bar-row" style="margin-top: 15px;">
                         <span class="stat-label" style="width: 40px;">EXP</span>
@@ -679,9 +690,35 @@
             telaJogo.style.backgroundImage = `url('${urlBackground}')`;
         }
 
+        // FUNÇÃO DE REGISTRO DO TREINADOR
+        function registrarTreinador() {
+            const nomeStr = document.getElementById('input-trainer-name').value.trim().toUpperCase();
+            if (nomeStr.length < 2) {
+                alert("Por favor, insira um nome válido (mínimo 2 letras).");
+                return;
+            }
+            SoundManager.play('menu_click');
+            
+            // Gera ID Aleatório de Treinador (5 dígitos)
+            const randomTid = Math.floor(10000 + Math.random() * 90000).toString();
+            window.trainerData = { name: nomeStr, tid: randomTid };
+            localStorage.setItem('pmd_trainer', JSON.stringify(window.trainerData));
+            
+            mostrarEcra('screen-region');
+        }
+
         async function iniciarJogo() {
             try {
+                // VERIFICA PERFIL DE TREINADOR
+                const trainerRaw = localStorage.getItem('pmd_trainer');
+                if (!trainerRaw) {
+                    mostrarEcra('screen-trainer');
+                    return;
+                }
+                
+                window.trainerData = JSON.parse(trainerRaw);
                 let saveState = await loadGame();
+
                 if (saveState && saveState.species && saveState.species.id) {
                     mascoteAtivo = saveState;
                     Object.setPrototypeOf(mascoteAtivo, PokemonInstance.prototype);
@@ -727,6 +764,13 @@
         async function escolherStarter(id) {
             SoundManager.play('select_pokemon');
             mascoteAtivo = new PokemonInstance(id);
+            
+            // Grava a licença do treinador no monstrinho
+            if (window.trainerData) {
+                mascoteAtivo.otName = window.trainerData.name;
+                mascoteAtivo.trainerId = window.trainerData.tid;
+            }
+
             await saveGame(mascoteAtivo);
             
             atualizarBioma(mascoteAtivo.species.type);
@@ -919,6 +963,11 @@
             document.getElementById('status-exp').innerText = `${expPercent}%`;
             document.getElementById('status-nature').innerText = mascoteAtivo.nature.toUpperCase();
             
+            // PREENCHE A LICENÇA DE TREINADOR (OT) NO STATUS
+            const trainerName = mascoteAtivo.otName || 'DESCONHECIDO';
+            const trainerId = mascoteAtivo.trainerId || '00000';
+            document.getElementById('status-tid').innerText = `${trainerName} / ${trainerId}`;
+            
             const expBar = document.getElementById('status-exp-bar');
             expBar.style.width = '0%';
             
@@ -982,19 +1031,15 @@
 
             const berryEl = document.getElementById('berry-container');
             berryEl.style.display = 'block';
-            berryEl.style.transform = 'translateX(35px) scale(1)'; // Reseta o tamanho
+            berryEl.style.transform = 'translateX(35px) scale(1)'; 
             
-            // ETAPA 1: Berrie Inteira
             berryEl.innerText = berrySprites[tipoItem];
-
             PetEngine.changeAction('Eat'); 
 
-            // ETAPA 2: Berrie "Mordida" (reduz o tamanho)
             setTimeout(() => {
                 berryEl.style.transform = 'translateX(35px) scale(0.6)';
             }, 700);
 
-            // ETAPA 3: Berrie some
             setTimeout(() => {
                 berryEl.style.display = 'none';
             }, 1400);
@@ -1007,14 +1052,28 @@
             else if (['grama', 'inseto', 'veneno', 'normal'].includes(pType)) favBerry = 'berrie_verde';
             else favBerry = 'berrie_amarela';
 
+            // LÓGICA DE ALIMENTAÇÃO CORRIGIDA (Só dá buff se a fome for < 100%)
+            const foodBeforeEat = mascoteAtivo.food;
             let foodGain = 25;
-            let joyGain = (tipoItem === favBerry) ? 5 : -5;
+            let joyGain = 0;
+            let isFavorite = (tipoItem === favBerry);
+
+            if (isFavorite) {
+                if (foodBeforeEat < 100) {
+                    joyGain = 5; // Com fome e favorito = Bónus
+                } else {
+                    joyGain = 0; // Já está de estômago cheio
+                }
+            } else {
+                joyGain = -5; // Castigo por comer a fruta errada
+            }
 
             mascoteAtivo.food = Math.min(100, mascoteAtivo.food + foodGain);
             mascoteAtivo.joy = Math.min(100, Math.max(0, mascoteAtivo.joy + joyGain));
             await saveGame(mascoteAtivo); 
 
-            if (tipoItem === favBerry) {
+            // Animação do coração só ocorre se o bónus foi realmente aplicado
+            if (isFavorite && joyGain > 0) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
                     heart.innerText = '❤️';
