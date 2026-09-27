@@ -10,7 +10,8 @@
             margin: 0; padding: 0; 
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
             display: flex; justify-content: center; align-items: center; 
-            height: 100vh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            /* Uso de dvh para evitar corte do botão em smartphones */
+            height: 100dvh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             color: #333; overflow: hidden;
         }
         
@@ -22,7 +23,7 @@
         }
 
         @media (max-height: 700px) {
-            #app-container { border-radius: 0; max-height: 100vh; box-shadow: none; border: none; }
+            #app-container { border-radius: 0; max-height: 100dvh; box-shadow: none; border: none; }
         }
 
         .screen { display: none; flex-direction: column; height: 100%; }
@@ -99,7 +100,8 @@
         .btn-tipo-fogo { border-left: 6px solid #ef4444; }
         .btn-tipo-agua { border-left: 6px solid #3b82f6; }
 
-        #controles { display: flex; justify-content: center; padding: 20px 20px 35px 20px; background: #ffffff; z-index: 5; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        /* Ajuste de espaçamento inferior reduzido para proteger o botão */
+        #controles { display: flex; justify-content: center; padding: 15px 20px 20px 20px; background: #ffffff; z-index: 5; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
         .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 18px 0; width: 85%; border-radius: 16px; font-size: 18px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
 
@@ -117,8 +119,8 @@
 
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; pointer-events: none; }
         
-        /* AJUSTE: Base descida para 35px para assentar no meio da terra */
-        #poop-layer { position: absolute; bottom: 35px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
+        /* Linha de terra principal em 55px */
+        #poop-layer { position: absolute; bottom: 55px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
         
         #efeito-limpeza {
             display: none; position: absolute; inset: 0; z-index: 15;
@@ -130,9 +132,11 @@
 
         #ovo-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
         
-        /* AJUSTE: Ovo ancorado em 35px */
-        #ovo-wrapper { position: absolute; bottom: 35px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
-        #tempo-eclosao { position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%); font-weight: 700; font-size: 14px; color: #475569; background: rgba(255,255,255,0.85); padding: 8px 20px; border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* Ovo subiu para 55px (desenterrado) */
+        #ovo-wrapper { position: absolute; bottom: 55px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
+        
+        /* Texto desceu para 15px (descolado do ovo) */
+        #tempo-eclosao { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-weight: 700; font-size: 14px; color: #475569; background: rgba(255,255,255,0.85); padding: 8px 20px; border-radius: 20px; backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
         .ovo { width: 80px; height: 100px; background-color: #e2e8f0; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -15px -15px 25px rgba(0,0,0,0.2), 0 15px 25px rgba(0,0,0,0.15); animation: ovo-tremendo 3s infinite; }
         .ovo-grama { background-image: radial-gradient(circle at 30% 30%, #10b981 12px, transparent 13px), radial-gradient(circle at 75% 60%, #10b981 18px, transparent 19px), radial-gradient(circle at 45% 85%, #10b981 10px, transparent 11px); }
@@ -188,8 +192,8 @@
             <div class="selecao-header">ESCOLHA UMA REGIÃO</div>
             <div class="opcoes-grid">
                 <button class="btn-opcao btn-regiao" onclick="mostrarStarters('kanto')">KANTO</button>
-                <button class="btn-opcao btn-regiao" onclick="mostrarStarters('johto')">JOHTO</button>
-                <button class="btn-opcao btn-regiao" onclick="mostrarStarters('hoenn')">HOENN</button>
+                <button class="btn-opcao btn-regiao" style="opacity: 0.4; cursor: not-allowed;" onclick="alert('Região de Johto indisponível no momento.')">JOHTO</button>
+                <button class="btn-opcao btn-regiao" style="opacity: 0.4; cursor: not-allowed;" onclick="alert('Região de Hoenn indisponível no momento.')">HOENN</button>
             </div>
         </div>
 
@@ -425,7 +429,8 @@
 
         const PetEngine = {
             element: null, state: 'Idle', direction: 6, 
-            x: 0, containerW: 0, containerH: 0, speed: 0.2, 
+            x: 0, containerW: 0, containerH: 0, 
+            speed: 0.15, // Movimento muito mais suave e lento
             isRunning: false, dormindo: false, actionTimer: 0,
             animData: {}, currentFrame: 0, tickCounter: 0, basePath: '', currentActionName: 'Idle',
 
@@ -441,7 +446,10 @@
                     this.element.style.transformOrigin = 'center bottom';
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
                     this.element.style.transform = 'scale(2.5)';
-                    this.element.style.bottom = '35px';
+                    
+                    /* LINHA BASE EM 55PX PARA ALINHAR COM O CHÃO */
+                    this.element.style.bottom = '55px';
+                    
                     this.element.style.display = 'flex';
                     this.element.style.justifyContent = 'center';
                     this.element.style.alignItems = 'flex-end';
@@ -551,8 +559,11 @@
                     }
 
                     if (Date.now() > this.actionTimer) {
-                        this.actionTimer = Date.now() + 3000 + Math.random() * 5000;
+                        // INTERVALOS MUITO MAIORES: Pausas de 4 a 10 segundos
+                        this.actionTimer = Date.now() + 4000 + Math.random() * 6000;
                         const r = Math.random();
+                        
+                        // MAIOR PROBABILIDADE DE FICAR PARADO (70% do tempo)
                         if (r < 0.15) this.changeAction('WalkLeft');
                         else if (r < 0.30) this.changeAction('WalkRight');
                         else this.changeAction('IdleFront');
@@ -565,6 +576,7 @@
                     }
                 }
 
+                // OBTÉM QUADRO ESTÁTICO PERFEITO QUANDO OLHA PARA A FRENTE
                 if (this.state !== 'IdleFront') {
                     const anim = this.animData[this.currentActionName] || this.animData['Idle'];
                     this.tickCounter++;
@@ -576,7 +588,7 @@
                         }
                     }
                 } else {
-                    this.currentFrame = 0;
+                    this.currentFrame = 0; // Trava no primeiro frame ao olhar para a tela
                 }
             },
 
@@ -661,14 +673,6 @@
                 lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur", "grama") + gerarBotaoStarter(4, "Charmander", "fogo") + gerarBotaoStarter(7, "Squirtle", "agua"); 
                 idsParaCarregar = [1, 4, 7];
             } 
-            else if (regiao === 'johto') { 
-                lista.innerHTML = gerarBotaoStarter(152, "Chikorita", "grama") + gerarBotaoStarter(155, "Cyndaquil", "fogo") + gerarBotaoStarter(158, "Totodile", "agua"); 
-                idsParaCarregar = [152, 155, 158];
-            } 
-            else if (regiao === 'hoenn') { 
-                lista.innerHTML = gerarBotaoStarter(252, "Treecko", "grama") + gerarBotaoStarter(255, "Torchic", "fogo") + gerarBotaoStarter(258, "Mudkip", "agua"); 
-                idsParaCarregar = [252, 255, 258];
-            }
             
             mostrarEcra('screen-starter');
             idsParaCarregar.forEach(id => PMDHelper.playAnim(`sprite-starter-${id}`, id, 'Idle', 1.2));
