@@ -183,6 +183,9 @@
         .hatch-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 28px; width: 85%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .hatch-texto { font-size: 22px; font-weight: 800; margin-bottom: 0px; min-height: 30px; color: #f8fafc; letter-spacing: 1px; text-transform: uppercase; z-index: 5; text-align: center; }
 
+        /* BERRY DINÂMICA LIMPADA */
+        #berry-container { display: none; position: absolute; z-index: 4; font-size: 28px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); transition: transform 0.1s; pointer-events: none; }
+
     </style>
 </head>
 <body>
@@ -206,7 +209,6 @@
         </div>
 
         <div id="screen-game" class="screen">
-            <!-- DASHBOARD TOP PREMIUM -->
             <div class="top-dashboard">
                 <div class="dashboard-header">
                     <div class="nvl-badge">Nvl <span id="val-nivel">--</span></div>
@@ -238,12 +240,14 @@
                     <div id="tempo-eclosao"></div>
                 </div>
                 <div id="efeito-limpeza">✨🧼✨</div>
-                <div id="berry-container" style="display: none; position: absolute; bottom: 55px; left: 50%; transform: translateX(35px) scale(1); z-index: 4; font-size: 28px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); transition: transform 0.1s;"></div>
+                
+                <!-- BERRY COM POSIÇÃO CONTROLADA PELO JS -->
+                <div id="berry-container"></div>
+                
                 <div id="poop-layer"></div>
                 <div id="sprite-layer"></div>
             </div>
             
-            <!-- CONTROLES BOTTOM PREMIUM -->
             <div id="controles">
                 <button class="btn-principal btn-vermelho" onclick="abrirMenu()">INTERAÇÕES</button>
                 <button id="btn-main-time" class="btn-principal btn-azul" onclick="abrirParty()">TIME</button>
@@ -271,7 +275,6 @@
                 </div>
             </div>
 
-            <!-- MENU DO TIME COM CLIQUE SIMPLES -->
             <div id="party-overlay" class="overlay-glass" style="justify-content: flex-start; padding-top: 30px;">
                 <div style="color: white; font-weight: 800; font-size: 20px; letter-spacing: 2px; margin-bottom: 20px;">SEU TIME</div>
                 <div class="party-container" id="party-list-container"></div>
@@ -289,7 +292,6 @@
                 </div>
             </div>
 
-            <!-- TELA DE STATUS CORRIGIDA Z-INDEX 60 -->
             <div id="status-overlay" class="overlay-glass">
                 <div class="status-box">
                     <div class="status-header">
@@ -347,7 +349,6 @@
             </div>
         </div>
 
-        <!-- ECLOSÃO CORRIGIDA: IMAGEM RENDERIZADA ANTES DO TEXTO E EM UM CONTAINER ISOLADO -->
         <div id="screen-hatch" class="screen">
             <div class="hatch-container">
                 <div id="hatch-sprite-container" style="height: 120px; display: none; justify-content: center; align-items: flex-end; margin-bottom: 20px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));"></div>
@@ -478,10 +479,7 @@
                     this.element.style.transformOrigin = 'center bottom';
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
                     this.element.style.transform = 'scale(2.5)';
-                    
-                    /* GRAVIDADE ABAIXADA PARA 15PX: O Pokémon agora pisa exatamente na terra do cenário */
                     this.element.style.bottom = '15px'; 
-                    
                     this.element.style.display = 'flex';
                     this.element.style.justifyContent = 'center';
                     this.element.style.alignItems = 'flex-end';
@@ -828,7 +826,6 @@
 
             setTimeout(() => {
                 mostrarEcra('screen-hatch');
-                // Alteração estrutural da tela de hatch foi feita diretamente no HTML acima para consertar o espaçamento
                 document.getElementById('hatch-texto').innerText = `Nasceu um\n${mascoteAtivo.species.name.toUpperCase()}!`;
                 
                 document.getElementById('hatch-sprite-container').style.display = "flex";
@@ -1002,7 +999,6 @@
             slotAcao = null;
         }
 
-        // LÓGICA DE CLIQUE ÚNICO (Adeus Long Press)
         function clicarSlot(index) {
             SoundManager.play('menu_click');
             if (modoMover) {
@@ -1046,7 +1042,6 @@
             slotAcao = null;
         }
 
-        // CORREÇÃO DO STATUS: Variável salva antes do fechamento do Modal
         function verStatusParty() {
             const indexAlvo = slotAcao;
             fecharModalSlot();
@@ -1077,7 +1072,6 @@
                     </div>
                 `;
 
-                // CLIQUE ÚNICO GARANTIDO (Sem dependência de Toque Longo)
                 slot.addEventListener('click', () => clicarSlot(index));
 
                 container.appendChild(slot);
@@ -1170,6 +1164,7 @@
             }
         }
 
+        // LÓGICA DINÂMICA DA BERRY
         async function darComida(tipoItem) {
             if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); return; }
             
@@ -1184,14 +1179,22 @@
             };
 
             const berryEl = document.getElementById('berry-container');
+            
+            // POSICIONA A BERRY NO CENTRO (X) E AOS PÉS (Y) DO POKÉMON ATUAL
+            berryEl.style.left = PetEngine.x + 'px'; 
+            berryEl.style.bottom = '15px'; 
+            
             berryEl.style.display = 'block';
-            berryEl.style.transform = 'translateX(35px) scale(1)'; 
+            berryEl.style.transform = 'translate(-50%, -10px) scale(1)'; 
             
             berryEl.innerText = berrySprites[tipoItem];
+            
+            // Força a direção para frente na hora de comer
+            PetEngine.direction = 0; 
             PetEngine.changeAction('Eat'); 
 
             setTimeout(() => {
-                berryEl.style.transform = 'translateX(35px) scale(0.6)';
+                berryEl.style.transform = 'translate(-50%, -10px) scale(0.6)';
             }, 700);
 
             setTimeout(() => {
