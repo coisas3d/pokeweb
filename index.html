@@ -229,6 +229,10 @@
                     <div id="tempo-eclosao"></div>
                 </div>
                 <div id="efeito-limpeza">✨🧼✨</div>
+                
+                <!-- CONTAINER DA BERRIE ANIMADA -->
+                <div id="berry-container" style="display: none; position: absolute; bottom: 55px; left: 50%; transform: translateX(35px); z-index: 4; font-size: 28px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));"></div>
+
                 <div id="poop-layer"></div>
                 <div id="sprite-layer"></div>
             </div>
@@ -239,7 +243,6 @@
             
             <div id="menu-overlay" class="overlay-glass">
                 
-                <!-- MENU PRINCIPAL -->
                 <div id="menu-principal-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                     <div class="menu-grid">
                         <button class="menu-btn" onclick="executarAcao('status')">Status</button>
@@ -250,17 +253,13 @@
                     <button class="menu-btn btn-voltar" onclick="fecharMenu()">FECHAR</button>
                 </div>
 
-                <!-- SUBMENU ALIMENTAÇÃO (BERRIES E CANDIES) -->
                 <div id="submenu-alimentar" style="display: none; width: 100%; flex-direction: column; align-items: center;">
-                    <div style="color: white; font-weight: bold; margin-bottom: 15px; font-size: 16px; letter-spacing: 1px;">ESCOLHA O ALIMENTO</div>
-                    <div class="menu-grid" style="grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div style="color: white; font-weight: bold; margin-bottom: 15px; font-size: 16px; letter-spacing: 1px;">ESCOLHA A BERRIE</div>
+                    <div class="menu-grid">
                         <button class="menu-btn" style="color: #ef4444" onclick="darComida('berrie_vermelha')">🍒 Fruta Vermelha</button>
                         <button class="menu-btn" style="color: #3b82f6" onclick="darComida('berrie_azul')">🫐 Fruta Azul</button>
                         <button class="menu-btn" style="color: #10b981" onclick="darComida('berrie_verde')">🍏 Fruta Verde</button>
                         <button class="menu-btn" style="color: #eab308" onclick="darComida('berrie_amarela')">🍋 Fruta Amarela</button>
-                        <button class="menu-btn" onclick="darComida('candy_1')">🍬 Doce Comum</button>
-                        <button class="menu-btn" onclick="darComida('candy_2')">⚡ Doce Energia</button>
-                        <button class="menu-btn" style="grid-column: span 2;" onclick="darComida('candy_3')">💎 Doce Raro</button>
                     </div>
                     <button class="menu-btn btn-voltar" onclick="voltarMenuPrincipal()">VOLTAR</button>
                 </div>
@@ -433,6 +432,7 @@
             x: 0, containerW: 0, containerH: 0, speed: 0.15, 
             isRunning: false, dormindo: false, actionTimer: 0,
             animData: {}, currentFrame: 0, tickCounter: 0, basePath: '', currentActionName: 'Idle',
+            lastClickTime: 0,
 
             init(layerId) {
                 const layer = document.getElementById(layerId);
@@ -446,7 +446,7 @@
                     this.element.style.transformOrigin = 'center bottom';
                     this.element.style.filter = 'drop-shadow(0 15px 5px rgba(0,0,0,0.4))';
                     this.element.style.transform = 'scale(2.5)';
-                    this.element.style.bottom = '30px'; // Subiu para assentar
+                    this.element.style.bottom = '30px'; 
                     this.element.style.display = 'flex';
                     this.element.style.justifyContent = 'center';
                     this.element.style.alignItems = 'flex-end';
@@ -454,11 +454,20 @@
                     this.element.style.pointerEvents = 'auto';
                     this.element.style.cursor = 'pointer';
                     
-                    this.element.addEventListener('click', () => this.interagir());
-                    this.element.addEventListener('touchstart', (e) => {
-                        e.preventDefault(); 
-                        this.interagir();
-                    });
+                    // REQUISITO: DUPLO CLIQUE PARA INTERAGIR (Evita esbarrões)
+                    const handleDoubleTap = (e) => {
+                        if (e.type === 'touchstart') e.preventDefault();
+                        const now = Date.now();
+                        if (now - this.lastClickTime < 500) {
+                            this.interagir();
+                            this.lastClickTime = 0;
+                        } else {
+                            this.lastClickTime = now;
+                        }
+                    };
+                    
+                    this.element.addEventListener('click', handleDoubleTap);
+                    this.element.addEventListener('touchstart', handleDoubleTap, {passive: false});
 
                     layer.appendChild(this.element);
                 }
@@ -471,7 +480,6 @@
                 if (this.dormindo || this.state === 'Interacting' || mascoteAtivo.isEgg) return;
                 
                 SoundManager.play('menu_click');
-                
                 this.changeAction('IdleFront');
                 this.state = 'Interacting';
                 this.actionTimer = Date.now() + 2000; 
@@ -485,22 +493,18 @@
                 heart.style.fontSize = '12px';
                 heart.style.pointerEvents = 'none';
                 heart.style.animation = 'floatUp 1s ease-out forwards';
-                
                 this.element.appendChild(heart);
                 
                 if (!mascoteAtivo.interacoes) mascoteAtivo.interacoes = [];
                 const now = Date.now();
-                // Limpa interações que ocorreram há mais de 1 hora
                 mascoteAtivo.interacoes = mascoteAtivo.interacoes.filter(t => now - t < 3600000);
                 
-                // Limite de 5 carinhos por hora
+                // REQUISITO: Limite de 5 cliques por hora e ganho ajustado para 0.5 pontos
                 if (mascoteAtivo.interacoes.length < 5) {
                     mascoteAtivo.interacoes.push(now);
                     mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 0.5);
                     saveGame(mascoteAtivo);
                     atualizarInterface();
-                } else {
-                    console.log("Limite de carinho atingido por hora.");
                 }
                 
                 setTimeout(() => {
@@ -625,7 +629,6 @@
                     }
                 }
 
-                // ANIMAÇÃO PERPÉTUA (O Pokémon nunca congela, respira sempre!)
                 const anim = this.animData[this.currentActionName] || this.animData['Idle'];
                 this.tickCounter += 0.5; 
                 if (this.tickCounter >= anim.durations[this.currentFrame]) {
@@ -966,12 +969,40 @@
             setTimeout(() => { expBar.style.width = `${expPercent}%`; }, 50);
         }
 
+        // ANIMAÇÃO DE ALIMENTAÇÃO EM 3 ETAPAS COM AS BERRIES ESPECÍFICAS
         async function darComida(tipoItem) {
             if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); return; }
             
+            fecharMenu();
             SoundManager.play('eat');
-            
-            // O sistema lê o STAB primário do mascote
+
+            // Mapeamento visual das Berries e seus estados (Inteira -> Mordida)
+            const berrySprites = {
+                'berrie_vermelha': { inteira: '🍒', mordida: '🍎' },
+                'berrie_azul': { inteira: '🫐', mordida: '🍇' },
+                'berrie_verde': { inteira: '🍏', mordida: '🍐' },
+                'berrie_amarela': { inteira: '🍋', mordida: '🍊' }
+            };
+
+            const berryEl = document.getElementById('berry-container');
+            berryEl.style.display = 'block';
+
+            // ETAPA 1: Berrie Inteira (0s a 0.7s)
+            berryEl.innerText = berrySprites[tipoItem].inteira;
+
+            PetEngine.changeAction('Eat'); 
+
+            // ETAPA 2: Berrie Mordida no Meio (0.7s a 1.4s)
+            setTimeout(() => {
+                berryEl.innerText = berrySprites[tipoItem].mordida;
+            }, 700);
+
+            // ETAPA 3: Berrie some (1.4s a 2.0s)
+            setTimeout(() => {
+                berryEl.style.display = 'none';
+            }, 1400);
+
+            // Regra dos Tipos (STAB Primário)
             const pType = mascoteAtivo.species.type; 
             let favBerry = '';
             
@@ -980,32 +1011,34 @@
             else if (['grama', 'inseto', 'veneno', 'normal'].includes(pType)) favBerry = 'berrie_verde';
             else favBerry = 'berrie_amarela';
 
-            let foodGain = 0;
-            let joyGain = 0;
-            let energyGain = 0;
-
-            if (tipoItem.startsWith('berrie')) {
-                foodGain = 25;
-                if (tipoItem === favBerry) { joyGain = 5; } 
-                else { joyGain = -5; }
-            } else if (tipoItem === 'candy_1') {
-                foodGain = 15; joyGain = 2; // Doce Comum
-            } else if (tipoItem === 'candy_2') {
-                foodGain = 10; energyGain = 20; joyGain = 2; // Doce de Energia
-            } else if (tipoItem === 'candy_3') {
-                foodGain = 30; joyGain = 10; // Doce Raro
-            }
+            let foodGain = 25;
+            let joyGain = (tipoItem === favBerry) ? 5 : -5;
 
             mascoteAtivo.food = Math.min(100, mascoteAtivo.food + foodGain);
-            mascoteAtivo.energy = Math.min(100, mascoteAtivo.energy + energyGain);
             mascoteAtivo.joy = Math.min(100, Math.max(0, mascoteAtivo.joy + joyGain));
             await saveGame(mascoteAtivo); 
+
+            // Se for a berrie preferida, faz subir um coração da cabeça no fim
+            if (tipoItem === favBerry) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.innerText = '❤️';
+                    heart.style.position = 'absolute';
+                    heart.style.left = '50%';
+                    heart.style.top = '-20px';
+                    heart.style.transform = 'translateX(-50%)';
+                    heart.style.fontSize = '14px';
+                    heart.style.pointerEvents = 'none';
+                    heart.style.animation = 'floatUp 1s ease-out forwards';
+                    PetEngine.element.appendChild(heart);
+                    setTimeout(() => { if(heart.parentNode) heart.parentNode.removeChild(heart); }, 1000);
+                }, 1400);
+            }
             
-            PetEngine.changeAction('Eat'); 
-            setTimeout(() => { PetEngine.changeAction('IdleFront'); }, 2000); 
-            
-            atualizarInterface(); 
-            fecharMenu();
+            setTimeout(() => { 
+                PetEngine.changeAction('IdleFront'); 
+                atualizarInterface();
+            }, 2000); 
         }
 
         async function executarAcao(acao) {
