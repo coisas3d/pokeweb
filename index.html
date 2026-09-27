@@ -12,6 +12,7 @@
             display: flex; justify-content: center; align-items: center; 
             height: 100dvh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             color: #333; overflow: hidden;
+            user-select: none; /* Previne selecao de texto ao fazer touch longo */
         }
         
         #app-container { 
@@ -91,7 +92,7 @@
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
         }
 
-        .opcoes-grid { display: flex; flex-direction: column; gap: 15px; padding: 25px; flex-grow: 1; justify-content: center; background-color: #f1f5f9; }
+        .opcoes-grid { display: flex; flex-direction: column; gap: 15px; padding: 25px; flex-grow: 1; justify-content: flex-start; background-color: #f1f5f9; overflow-y: auto; }
         .btn-opcao { display: flex; align-items: center; padding: 12px 20px; border-radius: 16px; border: none; cursor: pointer; font-size: 17px; font-weight: 700; color: #1e293b; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .btn-opcao:active { transform: scale(0.97); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         
@@ -156,7 +157,26 @@
         .menu-btn:active { background: rgba(255, 255, 255, 0.2); transform: scale(0.95); }
         .btn-voltar { background: rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 0.5); margin-top: 15px; width: 85%; }
 
-        #status-overlay { justify-content: flex-start; padding: 25px; box-sizing: border-box; overflow-y: auto; }
+        /* Estilos do Menu de Time (Party HGSS Style) */
+        .party-container { width: 90%; max-height: 80%; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+        .party-slot { 
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0); border: 2px solid #cbd5e1; 
+            border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.1s; position: relative;
+        }
+        .party-slot:active { transform: scale(0.98); }
+        .party-slot.leader { border-color: #f59e0b; background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+        .party-slot.selected-move { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        .party-sprite-box { width: 50px; height: 50px; flex-shrink: 0; display: flex; justify-content: center; align-items: flex-end; }
+        .party-info { flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
+        .party-name-row { display: flex; justify-content: space-between; font-weight: 800; color: #1e293b; font-size: 15px; }
+        .party-hp-bg { width: 100%; height: 8px; background: #94a3b8; border-radius: 4px; overflow: hidden; }
+        .party-hp-fill { height: 100%; background: #10b981; }
+        
+        .action-modal { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 30; }
+        .action-modal-box { background: white; padding: 20px; border-radius: 16px; width: 70%; display: flex; flex-direction: column; gap: 10px; text-align: center; }
+
+        #status-overlay { justify-content: flex-start; padding: 25px; box-sizing: border-box; overflow-y: auto; z-index: 40;}
         .status-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .status-header { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px; }
         .status-title { font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 1px; font-family: 'Courier New', Courier, monospace; }
@@ -250,10 +270,9 @@
             </div>
             
             <div id="menu-overlay" class="overlay-glass">
-                
                 <div id="menu-principal-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                     <div class="menu-grid">
-                        <button class="menu-btn" onclick="executarAcao('status')">Status</button>
+                        <button class="menu-btn" onclick="abrirParty()">Time</button>
                         <button class="menu-btn" onclick="abrirSubMenu('alimentar')">Alimentar</button>
                         <button class="menu-btn" onclick="executarAcao('limpar')">Limpar</button>
                         <button class="menu-btn" onclick="executarAcao('dormir')" id="btn-dormir">Dormir / Acordar</button>
@@ -271,7 +290,27 @@
                     </div>
                     <button class="menu-btn btn-voltar" onclick="voltarMenuPrincipal()">VOLTAR</button>
                 </div>
+            </div>
 
+            <!-- TELA DE TIME (PARTY) -->
+            <div id="party-overlay" class="overlay-glass" style="justify-content: flex-start; padding-top: 20px;">
+                <div style="color: white; font-weight: 800; font-size: 18px; letter-spacing: 1px; margin-bottom: 15px;">SEU TIME</div>
+                <div class="party-container" id="party-list-container">
+                    <!-- Gerado pelo JS -->
+                </div>
+                <div style="margin-top: auto; padding-bottom: 20px; width: 100%; display: flex; justify-content: center;">
+                    <button class="menu-btn btn-voltar" style="width: 85%;" onclick="fecharParty()">VOLTAR</button>
+                </div>
+
+                <!-- Modal de Ação do Slot (Long Press) -->
+                <div id="slot-action-modal" class="action-modal">
+                    <div class="action-modal-box">
+                        <h3 style="margin: 0; color: #1e293b;" id="modal-pokemon-name">Pokemon</h3>
+                        <button class="menu-btn" style="color: #3b82f6; border: 1px solid #cbd5e1;" onclick="ativarModoMover()">Mover</button>
+                        <button class="menu-btn" style="color: #10b981; border: 1px solid #cbd5e1;" onclick="verStatusParty()">Status</button>
+                        <button class="menu-btn" style="color: #ef4444; border: 1px solid #cbd5e1; margin-top: 10px;" onclick="fecharModalSlot()">Cancelar</button>
+                    </div>
+                </div>
             </div>
 
             <div id="status-overlay" class="overlay-glass">
@@ -340,13 +379,20 @@
         </div>
     </div>
 
+    <!-- SCRIPTS NAS PRÓXIMAS MENSAGENS -->
     <script src="database.js"></script>
     <script src="pokemon_engine.js"></script>
     
     <script>
+        let mascotes = [];
         let mascoteAtivo = null;
         let loopEclosao = null;
         let processoEclosaoEmAndamento = false;
+        
+        // Variáveis do Time (Party)
+        let pressTimer = null;
+        let slotAcao = null;
+        let modoMover = false;
 
         const SoundManager = { play(effect) { console.log(`[Audio]: '${effect}'`); } };
 
@@ -360,6 +406,10 @@
         setInterval(updateClock, 1000);
         updateClock();
 
+        function salvarTime() {
+            localStorage.setItem('pmd_party', JSON.stringify(mascotes));
+        }
+
         const PMDHelper = {
             async playAnim(containerId, dexId, targetAnimName = 'Idle', scale = 1, flip = false) {
                 const container = document.getElementById(containerId);
@@ -371,7 +421,7 @@
                 
                 try {
                     const response = await fetch(basePath + 'AnimData.xml');
-                    if (!response.ok) throw new Error("XML não encontrado na pasta local.");
+                    if (!response.ok) throw new Error("XML não encontrado.");
                     const text = await response.text();
                     
                     const parser = new DOMParser();
@@ -431,7 +481,7 @@
                 } catch(e) {
                     console.error("Falha ao injetar animação local:", e);
                     container.innerHTML = '❌'; 
-                    container.style.fontSize = '24px';
+                    container.style.fontSize = '12px';
                 }
             }
         };
@@ -510,7 +560,7 @@
                 if (mascoteAtivo.interacoes.length < 5) {
                     mascoteAtivo.interacoes.push(now);
                     mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 0.5);
-                    saveGame(mascoteAtivo);
+                    salvarTime();
                     atualizarInterface();
                 }
                 
@@ -712,15 +762,27 @@
                 }
                 
                 window.trainerData = JSON.parse(trainerRaw);
-                let saveState = await loadGame();
+                
+                const partyRaw = localStorage.getItem('pmd_party');
+                if (partyRaw) {
+                    const savedParty = JSON.parse(partyRaw);
+                    mascotes = savedParty.map(p => {
+                        Object.setPrototypeOf(p, PokemonInstance.prototype);
+                        return TimeManager.calculateOfflineProgression(p);
+                    });
+                } else {
+                    // Migração de save antigo caso exista
+                    let oldSave = await loadGame();
+                    if (oldSave && oldSave.species) {
+                        Object.setPrototypeOf(oldSave, PokemonInstance.prototype);
+                        oldSave = TimeManager.calculateOfflineProgression(oldSave);
+                        mascotes = [oldSave];
+                        salvarTime();
+                    }
+                }
 
-                if (saveState && saveState.species && saveState.species.id) {
-                    mascoteAtivo = saveState;
-                    Object.setPrototypeOf(mascoteAtivo, PokemonInstance.prototype);
-                    
-                    mascoteAtivo = TimeManager.calculateOfflineProgression(mascoteAtivo);
-                    await saveGame(mascoteAtivo);
-                    
+                if (mascotes.length > 0) {
+                    mascoteAtivo = mascotes[0]; // Líder do time
                     atualizarBioma(mascoteAtivo.species.type);
                     mostrarEcra('screen-game');
                     atualizarInterface();
@@ -758,15 +820,17 @@
 
         async function escolherStarter(id) {
             SoundManager.play('select_pokemon');
-            mascoteAtivo = new PokemonInstance(id);
+            let novoMascote = new PokemonInstance(id);
             
             if (window.trainerData) {
-                mascoteAtivo.otName = window.trainerData.name;
-                mascoteAtivo.trainerId = window.trainerData.tid;
+                novoMascote.otName = window.trainerData.name;
+                novoMascote.trainerId = window.trainerData.tid;
             }
 
-            await saveGame(mascoteAtivo);
+            mascotes.push(novoMascote);
+            salvarTime();
             
+            mascoteAtivo = mascotes[0];
             atualizarBioma(mascoteAtivo.species.type);
             mostrarEcra('screen-game');
             atualizarInterface();
@@ -811,7 +875,7 @@
         function concluirEclosao() {
             SoundManager.play('menu_click');
             mascoteAtivo.isEgg = false;
-            saveGame(mascoteAtivo);
+            salvarTime();
             mostrarEcra('screen-game');
             processoEclosaoEmAndamento = false;
             
@@ -943,42 +1007,156 @@
         
         function fecharStatus() { fadeOut(document.getElementById('status-overlay')); }
 
-        function abrirStatus() {
+        // ==========================================
+        // LÓGICA DO TIME (PARTY) HG/SS STYLE
+        // ==========================================
+        function abrirParty() {
             SoundManager.play('menu_click');
-            fecharMenu();
+            document.getElementById('menu-principal-wrapper').style.display = 'none';
+            document.getElementById('party-overlay').style.display = 'flex';
+            renderParty();
+        }
+        
+        function fecharParty() {
+            SoundManager.play('menu_click');
+            document.getElementById('party-overlay').style.display = 'none';
+            document.getElementById('menu-principal-wrapper').style.display = 'flex';
+            modoMover = false;
+            slotAcao = null;
+        }
+
+        function iniciarPress(e, index) {
+            if (modoMover) return;
+            pressTimer = window.setTimeout(() => {
+                pressTimer = null;
+                SoundManager.play('menu_open');
+                slotAcao = index;
+                document.getElementById('modal-pokemon-name').innerText = mascotes[index].species.name.toUpperCase();
+                document.getElementById('slot-action-modal').style.display = 'flex';
+            }, 600); 
+        }
+
+        function limparPress() {
+            if (pressTimer !== null) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
+        }
+
+        function clicarSlot(index) {
+            if (modoMover && slotAcao !== null && slotAcao !== index) {
+                // Troca de posição
+                const temp = mascotes[slotAcao];
+                mascotes[slotAcao] = mascotes[index];
+                mascotes[index] = temp;
+                
+                modoMover = false;
+                slotAcao = null;
+                salvarTime();
+                mascoteAtivo = mascotes[0];
+                
+                SoundManager.play('menu_click');
+                renderParty();
+                atualizarBioma(mascoteAtivo.species.type);
+                PetEngine.element.innerHTML = '';
+                PetEngine.setPokemon(mascoteAtivo.species.id);
+                atualizarInterface();
+            } else if (modoMover && slotAcao === index) {
+                // Cancelar mover se clicar no mesmo
+                modoMover = false;
+                slotAcao = null;
+                renderParty();
+            }
+        }
+
+        function ativarModoMover() {
+            SoundManager.play('menu_click');
+            modoMover = true;
+            document.getElementById('slot-action-modal').style.display = 'none';
+            renderParty(); // Re-renderiza para destacar o slot selecionado
+        }
+
+        function fecharModalSlot() {
+            SoundManager.play('menu_click');
+            document.getElementById('slot-action-modal').style.display = 'none';
+            slotAcao = null;
+        }
+
+        function verStatusParty() {
+            fecharModalSlot();
+            abrirStatus(slotAcao);
+        }
+
+        function renderParty() {
+            const container = document.getElementById('party-list-container');
+            container.innerHTML = '';
             
-            PMDHelper.playAnim('status-sprite-container', mascoteAtivo.species.id, 'Idle', 1.5);
+            mascotes.forEach((poke, index) => {
+                const isLeader = index === 0;
+                const isSelectedMove = modoMover && slotAcao === index;
+                
+                const slot = document.createElement('div');
+                slot.className = `party-slot ${isLeader ? 'leader' : ''} ${isSelectedMove ? 'selected-move' : ''}`;
+                
+                slot.innerHTML = `
+                    <div class="party-sprite-box" id="party-sprite-${index}">⏳</div>
+                    <div class="party-info">
+                        <div class="party-name-row">
+                            <span>${poke.species.name.toUpperCase()}</span>
+                            <span>Lv.${poke.isEgg ? '?' : poke.level}</span>
+                        </div>
+                        <div class="party-hp-bg">
+                            <div class="party-hp-fill" style="width: ${poke.isEgg ? 0 : 100}%;"></div>
+                        </div>
+                    </div>
+                `;
+
+                slot.addEventListener('mousedown', (e) => iniciarPress(e, index));
+                slot.addEventListener('touchstart', (e) => iniciarPress(e, index));
+                slot.addEventListener('mouseup', limparPress);
+                slot.addEventListener('touchend', limparPress);
+                slot.addEventListener('mouseleave', limparPress);
+                slot.addEventListener('touchmove', limparPress);
+                slot.addEventListener('click', () => clicarSlot(index));
+
+                container.appendChild(slot);
+                PMDHelper.playAnim(`party-sprite-${index}`, poke.species.id, 'Idle', 1);
+            });
+        }
+        // ==========================================
+
+        const maxValores = { hp: 255, atk: 190, def: 230, spa: 194, spd: 230, spe: 200 };
+
+        function abrirStatus(index = 0) {
+            SoundManager.play('menu_click');
             
-            document.getElementById('status-nome').innerText = mascoteAtivo.species.name.toUpperCase();
-            document.getElementById('status-tipo').innerText = `TIPO: ${mascoteAtivo.species.type.toUpperCase()}`;
-            document.getElementById('status-lvl').innerText = mascoteAtivo.level;
+            // Fecha os outros menus, mas garante que a overlay continue caso venha do Time
+            document.getElementById('menu-principal-wrapper').style.display = 'none';
+            document.getElementById('party-overlay').style.display = 'none';
             
-            const expPercent = Math.floor(mascoteAtivo.exp * 100);
-            document.getElementById('status-exp').innerText = `${expPercent}%`;
-            document.getElementById('status-nature').innerText = mascoteAtivo.nature.toUpperCase();
+            const p = mascotes[index];
             
-            const trainerName = mascoteAtivo.otName || 'DESCONHECIDO';
-            const trainerId = mascoteAtivo.trainerId || '00000';
+            PMDHelper.playAnim('status-sprite-container', p.species.id, 'Idle', 1.5);
+            
+            document.getElementById('status-nome').innerText = p.species.name.toUpperCase();
+            document.getElementById('status-tipo').innerText = `TIPO: ${p.species.type.toUpperCase()}`;
+            document.getElementById('status-lvl').innerText = p.isEgg ? '--' : p.level;
+            
+            const expPercent = Math.floor(p.exp * 100);
+            document.getElementById('status-exp').innerText = p.isEgg ? '--%' : `${expPercent}%`;
+            document.getElementById('status-nature').innerText = p.nature.toUpperCase();
+            
+            const trainerName = p.otName || 'DESCONHECIDO';
+            const trainerId = p.trainerId || '00000';
             document.getElementById('status-tid').innerText = `${trainerName} / ${trainerId}`;
             
             const expBar = document.getElementById('status-exp-bar');
             expBar.style.width = '0%';
             
-            const stats = mascoteAtivo.calcularStatusReais();
-            const lvl = mascoteAtivo.level;
-            
-            // TETO MÁXIMO PROPORCIONAL AO NÍVEL (Usa a fórmula base de Nv100 calculada para o Nível atual)
-            const maxValores = {
-                hp: Math.floor(((2 * 255 + 94) * lvl) / 100 + lvl + 10),
-                atk: Math.floor((((2 * 190 + 94) * lvl) / 100 + 5) * 1.1),
-                def: Math.floor((((2 * 230 + 94) * lvl) / 100 + 5) * 1.1),
-                spa: Math.floor((((2 * 194 + 94) * lvl) / 100 + 5) * 1.1),
-                spd: Math.floor((((2 * 230 + 94) * lvl) / 100 + 5) * 1.1),
-                spe: Math.floor((((2 * 200 + 94) * lvl) / 100 + 5) * 1.1)
-            };
+            const stats = p.isEgg ? { hp:{real:0, penalty:0, final:0}, atk:{real:0, penalty:0, final:0}, def:{real:0, penalty:0, final:0}, spa:{real:0, penalty:0, final:0}, spd:{real:0, penalty:0, final:0}, spe:{real:0, penalty:0, final:0} } : p.calcularStatusReais();
             
             const natureMap = { Lonely: { buff: 'atk', debuff: 'def' }, Brave: { buff: 'atk', debuff: 'spe' }, Adamant: { buff: 'atk', debuff: 'spa' }, Naughty: { buff: 'atk', debuff: 'spd' }, Bold: { buff: 'def', debuff: 'atk' }, Relaxed: { buff: 'def', debuff: 'spe' }, Impish: { buff: 'def', debuff: 'spa' }, Lax: { buff: 'def', debuff: 'spd' }, Timid: { buff: 'spe', debuff: 'atk' }, Hasty: { buff: 'spe', debuff: 'def' }, Jolly: { buff: 'spe', debuff: 'spa' }, Naive: { buff: 'spe', debuff: 'spd' }, Modest: { buff: 'spa', debuff: 'atk' }, Mild: { buff: 'spa', debuff: 'def' }, Quiet: { buff: 'spa', debuff: 'spe' }, Rash: { buff: 'spa', debuff: 'spd' }, Calm: { buff: 'spd', debuff: 'atk' }, Gentle: { buff: 'spd', debuff: 'def' }, Sassy: { buff: 'spd', debuff: 'spe' }, Careful: { buff: 'spd', debuff: 'spa' } };
-            const currentNature = natureMap[mascoteAtivo.nature] || { buff: null, debuff: null };
+            const currentNature = natureMap[p.nature] || { buff: null, debuff: null };
 
             const renderStat = (statId, barId, statObj, key) => {
                 const el = document.getElementById(statId);
@@ -986,6 +1164,14 @@
                 const real = statObj.real;
                 const penalty = statObj.penalty;
                 const finalVal = statObj.final;
+
+                if (p.isEgg) {
+                    el.innerText = '--';
+                    bar.style.width = '0%';
+                    bar.style.background = 'transparent';
+                    bar.innerHTML = '';
+                    return;
+                }
 
                 if (penalty > 0) { el.innerHTML = `${real} <span style="color: #ef4444; font-size: 0.8em; margin-left: 4px;">(-${penalty})</span>`; } 
                 else { el.innerText = real; }
@@ -997,7 +1183,8 @@
                 bar.style.width = '0%'; 
                 
                 setTimeout(() => { 
-                    const pct = Math.min(100, (real / maxValores[key]) * 100);
+                    const maxStat = maxValores[key];
+                    const pct = Math.min(100, (real / maxStat) * 100);
                     bar.style.width = pct + '%'; 
                     bar.style.background = 'transparent';
                     bar.innerHTML = `
@@ -1016,8 +1203,12 @@
             renderStat('stat-spd', 'bar-spd', stats.spd, 'spd');
             renderStat('stat-spe', 'bar-spe', stats.spe, 'spe');
 
+            document.getElementById('menu-overlay').style.display = 'flex'; // Garante o fundo de vidro
             fadeIn(document.getElementById('status-overlay'));
-            setTimeout(() => { expBar.style.width = `${expPercent}%`; }, 50);
+            
+            if(!p.isEgg) {
+                setTimeout(() => { expBar.style.width = `${expPercent}%`; }, 50);
+            }
         }
 
         async function darComida(tipoItem) {
@@ -1073,7 +1264,7 @@
 
             mascoteAtivo.food = Math.min(100, mascoteAtivo.food + foodGain);
             mascoteAtivo.joy = Math.min(100, Math.max(0, mascoteAtivo.joy + joyGain));
-            await saveGame(mascoteAtivo); 
+            salvarTime(); 
 
             if (isFavorite && joyGain > 0) {
                 setTimeout(() => {
@@ -1101,7 +1292,7 @@
             if (!mascoteAtivo) return;
             if (mascoteAtivo.isEgg) { alert("Ainda é um ovo! Espere chocar."); fecharMenu(); return; }
 
-            if (acao === 'status') { abrirStatus(); return; }
+            if (acao === 'status') { abrirStatus(0); return; } // Por defeito abre o Status do Ativo (0)
             else if (acao === 'limpar') {
                 if (mascoteAtivo.sleep) { alert("O monstrinho está dormindo!"); } 
                 else {
@@ -1116,7 +1307,7 @@
                         mascoteAtivo.hygiene = 100;
                         mascoteAtivo.poops = 0;
                         mascoteAtivo.joy = Math.min(100, mascoteAtivo.joy + 5);
-                        await saveGame(mascoteAtivo);
+                        salvarTime();
                         atualizarInterface();
                     }, 500);
 
@@ -1125,7 +1316,7 @@
             }
             else if (acao === 'dormir') {
                 mascoteAtivo.sleep = !mascoteAtivo.sleep;
-                await saveGame(mascoteAtivo);
+                salvarTime();
                 PetEngine.setDormindo(mascoteAtivo.sleep);
                 SoundManager.play(mascoteAtivo.sleep ? 'sleep' : 'wake_up');
                 atualizarInterface();
