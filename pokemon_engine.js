@@ -22,19 +22,68 @@ const Natures = {
     Quirky: { buff: null, debuff: null }
 };
 
+// ==========================================
+// BANCO DE DADOS DE MOVIMENTOS (MOVIDO PARA ENGINE)
+// ==========================================
+const MoveDB = {
+    'tackle': { name: 'Tackle', type: 'normal', pwr: 40, acc: 100 },
+    'growl': { name: 'Growl', type: 'normal', pwr: 0, acc: 100 },
+    'leech_seed': { name: 'Leech Seed', type: 'grass', pwr: 0, acc: 90 },
+    'vine_whip': { name: 'Vine Whip', type: 'grass', pwr: 45, acc: 100 },
+    'poison_powder': { name: 'PoisonPowder', type: 'poison', pwr: 0, acc: 75 },
+    'sleep_powder': { name: 'Sleep Powder', type: 'grass', pwr: 0, acc: 75 },
+    'razor_leaf': { name: 'Razor Leaf', type: 'grass', pwr: 55, acc: 95 },
+    'scratch': { name: 'Scratch', type: 'normal', pwr: 40, acc: 100 },
+    'ember': { name: 'Ember', type: 'fire', pwr: 40, acc: 100 },
+    'metal_claw': { name: 'Metal Claw', type: 'steel', pwr: 50, acc: 95 },
+    'smokescreen': { name: 'Smokescreen', type: 'normal', pwr: 0, acc: 100 },
+    'scary_face': { name: 'Scary Face', type: 'normal', pwr: 0, acc: 100 },
+    'flamethrower': { name: 'Flamethrower', type: 'fire', pwr: 90, acc: 100 },
+    'tail_whip': { name: 'Tail Whip', type: 'normal', pwr: 0, acc: 100 },
+    'bubble': { name: 'Bubble', type: 'water', pwr: 40, acc: 100 },
+    'withdraw': { name: 'Withdraw', type: 'water', pwr: 0, acc: 100 },
+    'water_gun': { name: 'Water Gun', type: 'water', pwr: 40, acc: 100 },
+    'bite': { name: 'Bite', type: 'dark', pwr: 60, acc: 100 },
+    'rapid_spin': { name: 'Rapid Spin', type: 'normal', pwr: 20, acc: 100 }
+};
+
+const Learnsets = {
+    '1': [ {lvl: 1, id: 'tackle'}, {lvl: 3, id: 'growl'}, {lvl: 7, id: 'leech_seed'}, {lvl: 10, id: 'vine_whip'}, {lvl: 15, id: 'poison_powder'}, {lvl: 15, id: 'sleep_powder'}, {lvl: 20, id: 'razor_leaf'} ],
+    '4': [ {lvl: 1, id: 'scratch'}, {lvl: 1, id: 'growl'}, {lvl: 7, id: 'ember'}, {lvl: 13, id: 'metal_claw'}, {lvl: 19, id: 'smokescreen'}, {lvl: 25, id: 'scary_face'}, {lvl: 31, id: 'flamethrower'} ],
+    '7': [ {lvl: 1, id: 'tackle'}, {lvl: 1, id: 'tail_whip'}, {lvl: 7, id: 'bubble'}, {lvl: 10, id: 'withdraw'}, {lvl: 13, id: 'water_gun'}, {lvl: 18, id: 'bite'}, {lvl: 23, id: 'rapid_spin'} ]
+};
+
+const MoveManager = {
+    atualizarMovimentos(pokemon) {
+        if (!pokemon.moves) pokemon.moves = [null, null, null, null];
+        if (!pokemon.learnedMoves) pokemon.learnedMoves = [];
+        
+        const learnset = Learnsets[pokemon.species.id] || [];
+        
+        learnset.forEach(m => {
+            if (pokemon.level >= m.lvl && !pokemon.learnedMoves.includes(m.id)) {
+                pokemon.learnedMoves.push(m.id);
+                const slotLivre = pokemon.moves.indexOf(null);
+                if (slotLivre !== -1) {
+                    pokemon.moves[slotLivre] = m.id;
+                }
+            }
+        });
+    }
+};
+
 class PokemonInstance {
     constructor(speciesId) {
         this.species = Pokedex[speciesId];
         this.level = 5;
         this.exp = 0;
         
-        // Os 4 Pilares de Status do Tamagotchi
         this.food = 80;
         this.energy = 80;
         this.hygiene = 100;
         this.joy = 80;
-        this.poops = 0; // Quantidade de sujeira na tela
-        this.sleep = false; // Estado de vigília
+        this.poops = 0; 
+        this.sleep = false; 
         
         this.lastInteractionTime = Date.now();
         this.isEgg = true;
@@ -48,6 +97,10 @@ class PokemonInstance {
         this.evs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
         const natureKeys = Object.keys(Natures);
         this.nature = natureKeys[Math.floor(Math.random() * natureKeys.length)];
+
+        // Move slots e histórico
+        this.moves = [null, null, null, null];
+        this.learnedMoves = [];
     }
 
     calcularStatusReais() {
@@ -67,21 +120,18 @@ class PokemonInstance {
             return Math.floor(rawStat * multiplier);
         };
 
-        // Atributos Puros com Genética
         let statsBase = {
             hp: Math.floor((((2 * this.species.baseStats.hp + this.ivs.hp + Math.floor(this.evs.hp / 4)) * this.level) / 100) + this.level + 10),
             atk: calcRaw('atk'), def: calcRaw('def'), spa: calcRaw('spa'),
             spd: calcRaw('spd'), spe: calcRaw('spe')
         };
 
-        // Penalidade Matemática de Tristeza (Joy Debuff)
         let joyMult = 1.0;
-        if (this.joy < 10) joyMult = 0.5;      // -50%
-        else if (this.joy < 20) joyMult = 0.7; // -30%
-        else if (this.joy < 40) joyMult = 0.8; // -20%
-        else if (this.joy < 50) joyMult = 0.9; // -10%
+        if (this.joy < 10) joyMult = 0.5;      
+        else if (this.joy < 20) joyMult = 0.7; 
+        else if (this.joy < 40) joyMult = 0.8; 
+        else if (this.joy < 50) joyMult = 0.9; 
 
-        // O HP nunca sofre Debuff para não matar o mascote.
         let output = { hp: { real: statsBase.hp, penalty: 0, final: statsBase.hp } };
 
         ['atk', 'def', 'spa', 'spd', 'spe'].forEach(s => {
@@ -102,42 +152,37 @@ class TimeManager {
         const now = Date.now();
         const hoursPassed = (now - p.lastInteractionTime) / (1000 * 60 * 60);
         
-        // Conversor para Saves Antigos
         if (p.food === undefined) { p.food = p.hunger || 80; p.energy = 80; p.hygiene = 100; p.joy = 80; p.poops = 0; p.sleep = false;}
         if (p.poops === undefined) p.poops = 0;
 
         if (!p.isEgg && hoursPassed > 0) {
-            // 1. Comida
             p.food = Math.max(0, p.food - (hoursPassed * 12.5));
             
-            // 2. Sistema Orgânico de Higiene (Cocô)
             if (p.food > 40 && Math.random() < (0.15 * hoursPassed)) {
                 p.poops = Math.min(3, p.poops + 1);
             }
             p.hygiene = Math.max(0, p.hygiene - (hoursPassed * 5) - (p.poops * hoursPassed * 4));
 
-            // 3. Disposição (Energia)
             if (p.sleep && p.food > 0) {
-                p.energy = Math.min(100, p.energy + (hoursPassed * 50)); // Dormindo regenera rápido
+                p.energy = Math.min(100, p.energy + (hoursPassed * 50)); 
             } else if (!p.sleep) {
-                p.energy = Math.max(0, p.energy - (hoursPassed * 5)); // Acordado drena passivamente
+                p.energy = Math.max(0, p.energy - (hoursPassed * 5)); 
             }
 
-            // 4. Alegria (Penalizada se os cuidados estiverem ruins)
             let joyDrop = hoursPassed * 2;
-            if (p.food <= 0) joyDrop += hoursPassed * 10; // Fome 0 destrói a felicidade
+            if (p.food <= 0) joyDrop += hoursPassed * 10; 
             else if (p.food < 30) joyDrop += hoursPassed * 5;
             if (p.hygiene < 30) joyDrop += hoursPassed * 5;
             p.joy = Math.max(0, p.joy - joyDrop);
 
-            // 5. Ganho de Experiência Passiva
             if (p.food > 10 && !p.sleep && p.hygiene >= 30) {
-                let expMult = (p.food > 50) ? 1 : 0.5; // Comida > 50% = Nível mais rápido
+                let expMult = (p.food > 50) ? 1 : 0.5; 
                 p.exp += hoursPassed * (1 / 24) * expMult;
                 if (p.exp >= 1.0 && p.level < 100) {
                     const levelsGained = Math.floor(p.exp);
                     p.level += levelsGained;
                     p.exp -= levelsGained;
+                    MoveManager.atualizarMovimentos(p); // Checa se aprendeu golpe ao upar offline
                 }
             }
         }
