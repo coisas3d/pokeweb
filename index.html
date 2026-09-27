@@ -26,115 +26,114 @@
             #app-container { border-radius: 0; max-height: 100dvh; box-shadow: none; border: none; }
         }
 
-        .screen { display: none; flex-direction: column; height: 100%; }
+        /* BACKGROUND GLOBAL PARA TELAS INICIAIS (Sensação Premium) */
+        .premium-bg {
+            background-image: url('https://raw.githubusercontent.com/coisas3d/pokeweb/main/bioma/back_normal_night.jpg');
+            background-size: cover;
+            background-position: center bottom;
+            position: relative;
+        }
+        .premium-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7); /* Overlay escuro */
+            backdrop-filter: blur(5px);
+            z-index: 0;
+        }
+
+        .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 10; }
         .screen.active { display: flex; }
 
+        /* HEADER PREMIUM (Removido os fundos opacos e grosseiros) */
         .selecao-header { 
-            background: linear-gradient(90deg, #1e293b, #334155); 
-            color: white; padding: 25px 20px; text-align: center; 
-            font-weight: 800; font-size: 16px; letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 5;
+            position: relative; z-index: 5;
+            color: white; padding: 35px 20px 15px 20px; text-align: center; 
+            font-weight: 800; font-size: 20px; letter-spacing: 2px;
+            text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         
-        .top-dashboard {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 20px;
+        /* CARD PREMIUM PARA FORMULÁRIOS E SELEÇÕES */
+        .premium-card {
+            position: relative; z-index: 5;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px;
+            margin: 0 20px;
+            padding: 30px 20px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            z-index: 5;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            backdrop-filter: blur(10px);
-        }
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-        }
-        .nvl-badge {
-            font-weight: 800;
-            font-size: 15px;
-            color: #1e293b;
-            background: #e2e8f0;
-            padding: 4px 12px;
-            border-radius: 12px;
-        }
-        .clock-display {
-            font-size: 16px;
-            font-weight: 800;
-            font-family: 'Courier New', Courier, monospace;
-            color: #475569;
-            letter-spacing: 1px;
-        }
-        .mini-stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px 20px;
-        }
-        .mini-stat {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .mini-stat .icon { font-size: 16px; }
-        .mini-bar-bg {
-            flex-grow: 1;
-            height: 10px;
-            background: #e2e8f0;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .mini-bar-fill {
-            height: 100%;
-            width: 0%;
-            border-radius: 5px;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .opcoes-grid { display: flex; flex-direction: column; gap: 15px; padding: 25px; flex-grow: 1; justify-content: flex-start; background-color: #f1f5f9; overflow-y: auto; }
-        .btn-opcao { display: flex; align-items: center; padding: 12px 20px; border-radius: 16px; border: none; cursor: pointer; font-size: 17px; font-weight: 700; color: #1e293b; background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .btn-opcao:active { transform: scale(0.97); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        /* OPÇÕES DE STARTER PREMIUM */
+        .starter-list { width: 100%; display: flex; flex-direction: column; gap: 15px; }
         
-        .btn-tipo-grama { border-left: 6px solid #10b981; }
-        .btn-tipo-fogo { border-left: 6px solid #ef4444; }
-        .btn-tipo-agua { border-left: 6px solid #3b82f6; }
+        .btn-starter { 
+            display: flex; align-items: center; padding: 10px 20px; 
+            border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.3); 
+            cursor: pointer; font-size: 16px; font-weight: 700; color: white; 
+            background: rgba(0, 0, 0, 0.4); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-starter:active { transform: scale(0.97); background: rgba(0, 0, 0, 0.6); }
+        
+        .starter-sprite-box { width: 60px; height: 60px; display: flex; justify-content: center; align-items: flex-end; margin-right: 15px; position: relative; }
 
-        /* NOVA ÁREA DE CONTROLES INFERIOR */
+        /* INPUT PREMIUM */
+        .premium-input {
+            width: 100%; box-sizing: border-box; padding: 15px 20px; 
+            border-radius: 16px; border: 1px solid rgba(255,255,255,0.4); 
+            background: rgba(0,0,0,0.3); font-size: 18px; font-weight: bold; 
+            text-align: center; color: white; text-transform: uppercase;
+            outline: none; transition: border 0.3s;
+        }
+        .premium-input::placeholder { color: rgba(255,255,255,0.5); }
+        .premium-input:focus { border-color: #3b82f6; background: rgba(0,0,0,0.5); }
+
+        .btn-action-glass {
+            width: 100%; padding: 18px 0; margin-top: 25px; border-radius: 16px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.8));
+            color: white; font-weight: 800; font-size: 16px; letter-spacing: 1px;
+            border: 1px solid rgba(255,255,255,0.3); cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+        .btn-action-glass:active { transform: translateY(2px); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4); }
+
+        /* ELEMENTOS DO JOGO E DASHBOARD */
+        .top-dashboard {
+            background: rgba(255, 255, 255, 0.95); padding: 15px 20px; display: flex; flex-direction: column; gap: 12px; z-index: 5; box-shadow: 0 4px 15px rgba(0,0,0,0.05); backdrop-filter: blur(10px);
+        }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; }
+        .nvl-badge { font-weight: 800; font-size: 15px; color: #1e293b; background: #e2e8f0; padding: 4px 12px; border-radius: 12px; }
+        .clock-display { font-size: 16px; font-weight: 800; font-family: 'Courier New', Courier, monospace; color: #475569; letter-spacing: 1px; }
+        .mini-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+        .mini-stat { display: flex; align-items: center; gap: 8px; }
+        .mini-stat .icon { font-size: 16px; }
+        .mini-bar-bg { flex-grow: 1; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .mini-bar-fill { height: 100%; width: 0%; border-radius: 5px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s ease; }
+
         #controles { display: flex; justify-content: space-between; gap: 12px; padding: 15px 20px 20px 20px; background: #ffffff; z-index: 5; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
         .btn-principal { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 16px 0; border-radius: 16px; font-size: 16px; font-weight: 800; letter-spacing: 1px; box-shadow: 0 8px 15px -3px rgba(239, 68, 68, 0.4); cursor: pointer; transition: all 0.2s; flex: 1; }
         .btn-principal:active { transform: translateY(3px); box-shadow: 0 4px 6px -2px rgba(239, 68, 68, 0.4); }
         .btn-azul { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 8px 15px -3px rgba(59, 130, 246, 0.4); }
         .btn-azul:active { box-shadow: 0 4px 6px -2px rgba(59, 130, 246, 0.4); }
 
-        #tela-jogo { 
-            flex-grow: 1; width: 100%; height: 100%;
-            background-color: #cbd5e1; 
-            background-size: 100% 100% !important; 
-            background-position: center bottom; 
-            background-repeat: no-repeat; 
-            display: flex; flex-direction: column; position: relative; 
-            overflow: hidden; transition: background-image 1s ease-in-out; 
-        }
+        #tela-jogo { flex-grow: 1; width: 100%; height: 100%; background-color: #cbd5e1; background-size: 100% 100% !important; background-position: center bottom; background-repeat: no-repeat; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: background-image 1s ease-in-out; }
         #tela-jogo::after { content: ''; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.6); opacity: 0; transition: opacity 1s ease; pointer-events: none; z-index: 1; }
         #tela-jogo.dormindo::after { opacity: 1; }
 
         #sprite-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 2; pointer-events: none; }
         #poop-layer { position: absolute; bottom: 55px; left: 0; width: 100%; height: 40px; pointer-events: none; z-index: 3; }
         
-        #efeito-limpeza {
-            display: none; position: absolute; inset: 0; z-index: 15;
-            background: rgba(56, 189, 248, 0.3); backdrop-filter: blur(4px);
-            justify-content: center; align-items: center; font-size: 70px;
-            pointer-events: none;
-        }
-        
+        #efeito-limpeza { display: none; position: absolute; inset: 0; z-index: 15; background: rgba(56, 189, 248, 0.3); backdrop-filter: blur(4px); justify-content: center; align-items: center; font-size: 70px; pointer-events: none; }
         @keyframes flash-clean { 0% { opacity: 0; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1.1); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.2); } }
-        
-        @keyframes floatUp { 
-            0% { opacity: 1; transform: translate(-50%, 0) scale(1); } 
-            100% { opacity: 0; transform: translate(-50%, -30px) scale(1.5); } 
-        }
+        @keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, 0) scale(1); } 100% { opacity: 0; transform: translate(-50%, -30px) scale(1.5); } }
 
         #ovo-container { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
         #ovo-wrapper { position: absolute; bottom: 55px; left: 50%; width: 80px; height: 100px; display: flex; justify-content: center; align-items: center; transform: translateX(-50%) scale(0.65); transform-origin: bottom center; filter: drop-shadow(0 15px 5px rgba(0,0,0,0.4)); }
@@ -164,11 +163,7 @@
         .btn-voltar { background: rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 0.5); margin-top: 15px; width: 85%; }
 
         .party-container { width: 90%; max-height: 80%; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
-        .party-slot { 
-            background: linear-gradient(135deg, #f8fafc, #e2e8f0); border: 2px solid #cbd5e1; 
-            border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.1s; position: relative;
-        }
+        .party-slot { background: linear-gradient(135deg, #f8fafc, #e2e8f0); border: 2px solid #cbd5e1; border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.1s; position: relative; }
         .party-slot:active { transform: scale(0.98); }
         .party-slot.leader { border-color: #f59e0b; background: linear-gradient(135deg, #fffbeb, #fef3c7); }
         .party-slot.selected-move { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
@@ -197,38 +192,28 @@
         .stat-value { width: 45px; text-align: right; font-size: 14px; font-weight: 700; font-family: 'Courier New', Courier, monospace; }
         .fill-exp { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
         .fill-stat { background: linear-gradient(90deg, #10b981, #34d399); }
-
-        #screen-hatch { background-color: #0f172a; justify-content: center; align-items: center; color: white; text-align: center; z-index: 30; }
-        .hatch-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; width: 85%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(10px); }
-        .hatch-texto { font-size: 20px; font-weight: 700; margin-bottom: 30px; min-height: 30px; color: #f8fafc; }
-
     </style>
 </head>
 <body>
 
     <div id="app-container">
         
-        <div id="screen-trainer" class="screen">
-            <div class="selecao-header">REGISTRO DE TREINADOR</div>
-            <div class="opcoes-grid" style="align-items: center; text-align: center;">
-                <p style="color: #64748b; font-weight: 600; margin-bottom: 20px; font-size: 15px;">Como você se chama?</p>
-                <input type="text" id="input-trainer-name" maxlength="12" style="width: 80%; padding: 15px; border-radius: 12px; border: 2px solid #cbd5e1; font-size: 18px; font-weight: bold; text-align: center; color: #1e293b; text-transform: uppercase;" placeholder="SEU NOME">
-                <button class="btn-principal" style="margin-top: 30px; width: 85%;" onclick="registrarTreinador()">INICIAR JORNADA</button>
+        <!-- NOVA TELA DE REGISTRO PREMIUM -->
+        <div id="screen-trainer" class="screen premium-bg">
+            <div class="selecao-header">LICENÇA DE TREINADOR</div>
+            <div class="premium-card">
+                <p style="color: rgba(255,255,255,0.8); font-weight: 600; margin: 0 0 20px 0; font-size: 15px; text-align: center;">Insira seu nome para iniciar a jornada</p>
+                <input type="text" id="input-trainer-name" class="premium-input" maxlength="12" placeholder="SEU NOME">
+                <button class="btn-action-glass" onclick="registrarTreinador()">INICIAR JORNADA</button>
             </div>
         </div>
 
-        <div id="screen-region" class="screen">
-            <div class="selecao-header">ESCOLHA UMA REGIÃO</div>
-            <div class="opcoes-grid">
-                <button class="btn-opcao btn-regiao" onclick="mostrarStarters('kanto')">KANTO</button>
-                <button class="btn-opcao btn-regiao" style="opacity: 0.4; cursor: not-allowed;" onclick="alert('Região de Johto indisponível no momento.')">JOHTO</button>
-                <button class="btn-opcao btn-regiao" style="opacity: 0.4; cursor: not-allowed;" onclick="alert('Região de Hoenn indisponível no momento.')">HOENN</button>
-            </div>
-        </div>
-
-        <div id="screen-starter" class="screen">
+        <!-- TELA DE STARTER PREMIUM (FUXO DIRETO) -->
+        <div id="screen-starter" class="screen premium-bg">
             <div class="selecao-header">ESCOLHA SEU PARCEIRO</div>
-            <div class="opcoes-grid" id="lista-starters"></div>
+            <div class="premium-card" style="margin-top: 10px;">
+                <div class="starter-list" id="lista-starters"></div>
+            </div>
         </div>
 
         <div id="screen-game" class="screen">
@@ -263,20 +248,19 @@
                     <div id="tempo-eclosao"></div>
                 </div>
                 <div id="efeito-limpeza">✨🧼✨</div>
-                
                 <div id="berry-container" style="display: none; position: absolute; bottom: 55px; left: 50%; transform: translateX(35px) scale(1); z-index: 4; font-size: 28px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); transition: transform 0.1s;"></div>
-
                 <div id="poop-layer"></div>
                 <div id="sprite-layer"></div>
             </div>
             
+            <!-- NOVOS CONTROLES (Lado a Lado na Tela de Jogo) -->
             <div id="controles">
                 <button class="btn-principal" onclick="abrirMenu()">INTERAÇÕES</button>
                 <button id="btn-main-time" class="btn-principal btn-azul" onclick="abrirParty()">TIME</button>
             </div>
             
             <div id="menu-overlay" class="overlay-glass">
-                
+                <!-- MENU DE INTERAÇÕES (Status removido) -->
                 <div id="menu-principal-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                     <div class="menu-grid">
                         <button class="menu-btn" onclick="abrirSubMenu('alimentar')">Alimentar</button>
@@ -296,9 +280,9 @@
                     </div>
                     <button class="menu-btn btn-voltar" onclick="voltarMenuPrincipal()">VOLTAR</button>
                 </div>
-
             </div>
 
+            <!-- MENU DO TIME COM LONG PRESS -->
             <div id="party-overlay" class="overlay-glass" style="justify-content: flex-start; padding-top: 20px;">
                 <div style="color: white; font-weight: 800; font-size: 18px; letter-spacing: 1px; margin-bottom: 15px;">SEU TIME</div>
                 <div class="party-container" id="party-list-container"></div>
@@ -316,6 +300,7 @@
                 </div>
             </div>
 
+            <!-- TELA DE STATUS -->
             <div id="status-overlay" class="overlay-glass">
                 <div class="status-box">
                     <div class="status-header">
@@ -383,7 +368,6 @@
     </div>
     <script src="database.js"></script>
     <script src="pokemon_engine.js"></script>
-
     <script>
         let mascotes = [];
         let mascoteAtivo = null;
@@ -750,7 +734,8 @@
             window.trainerData = { name: nomeStr, tid: randomTid };
             localStorage.setItem('pmd_trainer', JSON.stringify(window.trainerData));
             
-            mostrarEcra('screen-region');
+            // Fluxo Direto: Saiu do registro, vai direto pra Kanto Starter
+            mostrarStarters('kanto');
         }
 
         async function iniciarJogo() {
@@ -786,35 +771,32 @@
                     mostrarEcra('screen-game');
                     atualizarInterface();
                 } else {
-                    mostrarEcra('screen-region');
+                    mostrarStarters('kanto');
                 }
             } catch (erro) { 
                 console.error("Erro fatal ao iniciar:", erro); 
-                mostrarEcra('screen-region');
+                mostrarEcra('screen-trainer');
             }
         }
 
-        function gerarBotaoStarter(id, nome, tipo) {
-            return `<button class="btn-opcao btn-tipo-${tipo}" onclick="escolherStarter(${id})">
-                        <div style="width: 50px; height: 50px; display: flex; justify-content: center; align-items: flex-end; margin-right: 15px; position: relative;">
-                            <div id="sprite-starter-${id}" style="position: absolute; bottom: 0; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); display: flex; justify-content: center; align-items: center; font-size: 20px;"></div>
-                        </div>
-                        <span>${nome.toUpperCase()}</span>
-                    </button>`;
+        function gerarBotaoStarter(id, nome) {
+            return `<div class="btn-starter" onclick="escolherStarter(${id})">
+                        <div class="starter-sprite-box" id="sprite-starter-${id}">⏳</div>
+                        <span>${nome}</span>
+                    </div>`;
         }
 
         function mostrarStarters(regiao) {
-            SoundManager.play('menu_click');
             const lista = document.getElementById('lista-starters');
             let idsParaCarregar = [];
             
             if (regiao === 'kanto') { 
-                lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur", "grama") + gerarBotaoStarter(4, "Charmander", "fogo") + gerarBotaoStarter(7, "Squirtle", "agua"); 
+                lista.innerHTML = gerarBotaoStarter(1, "Bulbasaur") + gerarBotaoStarter(4, "Charmander") + gerarBotaoStarter(7, "Squirtle"); 
                 idsParaCarregar = [1, 4, 7];
             } 
             
             mostrarEcra('screen-starter');
-            idsParaCarregar.forEach(id => PMDHelper.playAnim(`sprite-starter-${id}`, id, 'Idle', 1.2));
+            idsParaCarregar.forEach(id => PMDHelper.playAnim(`sprite-starter-${id}`, id, 'Idle', 1.5));
         }
 
         async function escolherStarter(id) {
@@ -937,13 +919,13 @@
             const ovoWrapper = document.getElementById('ovo-wrapper');
             const spriteLayer = document.getElementById('sprite-layer');
             const textoEclosao = document.getElementById('tempo-eclosao');
+            
             const btnTime = document.getElementById('btn-main-time');
 
             if (mascoteAtivo.isEgg) {
                 ovoContainer.style.display = 'flex';
                 spriteLayer.style.display = 'none';
                 
-                // BLOQUEIA O BOTÃO DE TIME ENQUANTO É OVO
                 if(btnTime) {
                     btnTime.style.opacity = '0.5';
                     btnTime.style.pointerEvents = 'none';
@@ -970,7 +952,6 @@
                 ovoContainer.style.display = 'none';
                 spriteLayer.style.display = 'block';
                 
-                // LIBERA O BOTÃO DE TIME
                 if(btnTime) {
                     btnTime.style.opacity = '1';
                     btnTime.style.pointerEvents = 'auto';
@@ -983,9 +964,10 @@
                 
                 if (!PetEngine.isRunning) {
                     PetEngine.init('sprite-layer');
-                    PetEngine.setPokemon(mascoteAtivo.species.id); 
-                    PetEngine.setDormindo(mascoteAtivo.sleep);
                 }
+                // Garante que o mascote correto está na tela
+                PetEngine.setPokemon(mascoteAtivo.species.id); 
+                PetEngine.setDormindo(mascoteAtivo.sleep);
             }
         }
 
@@ -1022,15 +1004,13 @@
         function abrirParty() {
             if(mascoteAtivo && mascoteAtivo.isEgg) return;
             SoundManager.play('menu_click');
-            document.getElementById('menu-principal-wrapper').style.display = 'none';
-            document.getElementById('party-overlay').style.display = 'flex';
+            fadeIn(document.getElementById('party-overlay'));
             renderParty();
         }
         
         function fecharParty() {
             SoundManager.play('menu_click');
-            document.getElementById('party-overlay').style.display = 'none';
-            document.getElementById('menu-principal-wrapper').style.display = 'flex';
+            fadeOut(document.getElementById('party-overlay'));
             modoMover = false;
             slotAcao = null;
         }
@@ -1062,11 +1042,12 @@
                 modoMover = false;
                 slotAcao = null;
                 salvarTime();
-                mascoteAtivo = mascotes[0];
+                mascoteAtivo = mascotes[0]; // Líder muda
                 
                 SoundManager.play('menu_click');
                 renderParty();
                 atualizarBioma(mascoteAtivo.species.type);
+                
                 PetEngine.element.innerHTML = '';
                 PetEngine.setPokemon(mascoteAtivo.species.id);
                 atualizarInterface();
@@ -1137,7 +1118,6 @@
         function abrirStatus(index = 0) {
             SoundManager.play('menu_click');
             
-            document.getElementById('menu-principal-wrapper').style.display = 'none';
             document.getElementById('party-overlay').style.display = 'none';
             
             const p = mascotes[index];
@@ -1211,7 +1191,6 @@
             renderStat('stat-spd', 'bar-spd', stats.spd, 'spd');
             renderStat('stat-spe', 'bar-spe', stats.spe, 'spe');
 
-            document.getElementById('menu-overlay').style.display = 'flex'; 
             fadeIn(document.getElementById('status-overlay'));
             
             if(!p.isEgg) {
@@ -1261,11 +1240,7 @@
             let isFavorite = (tipoItem === favBerry);
 
             if (isFavorite) {
-                if (foodBeforeEat < 100) {
-                    joyGain = 5; 
-                } else {
-                    joyGain = 0; 
-                }
+                if (foodBeforeEat < 100) { joyGain = 5; } else { joyGain = 0; }
             } else {
                 joyGain = -5; 
             }
