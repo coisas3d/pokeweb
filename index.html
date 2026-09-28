@@ -161,7 +161,7 @@
         .action-modal-box { background: rgba(255, 255, 255, 0.05); padding: 30px 20px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); width: 75%; display: flex; flex-direction: column; gap: 15px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .modal-title-pet { color: white; margin: 0 0 10px 0; font-size: 22px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* TELA DE STATUS COM Z-INDEX MÁXIMO */
+        /* TELA DE STATUS */
         #status-overlay { z-index: 60; justify-content: flex-start; padding: 25px; box-sizing: border-box; overflow-y: auto; overflow-x: hidden; }
         .status-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 20px; border-radius: 24px; margin-bottom: 15px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         .status-header { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px; }
@@ -180,20 +180,16 @@
 
         /* CARROSSEL PREMIUM COM ABAS */
         .carousel-wrapper { width: 100%; flex-grow: 1; position: relative; overflow: hidden; border-radius: 24px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column;}
-        
         .carousel-tabs { display: flex; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
         .tab-btn { flex: 1; padding: 15px 0; text-align: center; color: #94a3b8; font-weight: 800; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.3s; }
         .tab-btn.active { color: white; border-bottom: 2px solid #3b82f6; background: rgba(255,255,255,0.05); }
-
         .carousel-track { display: flex; width: 200%; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); flex-grow: 1; }
         .carousel-panel { width: 50%; padding: 15px 20px 20px 20px; box-sizing: border-box; flex-shrink: 0; }
         
-        /* MOVIMENTOS (COMPACTADOS PARA NÃO CORTAR) */
         .moves-grid { display: flex; flex-direction: column; gap: 8px; }
         .move-slot { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.1s; }
         .move-slot:active { transform: scale(0.98); background: rgba(0,0,0,0.4); }
         .move-slot.empty { opacity: 0.5; justify-content: center; font-weight: 700; color: #94a3b8; letter-spacing: 2px; pointer-events: none; }
-        
         .move-info { display: flex; flex-direction: column; gap: 4px; }
         .move-name { font-size: 14px; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 1px; }
         .move-type-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: white; width: fit-content; }
@@ -207,22 +203,20 @@
         #screen-hatch { background-color: #0f172a; justify-content: center; align-items: center; color: white; text-align: center; z-index: 50; }
         .hatch-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 28px; width: 85%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .hatch-texto { font-size: 22px; font-weight: 800; margin-bottom: 0px; min-height: 30px; color: #f8fafc; letter-spacing: 1px; text-transform: uppercase; z-index: 5; text-align: center; }
-
         #berry-container { display: none; position: absolute; z-index: 4; font-size: 28px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); transition: transform 0.1s; pointer-events: none; }
 
         /* CORES DOS TIPOS PARA AS BADGES */
         .type-normal { background: #A8A77A; } .type-fire { background: #EE8130; } .type-water { background: #6390F0; }
-        .type-electric { background: #F7D02C; } .type-grass { background: #7AC74C; } .type-ice { background: #96D9D6; }
-        .type-fighting { background: #C22E28; } .type-poison { background: #A33EA1; } .type-ground { background: #E2BF65; }
-        .type-flying { background: #A98FF3; } .type-psychic { background: #F95587; } .type-bug { background: #A6B91A; }
-        .type-rock { background: #B6A136; } .type-ghost { background: #735797; } .type-dragon { background: #6F35FC; }
-        .type-dark { background: #705848; } .type-steel { background: #B7B7CE; } .type-fairy { background: #D685AD; }
+        .type-eletrico { background: #F7D02C; } .type-grama { background: #7AC74C; } .type-gelo { background: #96D9D6; }
+        .type-lutador { background: #C22E28; } .type-veneno { background: #A33EA1; } .type-terra { background: #E2BF65; }
+        .type-voador { background: #A98FF3; } .type-psiquico { background: #F95587; } .type-inseto { background: #A6B91A; }
+        .type-pedra { background: #B6A136; } .type-fantasma { background: #735797; } .type-dragao { background: #6F35FC; }
+        .type-sombrio { background: #705848; } .type-aco { background: #B7B7CE; } .type-fada { background: #D685AD; }
     </style>
 </head>
 <body>
 
     <div id="app-container">
-        
         <div id="screen-trainer" class="screen premium-bg">
             <div class="selecao-header">LICENÇA DE TREINADOR</div>
             <div class="premium-card">
@@ -312,7 +306,7 @@
                     <div class="stat-text-line"><span>Nível</span> <span id="status-lvl">--</span></div>
                     <div class="stat-text-line"><span>Nature</span> <span id="status-nature" style="color: #f59e0b;">--</span></div>
                     <div class="stat-text-line"><span>Treinador ID</span> <span id="status-tid" style="color: #94a3b8; font-family: 'Courier New', Courier, monospace;">-- / --</span></div>
-                    <div class="stat-bar-row" style="margin-top: 15px;">
+                    <div class="stat-bar-row" style="margin-top: 20px;">
                         <span class="stat-label" style="width: 40px;">EXP</span>
                         <div class="stat-bar-bg"><div id="status-exp-bar" class="stat-bar-fill fill-exp"></div></div>
                         <span class="stat-value" id="status-exp" style="width: 45px; font-size: 13px;">0%</span>
@@ -320,7 +314,6 @@
                 </div>
                 
                 <div class="carousel-wrapper" id="status-carousel">
-                    <!-- ABAS DE NAVEGAÇÃO -->
                     <div class="carousel-tabs">
                         <div class="tab-btn active" id="tab-0" onclick="setCarouselPanel(0)">STATUS</div>
                         <div class="tab-btn" id="tab-1" onclick="setCarouselPanel(1)">MOVIMENTOS</div>
@@ -706,6 +699,7 @@
         function atualizarBioma(tipoPokemon) {
             const telaJogo = document.getElementById('tela-jogo');
             const tipoIngles = DicionarioTipos[tipoPokemon] || 'normal';
+            
             const horaAtual = new Date().getHours();
             const isNoite = horaAtual >= 18 || horaAtual < 6;
             const sufixoTempo = isNoite ? '_night' : '';
@@ -817,15 +811,16 @@
             
             const ovoWrapper = document.getElementById('ovo-wrapper');
             const textoEclosao = document.getElementById('tempo-eclosao');
-            const tipo = mascoteAtivo.species.type;
+            
+            const tipoOvo = mascoteAtivo.species.type;
             
             textoEclosao.innerText = "Rachando!";
             SoundManager.play('egg_crack');
             
             ovoWrapper.innerHTML = `
                 <div class="luz-eclosao"></div>
-                <div class="ovo-metade ovo-base ovo-${tipo}"></div>
-                <div class="ovo-metade ovo-topo ovo-${tipo}"></div>
+                <div class="ovo-metade ovo-base ovo-${tipoOvo}"></div>
+                <div class="ovo-metade ovo-topo ovo-${tipoOvo}"></div>
             `;
 
             setTimeout(() => {
@@ -927,7 +922,10 @@
                         ovoWrapper.innerHTML = '<div id="ovo-visual" class="ovo"></div>';
                     }
                     const visualOvo = document.getElementById('ovo-visual');
-                    visualOvo.className = `ovo ovo-${mascoteAtivo.species.type}`;
+                    
+                    const tipoOvo = mascoteAtivo.species.type;
+                    visualOvo.className = `ovo ovo-${tipoOvo}`;
+                    
                     textoEclosao.innerText = `Chocando... ${Math.ceil(tempoRestante/1000)}s`;
                     
                     if (tempoRestante <= 15000) { visualOvo.style.animationDuration = "0.5s"; } 
@@ -1044,7 +1042,6 @@
             slotAcao = null;
         }
 
-        // SWIPE COM ABAS (TABS)
         let currentCarouselPanel = 0;
         let swipeStartX = 0;
         let activePokemonIndexForMoves = 0;
@@ -1077,7 +1074,6 @@
             currentCarouselPanel = index;
             document.getElementById('carousel-track').style.transform = `translateX(-${index * 50}%)`;
             
-            // Controle de Abas
             document.getElementById('tab-0').classList.toggle('active', index === 0);
             document.getElementById('tab-1').classList.toggle('active', index === 1);
             
@@ -1134,7 +1130,14 @@
             PMDHelper.playAnim('status-sprite-container', p.species.id, 'Idle', 1.5);
             
             document.getElementById('status-nome').innerText = p.species.name.toUpperCase();
-            document.getElementById('status-tipo').innerText = `TIPO: ${p.species.type.toUpperCase()}`;
+            
+            // Tratamento de Tipagem Dupla (Lê type2 do engine)
+            let exibicaoTipos = p.species.type;
+            if (p.species.type2) {
+                exibicaoTipos += ` / ${p.species.type2}`;
+            }
+            document.getElementById('status-tipo').innerText = `TIPO: ${exibicaoTipos.toUpperCase()}`;
+            
             document.getElementById('status-lvl').innerText = p.isEgg ? '--' : p.level;
             
             const expPercent = Math.floor(p.exp * 100);
@@ -1304,6 +1307,7 @@
             setTimeout(() => { berryEl.style.display = 'none'; }, 1400);
 
             const pType = mascoteAtivo.species.type; 
+            
             let favBerry = '';
             if (['fogo', 'lutador', 'pedra', 'voador'].includes(pType)) favBerry = 'berrie_vermelha';
             else if (['agua', 'gelo', 'psiquico', 'dragao'].includes(pType)) favBerry = 'berrie_azul';
